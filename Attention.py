@@ -27,33 +27,43 @@ encoder_outputs, encoder_state = tf.nn.dynamic_rnn(
     initial_state=encoder_cell.zero_state(tf.shape(tfx)[0], dtype=tf.float32),
     time_major=False)
 
+# attention mechanism
+attention_mechanism = tf.contrib.seq2seq.LuongAttention(
+    num_units=UNITS,
+    memory=encoder_outputs, memory_sequence_length=None)
+
 
 # decoding for training and inference
 def decoding(helper):
     # Decoder
     decoder_cell = tf.nn.rnn_cell.BasicLSTMCell(UNITS)
+    wrapped_cell = tf.contrib.seq2seq.AttentionWrapper(  # add attention in here
+        decoder_cell, attention_mechanism, alignment_history=True, attention_layer_size=16)
+    # clone initial state for wrapped cell
+    initial_state = wrapped_cell.zero_state(tf.shape(tfx)[0], tf.float32).clone(cell_state=encoder_state)
+    # encoder hidden state score = encoder_state @ Wa @ decoder_state
+    # = [1, UNITS] dot [UNITS, UNITS] dot [UNITS, 1] = [1, 1]
     projection_layer = tf.layers.Dense(len(vocab))
-    decoder = tf.contrib.seq2seq.BasicDecoder(
-        decoder_cell, helper, encoder_state,
-        output_layer=projection_layer)
+    decoder = tf.contrib.seq2seq.BasicDecoder(wrapped_cell, helper, initial_state, output_layer=projection_layer)
     # Dynamic decoding
-    outputs = tf.contrib.seq2seq.dynamic_decode(
-        decoder, output_time_major=False, impute_finished=False, maximum_iterations=20)[0]
+    outputs, final_states, _ = tf.contrib.seq2seq.dynamic_decode(
+        decoder, output_time_major=False, impute_finished=False, maximum_iterations=15)
     logits = outputs.rnn_output
-    return logits
+    return logits, final_states
 
 
 # decoding in training
 with tf.variable_scope("decoder"):
     decoder_lengths = tf.placeholder(tf.int32, [None, ])
     y_embedded = tf.nn.embedding_lookup(embeddings, tfy[:, :-1])  # [n, step, 16]
-    train_logits = decoding(helper=tf.contrib.seq2seq.TrainingHelper(
+    train_logits, _ = decoding(helper=tf.contrib.seq2seq.TrainingHelper(
         inputs=y_embedded, sequence_length=decoder_lengths, time_major=False))
 
 # decoding in inference
 with tf.variable_scope("decoder", reuse=True):
-    infer_logits = decoding(helper=tf.contrib.seq2seq.GreedyEmbeddingHelper(
+    infer_logits, final_s = decoding(helper=tf.contrib.seq2seq.GreedyEmbeddingHelper(
         embedding=embeddings, start_tokens=tf.fill([tf.shape(tfx)[0]], v2i["<GO>"]), end_token=v2i["<EOS>"]))
+    align = tf.transpose(final_s.alignment_history.stack(), (1, 0, 2))
 
 # loss and training
 cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
@@ -68,12 +78,13 @@ train_op = opt.apply_gradients(clipped_gradients)
 sess = tf.InteractiveSession(config=tf.ConfigProto(device_count={'GPU': 0}))
 sess.run(tf.global_variables_initializer())
 
+# training
 for t in range(1000):
     bi = np.random.randint(0, len(x), size=64)
     bx, by = x[bi], y[bi]
     decoder_len = np.full((len(bx),), by.shape[1]-1)
     _, loss_ = sess.run([train_op, loss], {tfx: bx, tfy: by, decoder_lengths: decoder_len})
-    if t % 10 == 0:
+    if t % 50 == 0:
         logits_ = sess.run(infer_logits, {tfx: bx[:1, :]})
         target = "".join([i2v[i] for i in by[0, 1:-1]])
         res = []
@@ -88,3 +99,5 @@ for t in range(1000):
             "| target: ", target,
             "| inference: ", res,
         )
+
+utils.plot_attention(i2v, x[:6, :], y[:6, :], sess.run(align, {tfx: x[:6, :]}))
