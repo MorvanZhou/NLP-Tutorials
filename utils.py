@@ -21,7 +21,9 @@ def get_date_data(n=5000):
         date_cn.append(date.strftime("%y-%m-%d"))
         date_en.append(date.strftime("%d/%b/%Y"))
     vocab = set([str(i) for i in range(0, 10)] + ["-", "/", "<GO>", "<EOS>"] + [i.split("/")[1] for i in date_en])
-    v2i = {v: i for i, v in enumerate(vocab)}
+    v2i = {v: i for i, v in enumerate(vocab, start=1)}
+    v2i["<PAD>"] = 0
+    vocab.add("<PAD>")
     i2v = {i: v for v, i in v2i.items()}
     x, y = [], []
     for cn, en in zip(date_cn, date_en):
@@ -46,3 +48,10 @@ def plot_attention(i2v, sample_x, sample_y, alignments):
             plt.xlabel("Input")
     plt.tight_layout()
     plt.show()
+
+
+def pad_zero(seqs, max_len):
+    padded = np.zeros((len(seqs), max_len), dtype=np.int32)
+    for i, seq in enumerate(seqs):
+        padded[i, :len(seq)] = seq
+    return padded
