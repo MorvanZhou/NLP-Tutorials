@@ -123,6 +123,20 @@ class Transformer:
         mask = tf.tile(tf.expand_dims(mask, axis=0), [tf.shape(seqs)[0], 1, 1])     # [n, step, step]
         return tf.where(mask, pad_mask, tf.zeros_like(pad_mask))
 
+    def translate(self, src):
+        src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], MAX_LEN)
+        tgt_seq = "<GO>"
+        tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], MAX_LEN + 1)
+        tgti = 0
+        while True:
+            logit = self.sess.run(self.logits, {self.tfx: src_pad, self.tfy: tgt, self.training: False})[0, tgti, :]
+            idx = np.argmax(logit)
+            tgti += 1
+            tgt[0, tgti] = idx
+            if idx == v2i["<EOS>"] or tgti >= self.max_len:
+                break
+        return "".join([i2v[i] for i in tgt[0, 1:tgti]])
+
 
 model = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, DROP_RATE)
 # training
@@ -151,18 +165,7 @@ for t in range(1000):
 
 # prediction
 src_seq = "02-11-30"
-src = utils.pad_zero(np.array([v2i[v] for v in src_seq])[None, :], MAX_LEN)
-tgt_seq = "<GO>"
-tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], MAX_LEN+1)
-tgt_i = 1
-while True:
-    logits_ = model.sess.run(model.logits, {model.tfx: src, model.tfy: tgt, model.training: False})[0, tgt_i-1, :]
-    idx = np.argmax(logits_)
-    tgt[0, tgt_i] = idx
-    tgt_i += 1
-    if idx == v2i["<EOS>"] or tgt_i > MAX_LEN:
-        break
-print("src: ", src_seq, "\nprediction: ", "".join([i2v[i] for i in tgt[0]]))
+print("src: ", src_seq, "\nprediction: ", model.translate(src_seq))
 
 # save attention matrix for visualization
 # attentions = model.sess.run(model.attentions, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
