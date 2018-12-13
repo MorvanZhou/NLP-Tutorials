@@ -63,7 +63,7 @@ def position_embedding():
 
 
 def attention_matrix():
-    with open("attention_matrix.pkl", "rb") as f:
+    with open("./attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"]
     tgt = data["tgt"]
