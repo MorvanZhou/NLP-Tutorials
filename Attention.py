@@ -100,4 +100,8 @@ for t in range(1000):
             "| inference: ", res,
         )
 
-utils.plot_attention(i2v, x[:6, :], y[:6, :], sess.run(align, {tfx: x[:6, :]}))
+# save for plotting
+# data = {"i2v": i2v, "x": x[:6], "y": y[:6], "align": sess.run(align, {tfx: x[:6, :]})}
+# import pickle
+# with open("./visual_helper/attention_align.pkl", "wb") as f:
+#     pickle.dump(data, f)

@@ -6,6 +6,7 @@ http://nlp.seas.harvard.edu/2018/04/03/attention.html
 https://jalammar.github.io/illustrated-transformer/
 https://github.com/pengshuang/Transformer
 http://pgn2oyk5g.bkt.clouddn.com/WechatIMG360.png
+https://zhuanlan.zhihu.com/p/35571412      (key-value query)
 """
 
 import tensorflow as tf
@@ -171,5 +172,5 @@ print("src: ", src_seq, "\nprediction: ", model.translate(src_seq))
 # attentions = model.sess.run(model.attentions, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
 # data = {"src": [i2v[i] for i in x[0]], "tgt": [i2v[i] for i in y[0]], "attentions": attentions}
 # import pickle
-# with open("attention_matrix.pkl", "wb") as f:
+# with open("./visual_helper/attention_matrix.pkl", "wb") as f:
 #     pickle.dump(data, f)
