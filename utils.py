@@ -1,6 +1,5 @@
 import numpy as np
 import datetime
-import matplotlib.pyplot as plt
 
 
 def sub_sampling(int_words, threshold=1e-5):
@@ -34,24 +33,28 @@ def get_date_data(n=5000):
     return vocab, x, y, v2i, i2v, date_cn, date_en
 
 
-def plot_attention(i2v, sample_x, sample_y, alignments):
-    for i in range(6):
-        plt.subplot(2, 3, i + 1)
-        x_vocab = [i2v[j] for j in np.ravel(sample_x[i])]
-        y_vocab = [i2v[j] for j in sample_y[i, 1:]]
-        plt.imshow(alignments[i], cmap="YlGn", vmin=0., vmax=1.)
-        plt.yticks([j for j in range(len(y_vocab))], y_vocab)
-        plt.xticks([j for j in range(len(x_vocab))], x_vocab)
-        if i == 0 or i == 4:
-            plt.ylabel("Output")
-        if i > 3:
-            plt.xlabel("Input")
-    plt.tight_layout()
-    plt.show()
-
-
 def pad_zero(seqs, max_len):
     padded = np.zeros((len(seqs), max_len), dtype=np.int32)
     for i, seq in enumerate(seqs):
         padded[i, :len(seq)] = seq
     return padded
+
+
+def rotate_data(x, r):
+    # x shape [n, 2]
+    rotation_matrix = np.array([[np.cos(r), -np.sin(r)], [np.sin(r), np.cos(r)]])
+    return rotation_matrix.dot(x.T).T
+
+
+def generate_dist_data():
+    emb_dist1 = np.concatenate((np.random.normal(-.5, .3, (50, 2)), np.random.normal(0, .2, (100, 2))), axis=0)
+    np.random.shuffle(emb_dist1)
+    infrequent_words = np.arange(len(emb_dist1)-10)  # fake infrequent words
+    frequent_words = np.arange(len(emb_dist1)-10, len(emb_dist1))  # the rest is frequent words
+    emb_dist2 = rotate_data(emb_dist1, r=-np.pi / 3)
+    emb_dist2[infrequent_words] += np.random.normal(0, 0.01, size=(
+        len(infrequent_words), 2))  # large disturb infrequent word emb
+    emb_dist2[frequent_words] += np.random.normal(0, 0.005,
+                                                  size=(len(frequent_words), 2))  # small disturb frequent word emb
+    emb_dist2 += np.array([[1, 1]])  # shift
+    return emb_dist1, emb_dist2, frequent_words, infrequent_words
