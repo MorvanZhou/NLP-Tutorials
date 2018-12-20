@@ -18,11 +18,6 @@ MAX_LEN = 15
 N_LAYER = 3
 N_HEAD = 4
 DROP_RATE = 0.1
-# get and process data
-vocab, x, y, v2i, i2v, date_cn, date_en = utils.get_date_data()
-print("Chinese time order: ", date_cn[:3], "\nEnglish time order: ", date_en[:3])
-print("vocabularies: ", vocab)
-print("x index sample: \n", x[:2], "\ny index sample: \n", y[:2])
 
 
 class Transformer:
@@ -138,6 +133,12 @@ class Transformer:
                 break
         return "".join([i2v[i] for i in tgt[0, 1:tgti]])
 
+
+# get and process data
+vocab, x, y, v2i, i2v, date_cn, date_en = utils.get_date_data()
+print("Chinese time order: ", date_cn[:3], "\nEnglish time order: ", date_en[:3])
+print("vocabularies: ", vocab)
+print("x index sample: \n", x[:2], "\ny index sample: \n", y[:2])
 
 model = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, DROP_RATE)
 # training
