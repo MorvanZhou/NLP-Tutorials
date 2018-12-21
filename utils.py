@@ -1,5 +1,8 @@
 import numpy as np
 import datetime
+import os
+import requests
+import csv
 
 
 def sub_sampling(int_words, threshold=1e-5):
@@ -58,3 +61,20 @@ def generate_dist_data():
                                                   size=(len(frequent_words), 2))  # small disturb frequent word emb
     emb_dist2 += np.array([[1, 1]])  # shift
     return emb_dist1, emb_dist2, frequent_words, infrequent_words
+
+
+def download_mrpc(save_dir="./MRPC/", proxy=None):
+    # based on this script: https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e
+    train_url = 'https://s3.amazonaws.com/senteval/senteval_data/msr_paraphrase_train.txt'
+    test_url = 'https://s3.amazonaws.com/senteval/senteval_data/msr_paraphrase_test.txt'
+    os.makedirs(save_dir, exist_ok=True)
+    proxies = {"http": proxy, "https": proxy}
+    for url in [train_url, test_url]:
+        raw_path = os.path.join(save_dir, url.split("/")[-1])
+        if not os.path.isfile(raw_path):
+            print("downloading from %s" % url)
+            r = requests.get(url, proxies=proxies)
+            with open(raw_path, "wb") as f:
+                f.write(r.content.replace(b'"', b"<DQUOTE>"))
+                print("completed")
+
