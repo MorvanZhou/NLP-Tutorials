@@ -2,7 +2,7 @@ import numpy as np
 import datetime
 import os
 import requests
-import csv
+import pandas as pd
 
 
 def sub_sampling(int_words, threshold=1e-5):
@@ -78,3 +78,30 @@ def download_mrpc(save_dir="./MRPC/", proxy=None):
                 f.write(r.content.replace(b'"', b"<DQUOTE>"))
                 print("completed")
 
+
+def process_mrpc(dir="./MRPC/"):
+    data = {}
+    files = os.listdir(dir)
+    for f in files:
+        df = pd.read_csv(os.path.join(dir, f), sep='\t')
+        k = "train" if "train" in f else "test"
+        data[k] = {"is_same": df["Quality"].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
+    all_croups = np.concatenate((data["train"]["s1"], data["train"]["s2"], data["test"]["s1"], data["test"]["s2"]))
+    vocab = set()
+    croups_lsit = []
+    for c in all_croups:
+        cs = c.split(" ")
+        croups_lsit.append(cs)
+        vocab.update(set(cs))
+    v2i = {v: i for i, v in enumerate(vocab)}
+    i2v = {i: v for v, i in v2i.items()}
+    data["train"]["s1id"] = [[v2i[v] for v in c.split(" ")] for c in data["train"]["s1"]]
+    data["train"]["s2id"] = [[v2i[v] for v in c.split(" ")] for c in data["train"]["s2"]]
+    data["test"]["s1id"] = [[v2i[v] for v in c.split(" ")] for c in data["test"]["s1"]]
+    data["test"]["s2id"] = [[v2i[v] for v in c.split(" ")] for c in data["test"]["s2"]]
+    return data, vocab, v2i, i2v
+
+
+data, vocab, v2i, i2v = process_mrpc()
+print(data["train"]["s1id"][:3])
+print(data["train"]["s1"][:3])
