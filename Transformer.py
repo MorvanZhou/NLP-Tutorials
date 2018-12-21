@@ -21,7 +21,7 @@ DROP_RATE = 0.1
 
 
 class Transformer:
-    def __init__(self, model_dim, max_len, n_layer, n_head, drop_rate=0.1):
+    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1):
         self.model_dim = model_dim
         self.max_len = max_len
         self.n_layer = n_layer
@@ -32,14 +32,14 @@ class Transformer:
         self.tfx = tf.placeholder(tf.int32, [None, max_len])            # [n, step]
         self.tfy = tf.placeholder(tf.int32, [None, max_len+1])          # [n, step+1]
 
-        embeddings = tf.Variable(tf.random_normal((len(vocab), model_dim), 0., 0.01))           # [n_vocab, dim]
+        embeddings = tf.Variable(tf.random_normal((n_vocab, model_dim), 0., 0.01))           # [n_vocab, dim]
         x_embedded = tf.nn.embedding_lookup(embeddings, self.tfx) + self.position_embedding()   # [n, step, dim]
         y_embedded = tf.nn.embedding_lookup(embeddings, self.tfy[:, :-1]) + self.position_embedding()  # [n, step, dim]
 
         encoded_z = self._build_encoder(x_embedded)
         decoded_z = self._build_decoder(y_embedded, encoded_z)
 
-        self.logits = tf.layers.dense(decoded_z, len(vocab))                # [n, step, n_vocab]
+        self.logits = tf.layers.dense(decoded_z, n_vocab)                # [n, step, n_vocab]
         cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
             labels=self.tfy[:, 1:], logits=self.logits)
         self.loss = tf.reduce_mean(cross_entropy)
@@ -119,7 +119,7 @@ class Transformer:
         mask = tf.tile(tf.expand_dims(mask, axis=0), [tf.shape(seqs)[0], 1, 1])     # [n, step, step]
         return tf.where(mask, pad_mask, tf.zeros_like(pad_mask))
 
-    def translate(self, src):
+    def translate(self, src, v2i, i2v):
         src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], MAX_LEN)
         tgt_seq = "<GO>"
         tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], MAX_LEN + 1)
@@ -167,7 +167,7 @@ for t in range(1000):
 
 # prediction
 src_seq = "02-11-30"
-print("src: ", src_seq, "\nprediction: ", model.translate(src_seq))
+print("src: ", src_seq, "\nprediction: ", model.translate(src_seq, v2i, i2v))
 
 # save attention matrix for visualization
 # attentions = model.sess.run(model.attentions, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
