@@ -72,7 +72,7 @@ class Transformer:
             mask = tf.tile(mask, [self.n_head, 1, 1])                           # repeat for n_head
             score = tf.where(mask, score, tf.fill(tf.shape(score), -np.inf))    # make softmax not select padded value
         attention = tf.nn.softmax(score, axis=-1)                               # [h*n, q_step, step]
-        attention = tf.where(tf.is_nan(attention), tf.zeros_like(attention), attention)  # replace nan caused by all padding by 0
+        attention = tf.where(tf.is_nan(attention), tf.zeros_like(attention), attention)  # replace nan caused softmax of all -inf
         attention = tf.layers.dropout(attention, rate=self.drop_rate, training=self.training)
         context = tf.matmul(attention, v)                   # [h*n, q_step, step] @ [h*n, step, dv] = [h*n, q_step, dv]
         return attention, context
