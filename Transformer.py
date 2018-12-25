@@ -12,13 +12,14 @@ https://zhuanlan.zhihu.com/p/35571412      (key-value query)
 import tensorflow as tf
 import numpy as np
 import utils
+import time
 
 MODEL_DIM = 32
 MAX_LEN = 15
 N_LAYER = 3
 N_HEAD = 4
 DROP_RATE = 0.1
-
+T = []
 
 class Transformer:
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1):
@@ -46,7 +47,7 @@ class Transformer:
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):   # for batch norm
             self.train_op = tf.train.AdamOptimizer(0.001).minimize(self.loss)
 
-        self.sess = tf.InteractiveSession(config=tf.ConfigProto(device_count={'GPU': 0}))
+        self.sess = tf.InteractiveSession(config=tf.ConfigProto(device_count={'GPU': 1}))
         self.sess.run(tf.global_variables_initializer())
 
     def _build_encoder(self, xz):
@@ -71,6 +72,7 @@ class Transformer:
             mask = tf.tile(mask, [self.n_head, 1, 1])                           # repeat for n_head
             score = tf.where(mask, score, tf.fill(tf.shape(score), -np.inf))    # make softmax not select padded value
         attention = tf.nn.softmax(score, axis=-1)                               # [h*n, q_step, step]
+        attention = tf.where(tf.is_nan(attention), tf.zeros_like(attention), attention)     # replace nan caused by all padding by 0
         attention = tf.layers.dropout(attention, rate=self.drop_rate, training=self.training)
         context = tf.matmul(attention, v)           # [h*n, q_step, step] @ [h*n, step, dv] = [h*n, q_step, dv]
         return attention, context
@@ -110,7 +112,7 @@ class Transformer:
 
     @staticmethod
     def pad_mask(seqs):
-        mask = tf.where(seqs == 0, tf.zeros_like(seqs), tf.ones_like(seqs))                         # 0 idx is padding
+        mask = tf.where(tf.equal(seqs, 0), tf.zeros_like(seqs), tf.ones_like(seqs))                 # 0 idx is padding
         return tf.cast(tf.expand_dims(mask, axis=1) * tf.expand_dims(mask, axis=2), dtype=tf.bool)  # [n, step, step]
 
     def output_mask(self, seqs):
@@ -120,9 +122,9 @@ class Transformer:
         return tf.where(mask, pad_mask, tf.zeros_like(pad_mask))
 
     def translate(self, src, v2i, i2v):
-        src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], MAX_LEN)
+        src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], self.max_len)
         tgt_seq = "<GO>"
-        tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], MAX_LEN + 1)
+        tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], self.max_len + 1)
         tgti = 0
         while True:
             logit = self.sess.run(self.logits, {self.tfx: src_pad, self.tfy: tgt, self.training: False})[0, tgti, :]
@@ -140,11 +142,13 @@ print("Chinese time order: ", date_cn[:3], "\nEnglish time order: ", date_en[:3]
 print("vocabularies: ", vocab)
 print("x index sample: \n", x[:2], "\ny index sample: \n", y[:2])
 
-model = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, DROP_RATE)
+model = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, len(vocab), DROP_RATE)
 # training
+t0 = time.time()
 for t in range(1000):
     bi = np.random.randint(0, len(x), size=64)
     bx, by = utils.pad_zero(x[bi], max_len=MAX_LEN), utils.pad_zero(y[bi], max_len=MAX_LEN+1)
+    # tt = model.sess.run(T, {model.tfx: bx, model.tfy: by, model.training: True})
     _, loss_ = model.sess.run([model.train_op, model.loss], {model.tfx: bx, model.tfy: by, model.training: True})
     if t % 50 == 0:
         logits_ = model.sess.run(model.logits, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
@@ -158,20 +162,23 @@ for t in range(1000):
             if i == v2i["<EOS>"]:break
             res.append(i2v[i])
         res = "".join(res)
+        t1 = time.time()
         print(
             "step: ", t,
+            "| time: %.2f" % (t1-t0),
             "| loss: %.3f" % loss_,
             "| target: ", target,
             "| inference: ", res,
         )
+        t0 = t1
 
 # prediction
 src_seq = "02-11-30"
 print("src: ", src_seq, "\nprediction: ", model.translate(src_seq, v2i, i2v))
 
 # save attention matrix for visualization
-# attentions = model.sess.run(model.attentions, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
-# data = {"src": [i2v[i] for i in x[0]], "tgt": [i2v[i] for i in y[0]], "attentions": attentions}
-# import pickle
-# with open("./visual_helper/attention_matrix.pkl", "wb") as f:
-#     pickle.dump(data, f)
+attentions = model.sess.run(model.attentions, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
+data = {"src": [i2v[i] for i in x[0]], "tgt": [i2v[i] for i in y[0]], "attentions": attentions}
+import pickle
+with open("./visual_helper/transformer_attention_matrix.pkl", "wb") as f:
+    pickle.dump(data, f)
