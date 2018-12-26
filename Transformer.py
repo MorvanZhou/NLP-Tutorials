@@ -73,6 +73,8 @@ class Transformer:
             score = tf.where(mask, score, tf.fill(tf.shape(score), -np.inf))    # make softmax not select padded value
         attention = tf.nn.softmax(score, axis=-1)                               # [h*n, q_step, step]
         attention = tf.where(tf.is_nan(attention), tf.zeros_like(attention), attention)  # replace nan caused softmax of all -inf
+        self.attentions.append(
+            tf.transpose(tf.split(attention, self.n_head, axis=0), (1, 0, 2, 3)))  # [n, h, q_step, step]
         attention = tf.layers.dropout(attention, rate=self.drop_rate, training=self.training)
         context = tf.matmul(attention, v)                   # [h*n, q_step, step] @ [h*n, step, dv] = [h*n, q_step, dv]
         return attention, context
@@ -86,8 +88,7 @@ class Transformer:
         k_ = tf.concat(tf.split(k, self.n_head, axis=2), axis=0)        # [h*n, step, h_dim]
         v_ = tf.concat(tf.split(v, self.n_head, axis=2), axis=0)        # [h*n, step, h_dim]
 
-        attention, context = self.scaled_dot_product_attention(q_, k_, v_, mask)
-        self.attentions.append(tf.transpose(tf.split(attention, self.n_head, axis=0), (1, 0, 2, 3))) # [n, h, q_step, step]
+        context = self.scaled_dot_product_attention(q_, k_, v_, mask)
         o = tf.concat(tf.split(context, self.n_head, axis=0), axis=2)   # [n, q_step, h*h_dim=model_dim]
         o = tf.layers.dense(o, self.model_dim, use_bias=False)
         o = tf.layers.dropout(o, rate=self.drop_rate, training=self.training)
