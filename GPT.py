@@ -115,7 +115,7 @@ class GPT:
 
 
 # get and process data
-utils.download_mrpc(save_dir="./MRPC/", proxy="http://web-proxy.oa.com:8080")
+utils.download_mrpc(save_dir="./MRPC/")
 data, vocab, v2i, i2v, max_len = utils.process_mrpc("./MRPC")
 print("data include: ", data.keys())
 print("Samples ids: ", data["train"]["s1id"][0], "\nSamples words: ", data["train"]["s1"][0])

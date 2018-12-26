@@ -3,6 +3,7 @@ import datetime
 import os
 import requests
 import pandas as pd
+import re
 
 
 def sub_sampling(int_words, threshold=1e-5):
@@ -64,7 +65,6 @@ def generate_dist_data():
 
 
 def download_mrpc(save_dir="./MRPC/", proxy=None):
-    # based on this script: https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e
     train_url = 'https://s3.amazonaws.com/senteval/senteval_data/msr_paraphrase_train.txt'
     test_url = 'https://s3.amazonaws.com/senteval/senteval_data/msr_paraphrase_test.txt'
     os.makedirs(save_dir, exist_ok=True)
@@ -75,8 +75,17 @@ def download_mrpc(save_dir="./MRPC/", proxy=None):
             print("downloading from %s" % url)
             r = requests.get(url, proxies=proxies)
             with open(raw_path, "wb") as f:
-                f.write(r.content.replace(b'"', b"<DQUOTE>"))
+                f.write(r.content.replace('"', "<QUOTE>"))
                 print("completed")
+
+
+def text_standardize(text):
+    text = re.sub(r'—', '-', text)
+    text = re.sub(r'–', '-', text)
+    text = re.sub(r'―', '-', text)
+    text = re.sub(r" \d+(,\d+)?(\.\d+)? ", " <NUM> ", text)
+    text = re.sub(r" \d+-", " <NUM>-", text)
+    return text.strip()
 
 
 def process_mrpc(dir="./MRPC/"):
@@ -86,22 +95,21 @@ def process_mrpc(dir="./MRPC/"):
         df = pd.read_csv(os.path.join(dir, f), sep='\t')
         k = "train" if "train" in f else "test"
         data[k] = {"is_same": df["Quality"].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
-    all_croups = np.concatenate((data["train"]["s1"], data["train"]["s2"], data["test"]["s1"], data["test"]["s2"]))
     vocab = set()
-    croups_lsit = []
-    for c in all_croups:
-        cs = c.split(" ")
-        croups_lsit.append(cs)
-        vocab.update(set(cs))
-    v2i = {v: i for i, v in enumerate(vocab)}
+    for n in ["train", "test"]:
+        for m in ["s1", "s2"]:
+            for i in range(len(data[n][m])):
+                data[n][m][i] = "<GO> " + text_standardize(data[n][m][i].lower()) + " <EOS>"
+                cs = data[n][m][i].split(" ")
+                vocab.update(set(cs))
+    v2i = {v: i for i, v in enumerate(vocab, start=1)}
+    v2i["<PAD>"] = 0
+    v2i["<SEP>"] = len(v2i)
+    vocab.update(["<PAD>", "<SEP>"])
     i2v = {i: v for v, i in v2i.items()}
-    data["train"]["s1id"] = [[v2i[v] for v in c.split(" ")] for c in data["train"]["s1"]]
-    data["train"]["s2id"] = [[v2i[v] for v in c.split(" ")] for c in data["train"]["s2"]]
-    data["test"]["s1id"] = [[v2i[v] for v in c.split(" ")] for c in data["test"]["s1"]]
-    data["test"]["s2id"] = [[v2i[v] for v in c.split(" ")] for c in data["test"]["s2"]]
-    return data, vocab, v2i, i2v
-
-
-data, vocab, v2i, i2v = process_mrpc()
-print(data["train"]["s1id"][:3])
-print(data["train"]["s1"][:3])
+    for n in ["train", "test"]:
+        for m in ["s1", "s2"]:
+            data[n][m+"id"] = [[v2i[v] for v in c.split(" ")] for c in data[n][m]]
+    max_len = max(
+        [len(s) for s in data["train"]["s1id"] + data["train"]["s2id"] + data["test"]["s1id"] + data["test"]["s2id"]])
+    return data, vocab, v2i, i2v, max_len
