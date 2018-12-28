@@ -22,12 +22,14 @@ DROP_RATE = 0.1
 
 
 class Transformer:
-    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1):
+    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1, padding_idx=0):
         self.model_dim = model_dim
         self.max_len = max_len
         self.n_layer = n_layer
         self.n_head = n_head
         self.drop_rate = drop_rate
+        self.padding_idx = padding_idx
+
         self.attentions = []    # for visualization
         self.training = tf.placeholder(tf.bool, None)
         self.tfx = tf.placeholder(tf.int32, [None, max_len])            # [n, step]
@@ -37,28 +39,26 @@ class Transformer:
         x_embedded = tf.nn.embedding_lookup(embeddings, self.tfx) + self.position_embedding()           # [n, step, dim]
         y_embedded = tf.nn.embedding_lookup(embeddings, self.tfy[:, :-1]) + self.position_embedding()   # [n, step, dim]
 
-        encoded_z = self._build_encoder(x_embedded)
-        decoded_z = self._build_decoder(y_embedded, encoded_z)
+        encoded_z = self.build_encoder(x_embedded, mask=self.pad_mask(self.tfx))
+        decoded_z = self.build_decoder(y_embedded, encoded_z, mask=self.output_mask(self.tfy[:, :-1]))
 
         self.logits = tf.layers.dense(decoded_z, n_vocab)                           # [n, step, n_vocab]
         cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
             labels=self.tfy[:, 1:], logits=self.logits)
         self.loss = tf.reduce_mean(cross_entropy)
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):   # for batch norm
-            self.train_op = tf.train.AdamOptimizer(0.001).minimize(self.loss)
+            self.train_op = tf.train.AdamOptimizer(0.002).minimize(self.loss)
 
         self.sess = tf.InteractiveSession(config=tf.ConfigProto(device_count={'GPU': 1}))
         self.sess.run(tf.global_variables_initializer())
 
-    def _build_encoder(self, xz):
-        mask = self.pad_mask(self.tfx)
+    def build_encoder(self, xz, mask):
         for n in range(self.n_layer):
             xz = self.lnorm(self.multi_head(xz, xz, xz, mask) + xz)
             xz = self.lnorm(self.position_wise_ffn(xz) + xz)
         return xz
 
-    def _build_decoder(self, yz, xz):
-        mask = self.output_mask(self.tfy[:, :-1])
+    def build_decoder(self, yz, xz, mask):
         for n in range(self.n_layer):
             yz = self.lnorm(self.multi_head(yz, yz, yz, mask) + yz)
             yz = self.lnorm(self.multi_head(yz, xz, xz, None) + yz)
@@ -77,7 +77,7 @@ class Transformer:
             tf.transpose(tf.split(attention, self.n_head, axis=0), (1, 0, 2, 3)))  # [n, h, q_step, step]
         attention = tf.layers.dropout(attention, rate=self.drop_rate, training=self.training)
         context = tf.matmul(attention, v)                   # [h*n, q_step, step] @ [h*n, step, dv] = [h*n, q_step, dv]
-        return attention, context
+        return context
 
     def multi_head(self, query, key, value, mask=None):
         head_dim = self.model_dim // self.n_head
@@ -111,9 +111,8 @@ class Transformer:
         pe = pe[None, :, :]                                             # [1, max_len, model_dim]    for batch adding
         return tf.constant(pe, dtype=tf.float32)
 
-    @staticmethod
-    def pad_mask(seqs):
-        mask = tf.where(tf.equal(seqs, 0), tf.zeros_like(seqs), tf.ones_like(seqs))                 # 0 idx is padding
+    def pad_mask(self, seqs):
+        mask = tf.where(tf.equal(seqs, self.padding_idx), tf.zeros_like(seqs), tf.ones_like(seqs))  # 0 idx is padding
         return tf.cast(tf.expand_dims(mask, axis=1) * tf.expand_dims(mask, axis=2), dtype=tf.bool)  # [n, step, step]
 
     def output_mask(self, seqs):
@@ -152,23 +151,13 @@ for t in range(1000):
     _, loss_ = model.sess.run([model.train_op, model.loss], {model.tfx: bx, model.tfy: by, model.training: True})
     if t % 50 == 0:
         logits_ = model.sess.run(model.logits, {model.tfx: bx[:1, :], model.tfy: by[:1, :], model.training: False})
-        target = []
-        for i in by[0, 1:]:
-            if i == v2i["<EOS>"]:break
-            target.append(i2v[i])
-        target = "".join(target)
-        res = []
-        for i in np.argmax(logits_[0], axis=1):
-            if i == v2i["<EOS>"]:break
-            res.append(i2v[i])
-        res = "".join(res)
         t1 = time.time()
         print(
             "step: ", t,
             "| time: %.2f" % (t1-t0),
             "| loss: %.3f" % loss_,
-            "| target: ", target,
-            "| inference: ", res,
+            "| target: ", "".join([i2v[i] for i in by[0, 1:] if i != v2i["<PAD>"]]),
+            "| inference: ", "".join([i2v[i] for i in np.argmax(logits_[0], axis=1) if i != v2i["<PAD>"]]),
         )
         t0 = t1
 

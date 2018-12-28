@@ -16,50 +16,47 @@ N_CLS = 2
 
 
 class GPT:
-    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, n_cls, lambda_=0.5, drop_rate=0.1):
+    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, n_cls, lambda_=0.5, drop_rate=0.1, padding_idx=0):
         self.model_dim = model_dim
         self.max_len = max_len
         self.n_layer = n_layer
         self.n_head = n_head
         self.drop_rate = drop_rate
+        self.padding_idx = padding_idx
         self.attentions = []    # for visualization
 
         # inputs
         self.training = tf.placeholder(tf.bool, None)               # used in unsupervised & supervised learning
-        self.tfx = tf.placeholder(tf.int32, [None, max_len])      # used in unsupervised & supervised learning
+        self.tfseq = tf.placeholder(tf.int32, [None, max_len])      # used in unsupervised & supervised learning
         self.tfcls = tf.placeholder(tf.int32, [None, ])  # target in supervised learning
-
-        self.target_seq = tf.concat(
-            (self.tfx[:, 1:], tf.zeros((tf.shape(self.tfx)[0], 1), dtype=tf.int32)), axis=1) # [n, step] add pad at end
 
         word_embeddings = tf.Variable(tf.random_normal((n_vocab, model_dim), 0., 0.01))      # [n_vocab, dim]
         position_embeddings = tf.Variable(tf.random_normal((1, max_len, model_dim)))          # [1, step, dim]
-        x_embedded = tf.nn.embedding_lookup(word_embeddings, self.tfx) + position_embeddings  # [n, step, dim]
+        x_embedded = tf.nn.embedding_lookup(word_embeddings, self.tfseq) + position_embeddings  # [n, step, dim]
 
-        decoded_z = self._build_decoder(x_embedded)
+        mask = self.make_mask(tf.concat((self.tfseq[:, :-1], tf.ones_like(self.tfseq[:, -1:])), axis=1))
+        z = self.build_net(x_embedded, mask=mask)
 
         # output heads
-        self.seq_logits = tf.layers.dense(decoded_z, n_vocab)                # [n, step, n_vocab]
-        reshaped_decoded_z = tf.reshape(decoded_z, [-1, max_len*model_dim])
-        self.cls_logits = tf.layers.dense(reshaped_decoded_z, n_cls)                    # [n, n_cls]
+        self.seq_logits = tf.layers.dense(z[:, :-1, :], n_vocab)                # [n, step-1, n_vocab]
+        self.cls_logits = tf.layers.dense(z[:, -1, :], n_cls)                   # [n, n_cls]
 
         # losses
         self.unsupervised_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-            labels=self.target_seq, logits=self.seq_logits))
+            labels=self.tfseq[:, 1:], logits=self.seq_logits))
         cls_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
             labels=self.tfcls, logits=self.cls_logits))
         self.semi_supervised_loss = cls_loss + lambda_ * self.unsupervised_loss
 
         # train
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):   # for batch norm
-            self.unsupervised_train = tf.train.AdamOptimizer(0.001).minimize(self.unsupervised_loss)
-            self.supervised_train = tf.train.AdamOptimizer(0.001).minimize(self.semi_supervised_loss)
+            self.unsupervised_train = tf.train.AdamOptimizer(0.002).minimize(self.unsupervised_loss)
+            self.semi_supervised_train = tf.train.AdamOptimizer(0.002).minimize(self.semi_supervised_loss)
 
         self.sess = tf.InteractiveSession(config=tf.ConfigProto(device_count={'GPU': 1}))
         self.sess.run(tf.global_variables_initializer())
 
-    def _build_decoder(self, z):
-        mask = self.output_mask(self.tfx)
+    def build_net(self, z, mask):
         for n in range(self.n_layer):
             z = self.lnorm(self.multi_head(z, z, z, mask) + z)
             z = self.lnorm(self.position_wise_ffn(z) + z)
@@ -102,70 +99,59 @@ class GPT:
     def lnorm(self, x):
         return tf.layers.batch_normalization(x, training=self.training)
 
-    @staticmethod
-    def pad_mask(seqs):
-        mask = tf.where(tf.equal(seqs, 0), tf.zeros_like(seqs), tf.ones_like(seqs))                # 0 idx is padding
-        return tf.cast(tf.expand_dims(mask, axis=1) * tf.expand_dims(mask, axis=2), dtype=tf.bool) # [n, step+1, step+1]
-
-    def output_mask(self, seqs):
-        pad_mask = self.pad_mask(seqs)
-        mask = tf.constant(~np.triu(np.ones((self.max_len, self.max_len), dtype=np.bool), 1))
-        mask = tf.tile(tf.expand_dims(mask, axis=0), [tf.shape(seqs)[0], 1, 1])     # [n, step+1, step+1]
+    def make_mask(self, seqs):
+        """
+        output mask will look like this:
+        input|  G,1,2,P,P
+        target|
+        1      [1,0,0,0,0]
+        2      [1,1,0,0,0]
+        P      [1,1,1,0,0]
+        P      [0,0,0,0,0]
+        cls    [1,1,1,0,0]     this line for predicting class
+        """
+        pad_mask = tf.where(tf.equal(seqs, self.padding_idx), tf.zeros_like(seqs), tf.ones_like(seqs))  # 0 idx is padding
+        pad_mask = tf.cast(tf.expand_dims(pad_mask, axis=1) * tf.expand_dims(pad_mask, axis=2), dtype=tf.bool)  # [n, step, step]
+        np_m = ~np.triu(np.ones((self.max_len, self.max_len), dtype=np.bool), 1)
+        np_m[-1, -1] = False
+        mask = tf.constant(np_m)
+        mask = tf.tile(tf.expand_dims(mask, axis=0), [tf.shape(seqs)[0], 1, 1])     # [n, step, step]
         return tf.where(mask, pad_mask, tf.zeros_like(pad_mask))
 
 
 # get and process data
-utils.download_mrpc(save_dir="./MRPC/")
-data, vocab, v2i, i2v, max_len = utils.process_mrpc("./MRPC")
-print("data include: ", data.keys())
-print("Samples ids: ", data["train"]["s1id"][0], "\nSamples words: ", data["train"]["s1"][0])
-max_len = max_len*2 + 1
-unsupervised_x = data["train"]["s1id"] + data["train"]["s2id"]
-supervised_x = [data["train"]["s1id"][i] + [v2i["<SEP>"], ] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
-
+v2i, i2v, max_len, unsupervised_x, supervised_x, supervised_label = utils.gpt_mrpc("./MRPC")
 model = GPT(model_dim=MODEL_DIM, max_len=max_len, n_layer=N_LAYER, n_head=N_HEAD,
             n_vocab=len(v2i), n_cls=N_CLS)
 
 # unsupervised training
 t0 = time.time()
-for t in range(7000):
-    bi = np.random.randint(0, len(unsupervised_x), size=64)
-    bx = utils.pad_zero([unsupervised_x[i] for i in bi], max_len=max_len)     # add one more zero padding for fake task
-    _, loss_ = model.sess.run([model.unsupervised_train, model.unsupervised_loss], {model.tfx: bx, model.training: True})
+for t in range(5000):
+    bi = np.random.randint(0, len(unsupervised_x), size=32)
+    bx = unsupervised_x[bi]
+    _, loss_ = model.sess.run([model.unsupervised_train, model.unsupervised_loss], {model.tfseq: bx, model.training: True})
     if t % 50 == 0:
-        seq_logits_ = model.sess.run(model.seq_logits, {model.tfx: bx, model.training: False})
-        target = []
-        for i in bx[0]:
-            target.append(i2v[i])
-            if i == v2i["<EOS>"]: break
-        target = " ".join(target)
-        res = []
-        for i in np.argmax(seq_logits_[0], axis=1):
-            res.append(i2v[i])
-            if i == v2i["<EOS>"]: break
-        res = " ".join(res)
+        seq_logits_ = model.sess.run(model.seq_logits, {model.tfseq: bx, model.training: False})
         t1 = time.time()
         print(
             "Unsupervised step: ", t,
             "| time: %.2f" % (t1-t0),
             "| loss: %.3f" % loss_,
-            "\n| target: ", target,
-            "\n| predict: ", res,
+            "\n| target: ", " ".join([i2v[i] for i in bx[0] if i != v2i["<PAD>"]]),
+            "\n| predict: ", " ".join([i2v[i] for i in np.argmax(seq_logits_[0], axis=1) if i != v2i["<PAD>"]]),
         )
         t0 = t1
 
 # supervised learning
-supervised_label = data["train"]["is_same"]
-for t in range(3000):
-    bi = np.random.randint(0, len(supervised_x), size=64)
-    bx = utils.pad_zero([supervised_x[i] for i in bi], max_len=max_len)
-    bx[:, -1] = 1
-    _, loss_ = model.sess.run([model.supervised_train, model.semi_supervised_loss],
-                              {model.tfx: bx, model.tfcls: supervised_label[bi], model.training: True})
+for t in range(1000):
+    bi = np.random.randint(0, len(supervised_x), size=32)
+    bx, by = supervised_x[bi], supervised_label[bi]
+    _, loss_ = model.sess.run([model.semi_supervised_train, model.semi_supervised_loss],
+                              {model.tfseq: bx, model.tfcls: by, model.training: True})
     if t % 50 == 0:
         bl = supervised_label[bi]
-        cls_logits_ = model.sess.run(model.cls_logits, {model.tfx: bx, model.training: False})
-        correct = cls_logits_.argmax(axis=1) == supervised_label[bi]
+        cls_logits_ = model.sess.run(model.cls_logits, {model.tfseq: bx, model.training: False})
+        correct = cls_logits_.argmax(axis=1) == by
         acc = np.sum(correct) / len(correct)
         t1 = time.time()
         print(
@@ -177,7 +163,7 @@ for t in range(3000):
         t0 = t1
 
 # save attention matrix for visualization
-attentions, cls_logits_, seq_logits_ = model.sess.run([model.attentions, model.cls_logits, model.seq_logits], {model.tfx: bx, model.training: False})
+attentions, cls_logits_, seq_logits_ = model.sess.run([model.attentions, model.cls_logits, model.seq_logits], {model.tfseq: bx, model.training: False})
 data = {"src": bx, "label": cls_logits_.argmax(axis=1), "seq": seq_logits_.argmax(axis=-1), "attentions": attentions, "i2v": i2v}
 import pickle
 with open("./visual_helper/GPT_attention_matrix.pkl", "wb") as f:
