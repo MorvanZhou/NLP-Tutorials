@@ -114,8 +114,8 @@ def process_mrpc(dir="./MRPC/", go="<GO> ", end=" <EOS>"):
     return data, v2i, i2v, max_len
 
 
-def gpt_mrpc(dir="./MRPC"):
-    maybe_download_mrpc(save_dir="./MRPC/")
+def gpt_mrpc(dir="./MRPC", proxy=None):
+    maybe_download_mrpc(save_dir="./MRPC/", proxy=proxy)
     data, v2i, i2v, max_len = process_mrpc(dir, go="<GO> ", end=" <EOS>")
     max_len = max_len * 2 + 1
     unsupervised_x = data["train"]["s1id"] + data["train"]["s2id"]
@@ -128,19 +128,19 @@ def gpt_mrpc(dir="./MRPC"):
     return v2i, i2v, max_len, unsupervised_x, supervised_x, supervised_label
 
 
-def bert_mrpc(dir="./MRPC/"):
-    maybe_download_mrpc(save_dir="./MRPC/")
+def bert_mrpc(dir="./MRPC/", proxy=None):
+    maybe_download_mrpc(save_dir="./MRPC/", proxy=proxy)
     data, v2i, i2v, max_len = process_mrpc(dir, go="", end=" <SEP>")
     v2i["<MASK>"] = len(v2i)        # add mask token
     i2v[v2i["<MASK>"]] = "<MASK>"
 
     max_len = max_len * 2 + 1
     x1 = data["train"]["s1id"] + data["train"]["s2id"]
-    len1 = np.array([len(s) for s in x1])
+    len1 = np.array([[0, len(s)] for s in x1])
     x1 = pad_zero(x1, max_len=max_len)
     x2 = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
     x2 = pad_zero(x2, max_len=max_len)
-    len2 = np.array([len(s1) + len(s2) for s1, s2 in zip(data["train"]["s1id"], data["train"]["s2id"])])
+    len2 = np.array([[len(s1), len(s2)] for s1, s2 in zip(data["train"]["s1id"], data["train"]["s2id"])])
     y2 = data["train"]["is_same"]
     print("task1 example: ", data["train"]["s1"][0])
     print("task2 example: ", data["train"]["s1"][0] + " " + data["train"]["s2"][0])
