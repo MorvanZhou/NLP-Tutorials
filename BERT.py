@@ -3,7 +3,6 @@ reference:
 https://zhuanlan.zhihu.com/p/49271699
 https://jalammar.github.io/illustrated-bert/
 """
-# NOT COMPLETE
 
 import numpy as np
 import tensorflow as tf
@@ -12,8 +11,8 @@ import time
 
 
 MODEL_DIM = 128
-N_LAYER = 3
-N_HEAD = 3
+N_LAYER = 5
+N_HEAD = 6
 N_CLS = 2
 MAX_SEG = 3   # sentence 1, sentence 2, padding
 WORD_REPLACE_RATE = 0.15
@@ -58,8 +57,8 @@ class BERT:
 
         # train
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):   # for batch norm
-            self.train1 = tf.train.AdamOptimizer(0.0003).minimize(self.loss1)
-            self.train2 = tf.train.AdamOptimizer(0.0003).minimize(self.loss2)
+            self.train1 = tf.train.AdamOptimizer(0.001).minimize(self.loss1)
+            self.train2 = tf.train.AdamOptimizer(0.001).minimize(self.loss2)
 
         self.sess = tf.InteractiveSession(config=tf.ConfigProto(device_count={'GPU': 1}))
         self.sess.run(tf.global_variables_initializer())
