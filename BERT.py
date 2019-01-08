@@ -11,8 +11,8 @@ import time
 
 
 MODEL_DIM = 128
-N_LAYER = 5
-N_HEAD = 6
+N_LAYER = 3
+N_HEAD = 4
 N_CLS = 2
 MAX_SEG = 3   # sentence 1, sentence 2, padding
 WORD_REPLACE_RATE = 0.15
@@ -35,6 +35,7 @@ class BERT:
         self.training = tf.placeholder(tf.bool, None)
         self.tfseq = tf.placeholder(tf.int32, [None, max_len])
         self.tfseq_replaced = tf.placeholder(tf.int32, [None, max_len])
+        self.tflabel_rep = tf.cast(tf.placeholder(tf.bool, [None, max_len]), tf.float32)
         self.tftask = tf.placeholder(tf.int32, [None, 1])
         self.tfseg = tf.placeholder(tf.int32, [None, max_len+1])    # +1 to max_len is to consider 1 task index
         self.tfcls = tf.placeholder(tf.int32, [None, ])
@@ -49,11 +50,11 @@ class BERT:
         self.seq_logits = tf.layers.dense(z[:, 1:], n_vocab)                # [n, step, n_vocab]
         self.cls_logits = tf.layers.dense(z[:, 0], n_cls)                   # [n, n_cls]
 
-        # losses
+        # losses on the masked or replaced words or whole sentence
         self.loss1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-            labels=self.tfseq, logits=self.seq_logits))
+            labels=self.tfseq, logits=self.seq_logits) * self.tflabel_rep)
         self.loss2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-            labels=self.tfcls, logits=self.cls_logits))
+            labels=self.tfcls, logits=self.cls_logits)) + self.loss1
 
         # train
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):   # for batch norm
@@ -137,37 +138,42 @@ def rand_replace(replace_tmp, bl):
     # The replace percentage in this method is different from which in original paper
     sizes = np.maximum(WORD_REPLACE_RATE * (bl-1), 1).astype(np.int)
     replace_change = np.random.rand(len(bl))
+    label_rep = np.zeros_like(replace_tmp, dtype=np.bool)
     for i in range(len(replace_tmp)):
-        if replace_change[i] < 0.8:
+        if replace_change[i] < 0.9:     # replace with 90% chance
             if bl[i][0] == 0:   # single sentence
-                replace_tmp[i, np.random.randint(low=1, high=bl[i][1]-1, size=sizes[i][1])] = v2i["<MASK>"]
+                label_rep[i, np.random.randint(low=1, high=bl[i][1]-1, size=sizes[i][1])] = True
             else:               # two sentence
-                replace_tmp[i, np.random.randint(low=1, high=bl[i][0]-1, size=sizes[i][0])] = v2i["<MASK>"]
-                replace_tmp[i, np.random.randint(low=bl[i][0]+1, high=sum(bl[i]), size=sizes[i][1])] = v2i["<MASK>"]
-        elif replace_change[i] < 0.9:
-            if bl[i][0] == 0:   # single sentence
-                replace_tmp[i, np.random.randint(low=1, high=bl[i][1]-1, size=sizes[i][1])] = [v2i[v] for v in np.random.choice(normal_words, size=sizes[i][1])]
-            else:               # two sentence
-                replace_tmp[i, np.random.randint(low=1, high=bl[i][0]-1, size=sizes[i][0])] = [v2i[v] for v in np.random.choice(normal_words, size=sizes[i][0])]
-                replace_tmp[i, np.random.randint(low=bl[i][0]+1, high=sum(bl[i]), size=sizes[i][1])] = [v2i[v] for v in np.random.choice(normal_words, size=sizes[i][1])]
-    return replace_tmp
+                label_rep[i, np.random.randint(low=1, high=bl[i][0]-1, size=sizes[i][0])] = True
+                label_rep[i, np.random.randint(low=bl[i][0]+1, high=sum(bl[i]), size=sizes[i][1])] = True
+
+            if replace_change[i] < 0.8:     # use mask with 80% chance
+                replace_tmp[i, label_rep[i]] = v2i["<MASK>"]
+            else:                           # use replace with 10% chance
+                replace_tmp[i, label_rep[i]] = [v2i[v] for v in
+                                                   np.random.choice(normal_words, size=np.sum(label_rep[i]))]
+        else:   # > 90% chance
+            label_rep[i, :] = True
+
+    return replace_tmp, label_rep
 
 
 def train_task1(x1, seg1, task, slen):
     bi = np.random.randint(0, len(x1), size=b_size)
     bx, bs, bl = x1[bi], seg1[bi], slen[bi]
-    replaced = rand_replace(replace_tmp=bx.copy(), bl=bl)
+    replaced, label_rep = rand_replace(replace_tmp=bx.copy(), bl=bl)
     _, loss_, seq_logits_ = model.sess.run([model.train1, model.loss1, model.seq_logits], {
-        model.tfseq: bx, model.tfseq_replaced: replaced, model.tfseg: bs, model.tftask: task, model.training: True})
+        model.tfseq: bx, model.tfseq_replaced: replaced, model.tflabel_rep: label_rep,
+        model.tfseg: bs, model.tftask: task, model.training: True})
     return loss_, seq_logits_[0], bx[0], replaced[0]
 
 
 def train_task2(x2, seg2, y2, task, slen):
     bi = np.random.randint(0, len(x2), size=b_size)
     bx, bs, by, bl = x2[bi], seg2[bi], y2[bi], slen[bi]
-    replaced = rand_replace(replace_tmp=bx.copy(), bl=bl)
+    replaced, label_rep = rand_replace(replace_tmp=bx.copy(), bl=bl)
     _, loss_, cls_logits_, seq_logits_ = model.sess.run([model.train2, model.loss2, model.cls_logits, model.seq_logits], {
-        model.tfseq: bx, model.tfseq_replaced: replaced, model.tfseg: bs,
+        model.tfseq: bx, model.tfseq_replaced: replaced, model.tflabel_rep: label_rep, model.tfseg: bs,
         model.tfcls: by, model.tftask: task, model.training: True})
     return loss_, cls_logits_, by, replaced[0], seq_logits_[0], bx[0]
 
