@@ -21,7 +21,7 @@ embeddings = tf.Variable(tf.random_normal((len(vocab), 16), mean=0., stddev=0.01
 x_embedded = tf.nn.embedding_lookup(embeddings, tfx)                                    # [n, step, 16]
 
 # encoding
-encoder_cell = tf.nn.rnn_cell.BasicLSTMCell(UNITS)
+encoder_cell = tf.nn.rnn_cell.LSTMCell(UNITS)
 encoder_outputs, encoder_state = tf.nn.dynamic_rnn(
     cell=encoder_cell, inputs=x_embedded, sequence_length=None,
     initial_state=encoder_cell.zero_state(tf.shape(tfx)[0], dtype=tf.float32),
@@ -31,7 +31,7 @@ encoder_outputs, encoder_state = tf.nn.dynamic_rnn(
 # decoding for training and inference
 def decoding(helper):
     # Decoder
-    decoder_cell = tf.nn.rnn_cell.BasicLSTMCell(UNITS)
+    decoder_cell = tf.nn.rnn_cell.LSTMCell(UNITS)
     projection_layer = tf.layers.Dense(len(vocab))
     decoder = tf.contrib.seq2seq.BasicDecoder(
         decoder_cell, helper, encoder_state,

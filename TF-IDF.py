@@ -113,7 +113,7 @@ def docs_score(q, d_tf, d_idf, v2i, len_norm=False):
     d_idf = d_idf[:, None]          # [n, 1]
     q_vec = q_tf * d_idf            # [n, 1]
 
-    d_matrix = tf * d_idf       # [n, doc]
+    d_matrix = d_tf * d_idf       # [n, doc]
     scores = cosine_similarity(q_vec, d_matrix)
     if len_norm:
         len_docs = [len(d) for d in docs_words]
