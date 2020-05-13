@@ -4,6 +4,8 @@ import os
 import requests
 import pandas as pd
 import re
+import itertools
+import matplotlib.pyplot as plt
 
 
 def sub_sampling(int_words, threshold=1e-5):
@@ -65,8 +67,8 @@ def generate_dist_data():
 
 
 def maybe_download_mrpc(save_dir="./MRPC/", proxy=None):
-    train_url = 'https://s3.amazonaws.com/senteval/senteval_data/msr_paraphrase_train.txt'
-    test_url = 'https://s3.amazonaws.com/senteval/senteval_data/msr_paraphrase_test.txt'
+    train_url = 'https://raw.githubusercontent.com/tensorflow/datasets/master/tensorflow_datasets/testing/test_data/fake_examples/glue/MRPC/msr_paraphrase_train.txt'
+    test_url = 'https://raw.githubusercontent.com/tensorflow/datasets/master/tensorflow_datasets/testing/test_data/fake_examples/glue/MRPC//msr_paraphrase_test.txt'
     os.makedirs(save_dir, exist_ok=True)
     proxies = {"http": proxy, "https": proxy}
     for url in [train_url, test_url]:
@@ -74,8 +76,8 @@ def maybe_download_mrpc(save_dir="./MRPC/", proxy=None):
         if not os.path.isfile(raw_path):
             print("downloading from %s" % url)
             r = requests.get(url, proxies=proxies)
-            with open(raw_path, "wb") as f:
-                f.write(r.content.replace('"', "<QUOTE>"))
+            with open(raw_path, "w") as f:
+                f.write(r.text.replace('"', "<QUOTE>"))
                 print("completed")
 
 
@@ -163,3 +165,68 @@ def bert_mrpc(dir="./MRPC/", proxy=None):
     print("segment2 example: ", seg2[1])
     normal_words = set(v2i.keys()).difference(["<SEP>", "<MASK>", "<PAD>"])
     return x1, x2, y2, seg1, seg2, max_len, v2i, i2v, len1, len2, list(normal_words)
+
+
+class Dataset:
+    def __init__(self, x, y, v2i, i2v):
+        self.x, self.y = x, y
+        self.v2i, self.i2v = v2i, i2v
+        self.vocab = v2i.keys()
+
+    def sample(self, n):
+        b_idx = np.random.randint(0, len(self.x), n)
+        bx, by = self.x[b_idx], self.y[b_idx]
+        return bx, by
+
+    @property
+    def num_word(self):
+        return len(self.v2i)
+
+
+def process_skip_gram_data(corpus, skip_window=2):
+    all_words = [sentence.split(" ") for sentence in corpus]
+    all_words = np.array(list(itertools.chain(*all_words)))
+    # vocab sort by decreasing frequency for the negative sampling below (nce_loss).
+    vocab, v_count = np.unique(all_words, return_counts=True)
+    vocab = vocab[np.argsort(v_count)[::-1]]
+
+    print("all vocabularies sorted from more frequent to less frequent:\n", vocab)
+    v2i = {v: i for i, v in enumerate(vocab)}
+    i2v = {i: v for v, i in v2i.items()}
+
+    # pair data
+    pairs = []
+    js = [i for i in range(-skip_window, skip_window + 1) if i != 0]
+    for c in corpus:
+        words = c.split(" ")
+        w_idx = [v2i[w] for w in words]
+        for i in range(len(w_idx)):
+            for j in js:
+                if i + j < 0 or i + j >= len(w_idx):
+                    continue
+                pairs.append((w_idx[i], w_idx[i + j]))  # (center, context) or (feature, target)
+    pairs = np.array(pairs)
+    print("5 example pairs:\n", pairs[:5])
+    x, y = pairs[:, 0], pairs[:, 1]
+    return Dataset(x, y, v2i, i2v)
+
+
+def show_skip_gram_word_embedding(model, data: Dataset):
+    word_emb = model.embeddings.get_weights()[0]
+    for i in range(data.num_word):
+        c = "blue"
+        try:
+            int(data.i2v[i])
+        except ValueError:
+            c = "red"
+        plt.text(word_emb[i, 0], word_emb[i, 1], s=data.i2v[i], color=c, weight="bold")
+    plt.xlim(word_emb[:, 0].min() - .5, word_emb[:, 0].max() + .5)
+    plt.ylim(word_emb[:, 1].min() - .5, word_emb[:, 1].max() + .5)
+    plt.xticks(())
+    plt.yticks(())
+    plt.xlabel("embedding dim1")
+    plt.ylabel("embedding dim2")
+    path = "visual_helper/skip_gram.png"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    plt.savefig(path, dpi=300, format="png")
+    plt.show()
