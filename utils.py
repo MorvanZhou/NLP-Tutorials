@@ -183,7 +183,7 @@ class Dataset:
         return len(self.v2i)
 
 
-def process_skip_gram_data(corpus, skip_window=2):
+def process_w2v_data(corpus, skip_window=2, method="skip_gram"):
     all_words = [sentence.split(" ") for sentence in corpus]
     all_words = np.array(list(itertools.chain(*all_words)))
     # vocab sort by decreasing frequency for the negative sampling below (nce_loss).
@@ -197,21 +197,36 @@ def process_skip_gram_data(corpus, skip_window=2):
     # pair data
     pairs = []
     js = [i for i in range(-skip_window, skip_window + 1) if i != 0]
+
     for c in corpus:
         words = c.split(" ")
         w_idx = [v2i[w] for w in words]
-        for i in range(len(w_idx)):
-            for j in js:
-                if i + j < 0 or i + j >= len(w_idx):
-                    continue
-                pairs.append((w_idx[i], w_idx[i + j]))  # (center, context) or (feature, target)
+        if method == "skip_gram":
+            for i in range(len(w_idx)):
+                for j in js:
+                    if i + j < 0 or i + j >= len(w_idx):
+                        continue
+                    pairs.append((w_idx[i], w_idx[i + j]))  # (center, context) or (feature, target)
+        elif method.lower() == "cbow":
+            for i in range(skip_window, len(w_idx) - skip_window):
+                context = []
+                for j in js:
+                    context.append(w_idx[i + j])
+                pairs.append(context + [w_idx[i]])  # (contexts, center) or (feature, target)
+        else:
+            raise ValueError
     pairs = np.array(pairs)
     print("5 example pairs:\n", pairs[:5])
-    x, y = pairs[:, 0], pairs[:, 1]
+    if method.lower() == "skip_gram":
+        x, y = pairs[:, 0], pairs[:, 1]
+    elif method.lower() == "cbow":
+        x, y = pairs[:, :-1], pairs[:, -1]
+    else:
+        raise ValueError
     return Dataset(x, y, v2i, i2v)
 
 
-def show_skip_gram_word_embedding(model, data: Dataset):
+def show_w2v_word_embedding(model, data: Dataset, path):
     word_emb = model.embeddings.get_weights()[0]
     for i in range(data.num_word):
         c = "blue"
@@ -226,7 +241,6 @@ def show_skip_gram_word_embedding(model, data: Dataset):
     plt.yticks(())
     plt.xlabel("embedding dim1")
     plt.ylabel("embedding dim2")
-    path = "visual_helper/skip_gram.png"
     os.makedirs(os.path.dirname(path), exist_ok=True)
     plt.savefig(path, dpi=300, format="png")
     plt.show()
