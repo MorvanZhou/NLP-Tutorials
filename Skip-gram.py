@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
-from utils import process_skip_gram_data, show_skip_gram_word_embedding
+from utils import process_w2v_data, show_w2v_word_embedding
 
 corpus = [
     # numbers
@@ -56,6 +56,7 @@ class SkipGram(keras.Model):
         self.opt = tf.optimizers.Adam(0.01)
 
     def call(self, x, training=None, mask=None):
+        # x.shape = [n, ]
         o = self.embeddings(x)      # [n, emb_dim]
         return o
 
@@ -76,7 +77,7 @@ class SkipGram(keras.Model):
         return _loss.numpy()
 
 
-data = process_skip_gram_data(corpus, skip_window=2)
+data = process_w2v_data(corpus, skip_window=2, method="skip_gram")
 model = SkipGram(data.num_word, 2)
 
 # training
@@ -87,4 +88,4 @@ for t in range(2500):
         print("step: {} | loss: {}".format(t, loss))
 
 # plotting
-show_skip_gram_word_embedding(model, data)
+show_w2v_word_embedding(model, data, "visual_helper/skip_gram.png")
