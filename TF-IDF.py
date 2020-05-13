@@ -18,19 +18,18 @@ docs = [
 
 
 def get_tf(docs, method="log"):
+    # how frequent a word appears in a doc
     def safe_log(x):
         mask = x != 0
         x[mask] = np.log10(x[mask])
         return x
 
-    # different tf computation
-    def log_tf(tf): return 1 + safe_log(tf)
-
-    def augmented_tf(tf): return 0.5 + 0.5 * tf / np.max(tf, axis=1, keepdims=True)
-
-    def boolean_tf(tf): return np.minimum(tf, 1)
-
-    def log_avg_tf(tf): return (1 + safe_log(tf)) / (1 + safe_log(np.mean(tf, axis=1, keepdims=True)))
+    methods = {
+        "log": lambda x: 1 + safe_log(x),
+        "augmented": lambda x: 0.5 + 0.5 * x / np.max(x, axis=1, keepdims=True),
+        "boolean": lambda x: np.minimum(x, 1),
+        "log_avg": lambda x: (1 + safe_log(x)) / (1 + safe_log(np.mean(x, axis=1, keepdims=True))),
+    }
 
     docs_words = [d.replace(",", "").split(" ") for d in docs]
     vocab = set(itertools.chain(*docs_words))
@@ -44,27 +43,20 @@ def get_tf(docs, method="log"):
         for v in counter.keys():
             tf[v2i[v], i] = counter[v]
 
-    if method == "log":
-        weighted_tf = log_tf
-    elif method == "augmented":
-        weighted_tf = augmented_tf
-    elif method == "boolean":
-        weighted_tf = boolean_tf
-    elif method == "log_avg":
-        weighted_tf = log_avg_tf
-    else:
+    weighted_tf = methods.get(method, None)
+    if weighted_tf is None:
         raise ValueError
     return weighted_tf(tf), docs_words, v2i, i2v,
 
 
 # inverse document frequency
 def get_idf(docs_words, i2v, method="log"):
-    # different idf computation
-    def log_idf(df): return np.log10(len(docs) / df)
-
-    def prob_idf(df): return np.maximum(0, np.log((len(docs) - df) / df))
-
-    def length_norm(x): return x / np.sum(np.square(x))
+    # low idf for a word appears in more docs, mean less important
+    methods = {
+        "log": lambda x: np.log10(len(docs) / x),
+        "prob": lambda x: np.maximum(0, np.log((len(docs) - x) / x)),
+        "len_norm": lambda x: x / np.sum(np.square(x)),
+    }
 
     df = np.zeros((len(i2v),))
     for i in range(len(i2v)):
@@ -73,15 +65,10 @@ def get_idf(docs_words, i2v, method="log"):
             d_count += 1 if i2v[i] in d else 0
         df[i] = d_count
 
-    if method == "log":
-        idf = log_idf
-    elif method == "prob":
-        idf = prob_idf
-    elif method == "len_norm":
-        idf = length_norm
-    else:
+    idf_fn = methods.get(method, None)
+    if idf_fn is None:
         raise ValueError
-    return idf(df)
+    return idf_fn(df)
 
 
 def cosine_similarity(q, ds):
