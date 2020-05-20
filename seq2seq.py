@@ -2,16 +2,101 @@
 More details about NMT: https://github.com/tensorflow/nmt
 """
 import tensorflow as tf
+from tensorflow import keras
 import numpy as np
 import utils
+import tensorflow_addons as tfa
 
-UNITS = 32
+
+class Seq2Seq(keras.Model):
+    def __init__(self, enc_v_dim, dec_v_dim, emb_dim, units, max_pred_len, start_token, end_token, v2i):
+        super().__init__()
+
+        self.enc_embeddings = keras.layers.Embedding(
+            input_dim=enc_v_dim, output_dim=emb_dim,       # [n_vocab, emb_dim]
+            embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
+        )
+        self.dec_embeddings = keras.layers.Embedding(
+            input_dim=dec_v_dim, output_dim=emb_dim,  # [n_vocab, emb_dim]
+            embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
+        )
+        self.units = units
+        self.encoder = keras.layers.LSTM(units=units, return_sequences=True, return_state=True)
+        decoder_dense = keras.layers.Dense(1)
+        self.decoder_train = tfa.seq2seq.BasicDecoder(
+            cell=keras.layers.LSTM(units=units, return_sequences=True, return_state=True),
+            sampler=tfa.seq2seq.sampler.TrainingSampler(), output_layer=decoder_dense
+        )
+        self.decoder_eval = tfa.seq2seq.BasicDecoder(
+            cell=keras.layers.LSTM(units=units, return_sequences=True, return_state=True),
+            sampler=tfa.seq2seq.sampler.GreedyEmbeddingSampler(), output_layer=decoder_dense
+        )
+
+        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.opt = keras.optimizers.Adam(0.0001, clipnorm=5.0)
+        self.train_sampler = tfa.seq2seq.sampler.TrainingSampler()
+        self.max_pred_len = max_pred_len
+        self.start_token = start_token
+        self.end_token = end_token
+        self.v2i = v2i
+
+    def call(self, x, training=None, mask=None):
+        o, s = self.encode(x)
+        o, s = self.decode(o, s, training)
+        return o
+
+    def encode(self, x: tf.Tensor):
+        o = self.enc_embeddings(x)
+        init_s = (tf.zeros((x.shape[0], self.units)), tf.zeros(x.shape[0], self.units))
+        o, h, c = self.encoder(o, initial_state=init_s)
+        return o, (h, c)
+
+    def decode(self, x, s, training=False):
+        o = self.dec_embeddings(x)
+        if training is None or training:
+            o, h, c = self.decoder_train(o, initial_state=s)
+        else:
+            finished1, in1, s1 = self.decoder_eval.initialize(
+                self.dec_embeddings.variables[0],
+                start_tokens=tf.fill([x.shape[0]], self.v2i["<GO>"]),
+                end_tokens=self.v2i["EOS"],
+            )
+            for i in range(self.max_pred_len):
+                o, h, c = self.decoder_eval(o, initial_state=s)
+        logits = self.dense(o)
+        return logits, (h, c)
+
+    def loss(self, x, y, training=None):
+        logits = self.call(x, training=training)
+        _loss = self.cross_entropy(y, logits)
+        return tf.reduce_mean(_loss)
+
+    def step(self, x, y):
+        with tf.GradientTape() as tape:
+            _loss: tf.Tensor = self.loss(x, y, True)
+            grads = tape.gradient(_loss, self.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.trainable_variables))
+        return _loss.numpy()
+
 
 # get and process data
-vocab, x, y, v2i, i2v, date_cn, date_en = utils.get_date_data()
-print("Chinese time order: ", date_cn[:3], "\nEnglish time order: ", date_en[:3])
-print("vocabularies: ", vocab)
-print("x index sample: \n", x[:2], "\ny index sample: \n", y[:2])
+data = utils.DateData()
+print("Chinese time order: ", data.date_cn[:3], "\nEnglish time order: ", data.date_en[:3])
+print("vocabularies: ", data.vocab)
+print("x index sample: \n", data.x[:2], "\ny index sample: \n", data.y[:2])
+
+model = Seq2Seq(
+    data.num_word, data.num_word, 16, 16,
+    max_pred_len=20, start_token=data.start_token, end_token=data.end_token, v2i=data.v2i)
+
+# training
+for t in range(2500):
+    bx, by, decoder_len = data.sample(8)
+    loss = model.step(bx, by)
+    if t % 200 == 0:
+        print("step: {} | loss: {}".format(t, loss))
+
+
 
 # net
 tfx = tf.placeholder(tf.int32, [None, None])    # [n, time_step]
