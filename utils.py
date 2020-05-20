@@ -18,25 +18,43 @@ def sub_sampling(int_words, threshold=1e-5):
     return kept_words
 
 
-def get_date_data(n=5000):
-    date_cn = []
-    date_en = []
-    for timestamp in np.random.randint(143835585, 2043835585, n):
-        date = datetime.datetime.fromtimestamp(timestamp)
-        date_cn.append(date.strftime("%y-%m-%d"))
-        date_en.append(date.strftime("%d/%b/%Y"))
-    vocab = set([str(i) for i in range(0, 10)] + ["-", "/", "<GO>", "<EOS>"] + [i.split("/")[1] for i in date_en])
-    v2i = {v: i for i, v in enumerate(vocab, start=1)}
-    v2i["<PAD>"] = 0
-    vocab.add("<PAD>")
-    i2v = {i: v for v, i in v2i.items()}
-    x, y = [], []
-    for cn, en in zip(date_cn, date_en):
-        x.append([v2i[v] for v in cn])
-        y.append(
-            [v2i["<GO>"], ] + [v2i[v] for v in en[:3]] + [v2i[en[3:6]], ] + [v2i[v] for v in en[6:]] + [v2i["<EOS>"], ])
-    x, y = np.array(x), np.array(y)
-    return vocab, x, y, v2i, i2v, date_cn, date_en
+class DateData:
+    def __init__(self):
+        self.date_cn = []
+        self.date_en = []
+        self.start_token = "<GO>"
+        self.end_token = "<EOS>"
+        for timestamp in np.random.randint(143835585, 2043835585, n):
+            date = datetime.datetime.fromtimestamp(timestamp)
+            self.date_cn.append(date.strftime("%y-%m-%d"))
+            self.date_en.append(date.strftime("%d/%b/%Y"))
+        self.vocab = set(
+            [str(i) for i in range(0, 10)] + ["-", "/", self.start_token, self.end_token] + [
+                i.split("/")[1] for i in self.date_en])
+        self.v2i = {v: i for i, v in enumerate(self.vocab, start=1)}
+        self.v2i["<PAD>"] = 0
+        self.vocab.add("<PAD>")
+        self.i2v = {i: v for v, i in self.v2i.items()}
+        self.x, self.y = [], []
+        for cn, en in zip(self.date_cn, self.date_en):
+            self.x.append([self.v2i[v] for v in cn])
+            self.y.append(
+                [self.v2i["<GO>"], ] + [self.v2i[v] for v in en[:3]] + [
+                    self.v2i[en[3:6]], ] + [self.v2i[v] for v in en[6:]] + [
+                    self.v2i["<EOS>"], ])
+        self.x, self.y = np.array(self.x), np.array(self.y)
+
+    def sample(self, n=64):
+        bi = np.random.randint(0, len(self.x), size=n)
+        bx, by = self.x[bi], self.y[bi]
+        decoder_len = np.full((len(bx),), by.shape[1] - 1)
+        return bx, by, decoder_len
+
+    @property
+    def num_word(self):
+        return len(self.vocab)
+
+
 
 
 def pad_zero(seqs, max_len):
