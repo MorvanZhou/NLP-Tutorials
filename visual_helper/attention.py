@@ -18,6 +18,7 @@ def plot_attention(i2v, sample_x, sample_y, alignments):
         if i >= 3:
             plt.xlabel("Input")
     plt.tight_layout()
+    plt.savefig("attention.png", format="png", dpi=200)
     plt.show()
 
 
