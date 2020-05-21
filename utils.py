@@ -19,17 +19,15 @@ def sub_sampling(int_words, threshold=1e-5):
 
 
 class DateData:
-    def __init__(self):
+    def __init__(self, n):
         self.date_cn = []
         self.date_en = []
-        self.start_token = "<GO>"
-        self.end_token = "<EOS>"
         for timestamp in np.random.randint(143835585, 2043835585, n):
             date = datetime.datetime.fromtimestamp(timestamp)
             self.date_cn.append(date.strftime("%y-%m-%d"))
             self.date_en.append(date.strftime("%d/%b/%Y"))
         self.vocab = set(
-            [str(i) for i in range(0, 10)] + ["-", "/", self.start_token, self.end_token] + [
+            [str(i) for i in range(0, 10)] + ["-", "/", "<GO>", "<EOS>"] + [
                 i.split("/")[1] for i in self.date_en])
         self.v2i = {v: i for i, v in enumerate(self.vocab, start=1)}
         self.v2i["<PAD>"] = 0
@@ -43,12 +41,22 @@ class DateData:
                     self.v2i[en[3:6]], ] + [self.v2i[v] for v in en[6:]] + [
                     self.v2i["<EOS>"], ])
         self.x, self.y = np.array(self.x), np.array(self.y)
+        self.start_token = self.v2i["<GO>"]
+        self.end_token = self.v2i["<EOS>"]
 
     def sample(self, n=64):
         bi = np.random.randint(0, len(self.x), size=n)
         bx, by = self.x[bi], self.y[bi]
-        decoder_len = np.full((len(bx),), by.shape[1] - 1)
+        decoder_len = np.full((len(bx),), by.shape[1] - 1, dtype=np.int32)
         return bx, by, decoder_len
+
+    def idx2str(self, idx):
+        x = []
+        for i in idx:
+            x.append(self.i2v[i])
+            if i == self.end_token:
+                break
+        return "".join(x)
 
     @property
     def num_word(self):
