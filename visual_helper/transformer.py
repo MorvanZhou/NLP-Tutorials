@@ -25,6 +25,7 @@ def pad_mask(seqs):
         plt.yticks(range(6), SEQS[i - 1].split(" "),)
         plt.grid(which="minor", c="w", lw=0.5, linestyle="-")
     plt.tight_layout()
+    plt.savefig("transformer_pad_mask.png", dpi=200)
     plt.show()
 
 
@@ -46,6 +47,7 @@ def output_mask(seqs):
         plt.yticks(range(6), SEQS[i - 1].split(" "), )
         plt.grid(which="minor", c="w", lw=0.5, linestyle="-")
     plt.tight_layout()
+    plt.savefig("transformer_output_mask.png", dpi=200)
     plt.show()
 
 
@@ -59,6 +61,7 @@ def position_embedding():
     plt.imshow(pe, vmax=1, vmin=-1, cmap="rainbow")
     plt.ylabel("word position")
     plt.xlabel("embedding dim")
+    plt.savefig("transformer_position_embedding.png", dpi=200)
     plt.show()
 
 
@@ -69,9 +72,9 @@ def attention_matrix():
     tgt = data["tgt"]
     attentions = data["attentions"]
 
-    encoder_atten = attentions[:3]
-    decoder_tgt_atten = attentions[3::2]
-    decoder_src_atten = attentions[4::2]
+    encoder_atten = attentions["encoder"]
+    decoder_tgt_atten = attentions["decoder"]["mh1"]
+    decoder_src_atten = attentions["decoder"]["mh2"]
     plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
     plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
 
@@ -89,6 +92,7 @@ def attention_matrix():
                 plt.xlabel("head %i" % j)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
+    plt.savefig("transformer_encoder_self_attention.png", dpi=200)
     plt.show()
 
     plt.figure(1, (7, 7))
@@ -105,6 +109,7 @@ def attention_matrix():
                 plt.xlabel("head %i" % j)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
+    plt.savefig("transformer_decoder_self_attention.png", dpi=200)
     plt.show()
 
     plt.figure(2, (7, 7))
@@ -121,6 +126,7 @@ def attention_matrix():
                 plt.xlabel("head %i" % j)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
+    plt.savefig("transformer_decoder_encoder_attention.png", dpi=200)
     plt.show()
 
 
