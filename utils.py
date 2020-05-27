@@ -119,11 +119,9 @@ class MRPCData4BERT:
 
         self.max_len = max_len * 2
         mlm_x = data["train"]["s1id"] + data["train"]["s2id"]
-        self.mlm_len = np.array([len(s) for s in mlm_x])
         self.mlm_x = _pad_zero(mlm_x, max_len=self.max_len)
         nsp_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
         self.nsp_x = _pad_zero(nsp_x, max_len=self.max_len)
-        self.nsp_len = np.array([[len(s1), len(s2)] for s1, s2 in zip(data["train"]["s1id"], data["train"]["s2id"])])
         self.nsp_y = data["train"]["is_same"]
 
         self.mlm_seg = np.full(self.mlm_x.shape, 2, np.int32)
@@ -141,6 +139,11 @@ class MRPCData4BERT:
             si_ = si + len(data["train"]["s2id"][i])
             self.nsp_seg[i, si:si_] = 1
         self.normal_words = list(set(self.v2i.keys()).difference(["<SEP>", "<MASK>", "<PAD>"]))
+
+    def sample_mlm(self, n):
+        bi = np.random.randint(0, self.mlm_x.shape[0], size=n)
+        bx, bs = self.mlm_x[bi], self.mlm_seg[bi]
+        return bx, bs
 
     @property
     def num_word(self):
