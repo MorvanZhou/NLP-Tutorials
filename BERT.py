@@ -46,14 +46,14 @@ class BERT(keras.Model):
             input_dim=max_len, output_dim=model_dim,  # [step, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
-        self.position_space = tf.expand_dims(tf.linspace(0., 1., max_len+1), axis=0)
+        self.position_space = tf.expand_dims(tf.linspace(0., 1., max_len), axis=0)
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
-        self.o_seq = keras.layers.Dense(n_vocab)
+        self.o_mlm = keras.layers.Dense(n_vocab)
         self.o_cls = keras.layers.Dense(n_cls)
 
-        self.cross_entropy1 = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.cross_entropy2 = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt1 = keras.optimizers.Adam(0.001)
+        self.opt = keras.optimizers.Adam(0.001)
         self.opt2 = keras.optimizers.Adam(0.001)
 
     def get_embeddings(self, seg, seq):
@@ -75,12 +75,30 @@ class BERT(keras.Model):
 
     def mlm(self, seg, seq, mask_rate=0.1, training=False):
         embed = self.get_embeddings(seg, seq)   # [n. step, dim]
-        masked, masked_idx = self.random_mask(embed, mask_rate)
-        z = self.encoder(embed, training=training, mask=self._pad_mask(seg))
 
-    def random_mask(self, embed, rate):
+        # random mask
+        np_input_mask = np.random.rand(embed.shape[0], embed.shape[1]) > mask_rate
+        np_target_mask = np.logical_not(np_input_mask)
+        input_mask = tf.expand_dims(tf.convert_to_tensor(np_input_mask.astype(np.float32)), axis=2)  # [n, step, 1]
+        target_mask = tf.expand_dims(tf.convert_to_tensor(np_target_mask.astype(np.float32)), axis=2)   # [n, step, 1]
 
-        return masked, masked_idx
+        masked_embed = embed * input_mask
+        z = self.encoder(masked_embed, training=training, mask=self._pad_mask(seg))
+        mlm_logits = self.o_mlm(z)
+        masked_logits = mlm_logits * target_mask
+        inf = np.zeros(masked_logits.shape, dtype=np.float32)
+        inf[:, :, 0] += 1e-9
+        masked_logits += tf.convert_to_tensor(inf)         # make softmax to the first word index in vocab
+        return masked_logits, np_target_mask
+
+    def mlm_step(self, seg, seq, mask_rate=0.1):
+        with tf.GradientTape() as tape:
+            mlm_logits, target_mask = self.mlm(seg, seq, mask_rate, training=True)
+            target_words = seq * target_mask
+            _loss = self.cross_entropy(target_words, mlm_logits)
+        grads = tape.gradient(_loss, self.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.trainable_variables))
+        return _loss.numpy(), mlm_logits.numpy().argmax(axis=2), target_words
 
 
     def step1(self, seg, seq_replaced, task, label_mask, label):
@@ -143,15 +161,11 @@ def rand_replace(replace_tmp, bl):
     return replace_tmp, label_rep
 
 
-def train_MLM_NS(x1, seg1, task, slen):
-    bi = np.random.randint(0, len(x1), size=b_size)
-    bx, bs, bl = x1[bi], seg1[bi], slen[bi]
-    replaced, label_rep = rand_replace(replace_tmp=bx.copy(), bl=bl)
-    loss_, seq_logits_ = model.step1(seg=bs, seq_replaced=replaced, task=task, label_mask=label_rep[:, :, None], label=bx)
-    # _, loss_, seq_logits_ = model.sess.run([model.train1, model.loss1, model.seq_logits], {
-    #     model.tfseq: bx, model.tfseq_replaced: replaced, model.tflabel_rep: label_rep,
-    #     model.tfseg: bs, model.tftask: task, model.training: True})
-    return loss_, seq_logits_[0], bx[0], replaced[0]
+def train_mlm(data, model):
+    bx, bs = data.sample_mlm(32)
+    # replaced, label_rep = rand_replace(replace_tmp=bx.copy(), bl=bl)
+    loss, masked_pred, masked_target = model.mlm_step(seg=bs, seq=bx, mask_rate=0.1)
+    return loss, masked_pred, masked_target
 
 
 def train_task2(x2, seg2, y2, task, slen):
@@ -167,8 +181,7 @@ def train_task2(x2, seg2, y2, task, slen):
     return loss_, cls_logits_, by, replaced[0], seq_logits_[0], bx[0]
 
 
-if __name__ == "__main__":
-
+def main():
     # get and process data
     data = utils.MRPCData4BERT("./MRPC")
     model = BERT(
@@ -177,27 +190,33 @@ if __name__ == "__main__":
 
     t0 = time.time()
     b_size = 32
-    task1 = np.full((b_size, 1), 0, np.int32)
-    task2 = np.full((b_size, 1), 1, np.int32)
     for t in range(20000):
-        loss1, t1logits, tx1, trpl1 = train_task1(x1, seg1, task1, len1)
-        if t % 10 == 0:     # task 2 in this case is easy to learn
-            loss2, cls_logits_, by2, trpl2, t2logits, tx2 = train_task2(x2, seg2, y2, task2, len2)
-        if t % 50 == 0:
-            correct = cls_logits_.argmax(axis=1) == by2
-            acc = float(np.sum(correct) / len(cls_logits_))
-            t1 = time.time()
-            print(
+        loss, masked_pred, masked_target = train_mlm(data, model)
+        print(
                 "\n\nstep: ", t,
-                "| time: %.2f" % (t1 - t0),
-                "| loss1: %.3f, loss2: %.3f" % (loss1, loss2),
-                "\n| t1 tgt: ", u" ".join([i2v[i] for i in tx1 if i != v2i["<PAD>"]]).encode("utf-8"),
-                "\n| t1 rpl: ", u" ".join([i2v[i] for i in trpl1 if i != v2i["<PAD>"]]).encode("utf-8"),
-                "\n| t1 prd: ", u" ".join([i2v[i] for i in np.argmax(t1logits, axis=1) if i != v2i["<PAD>"]]).encode("utf-8"),
-                "\n| t2 acc: %.2f" % acc,
+                # "| time: %.2f" % (t1 - t0),
+                "| loss: %.3f" % loss,
+                "\n| t1 tgt: ", u" ".join([data.i2v[i] for i in masked_target[0] if (i != data.v2i["<PAD>"]) and i != 0]).encode("utf-8"),
+                # "\n| t1 rpl: ", u" ".join([data.i2v[i] for i in trpl1 if i != v2i["<PAD>"]]).encode("utf-8"),
+                "\n| t1 prd: ", u" ".join([data.i2v[i] for i in masked_pred[0] if (i != data.v2i["<PAD>"]) and i != 0]).encode("utf-8"),
+                # "\n| t2 acc: %.2f" % acc,
             )
-            t0 = t1
-
+        # if t % 10 == 0:     # task 2 in this case is easy to learn
+        #     loss2, cls_logits_, by2, trpl2, t2logits, tx2 = train_task2(x2, seg2, y2, task2, len2)
+        # if t % 50 == 0:
+        #     correct = cls_logits_.argmax(axis=1) == by2
+        #     acc = float(np.sum(correct) / len(cls_logits_))
+        #     t1 = time.time()
+        #     print(
+        #         "\n\nstep: ", t,
+        #         "| time: %.2f" % (t1 - t0),
+        #         "| loss1: %.3f, loss2: %.3f" % (loss1, loss2),
+        #         "\n| t1 tgt: ", u" ".join([i2v[i] for i in tx1 if i != v2i["<PAD>"]]).encode("utf-8"),
+        #         "\n| t1 rpl: ", u" ".join([i2v[i] for i in trpl1 if i != v2i["<PAD>"]]).encode("utf-8"),
+        #         "\n| t1 prd: ", u" ".join([i2v[i] for i in np.argmax(t1logits, axis=1) if i != v2i["<PAD>"]]).encode("utf-8"),
+        #         "\n| t2 acc: %.2f" % acc,
+        #     )
+        #     t0 = t1
 
     # save attention matrix for visualization
     # attentions, cls_logits_, seq_logits_ = model.sess.run([model.attentions, model.cls_logits, model.seq_logits], {model.tfx: bx, model.training: False})
@@ -205,4 +224,8 @@ if __name__ == "__main__":
     # import pickle
     # with open("./visual_helper/GPT_attention_matrix.pkl", "wb") as f:
     #     pickle.dump(data, f)
+
+if __name__ == "__main__":
+    main()
+
 
