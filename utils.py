@@ -63,8 +63,8 @@ def _pad_zero(seqs, max_len):
 
 
 def maybe_download_mrpc(save_dir="./MRPC/", proxy=None):
-    train_url = 'https://raw.githubusercontent.com/tensorflow/datasets/master/tensorflow_datasets/testing/test_data/fake_examples/glue/MRPC/msr_paraphrase_train.txt'
-    test_url = 'https://raw.githubusercontent.com/tensorflow/datasets/master/tensorflow_datasets/testing/test_data/fake_examples/glue/MRPC//msr_paraphrase_test.txt'
+    train_url = 'https://dl.fbaipublicfiles.com/senteval/senteval_data/msr_paraphrase_train.txt'
+    test_url = 'https://dl.fbaipublicfiles.com/senteval/senteval_data/msr_paraphrase_test.txt'
     os.makedirs(save_dir, exist_ok=True)
     proxies = {"http": proxy, "https": proxy}
     for url in [train_url, test_url]:
@@ -92,7 +92,7 @@ def _process_mrpc(dir="./MRPC/", go="<GO> ", end=" <EOS>"):
     for f in files:
         df = pd.read_csv(os.path.join(dir, f), sep='\t')
         k = "train" if "train" in f else "test"
-        data[k] = {"is_same": df["BOMQuality"].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
+        data[k] = {"is_same": df.iloc[:, 0].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
     vocab = set()
     for n in ["train", "test"]:
         for m in ["s1", "s2"]:
@@ -122,7 +122,7 @@ class MRPCData4BERT:
         self.mlm_x = _pad_zero(mlm_x, max_len=self.max_len)
         nsp_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
         self.nsp_x = _pad_zero(nsp_x, max_len=self.max_len)
-        self.nsp_y = data["train"]["is_same"]
+        self.nsp_y = data["train"]["is_same"][:, None]
 
         self.mlm_seg = np.full(self.mlm_x.shape, 2, np.int32)
         for i in range(len(data["train"]["s1id"])):
@@ -144,6 +144,11 @@ class MRPCData4BERT:
         bi = np.random.randint(0, self.mlm_x.shape[0], size=n)
         bx, bs = self.mlm_x[bi], self.mlm_seg[bi]
         return bx, bs
+
+    def sample_nsp(self, n):
+        bi = np.random.randint(0, self.nsp_x.shape[0], size=n)
+        bx, bs, by = self.nsp_x[bi], self.nsp_seg[bi], self.nsp_y[bi]
+        return bx, bs, by
 
     @property
     def num_word(self):
