@@ -49,7 +49,7 @@ class BERT(keras.Model):
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(0.001)
+        self.opt = keras.optimizers.Adam(0.01)
 
     def get_embeddings(self, seg, seq):
         embed = self.word_emb(seq) + self.segment_emb(seg) + self.position_emb(self.position_space)    # [n, step, dim]
@@ -149,19 +149,20 @@ def main():
     mlm_model = BERTMLM(bert)
     nsp_model = BERTNSP(bert)
     t0 = time.time()
-    b_size = 32
+    b_size = 64
     for t in range(20000):
-        loss_mlm, masked_pred, masked_target = mlm_model.step_mlm(data, b_size, mask_rate=0.1)
+        loss_mlm, masked_pred, masked_target = mlm_model.step(data, b_size, mask_rate=0.1)
         loss_nsp = nsp_model.step(data, b_size)
-        t1 = time.time()
-        print(
-                "\n\nstep: ", t,
-                "| time: %.2f" % (t1 - t0),
-                "| loss_mlm: %.3f | loss_nsp: %.3f" % (loss_mlm, loss_nsp),
-                "\n| mlm tgt: ", [data.i2v[i] for i in masked_target[0] if (i != data.v2i["<PAD>"]) and i != 0],
-                "\n| mlm prd: ", [data.i2v[i] for i in masked_pred[0] if (i != data.v2i["<PAD>"]) and i != 0],
-            )
-        t0 = t1
+        if t % 10 == 0:
+            t1 = time.time()
+            print(
+                    "\n\nstep: ", t,
+                    "| time: %.2f" % (t1 - t0),
+                    "| loss_mlm: %.3f | loss_nsp: %.3f" % (loss_mlm, loss_nsp),
+                    "\n| mlm tgt: ", [data.i2v[i] for i in masked_target[0] if (i != data.v2i["<PAD>"]) and i != 0],
+                    "\n| mlm prd: ", [data.i2v[i] for i in masked_pred[0] if (i != data.v2i["<PAD>"]) and i != 0],
+                )
+            t0 = t1
 
     # save attention matrix for visualization
     # attentions, cls_logits_, seq_logits_ = model.sess.run([model.attentions, model.cls_logits, model.seq_logits], {model.tfx: bx, model.training: False})
