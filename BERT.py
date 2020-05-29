@@ -49,7 +49,7 @@ class BERT(keras.Model):
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(0.01)
+        self.opt = keras.optimizers.Adam(0.0003)
 
     def get_embeddings(self, seg, seq):
         embed = self.word_emb(seq) + self.segment_emb(seg) + self.position_emb(self.position_space)    # [n, step, dim]
@@ -153,7 +153,7 @@ def main():
     mlm_model = BERTMLM(bert)
     nsp_model = BERTNSP(bert)
     t0 = time.time()
-    b_size = 64
+    b_size = 32
     for t in range(20000):
         loss_mlm, masked_pred, masked_target = mlm_model.step(data, b_size, mask_rate=0.2)
         loss_nsp = nsp_model.step(data, b_size)
