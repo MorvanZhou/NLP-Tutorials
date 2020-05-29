@@ -86,11 +86,12 @@ def _text_standardize(text):
     return text.strip()
 
 
-def _process_mrpc(dir="./MRPC/", go="<GO> ", end=" <EOS>"):
+def _process_mrpc(dir="./MRPC", go="<GO> ", end=" <EOS>"):
     data = {"train": None, "test": None}
     files = os.listdir(dir)
+    top_n = 50
     for f in files:
-        df = pd.read_csv(os.path.join(dir, f), sep='\t')
+        df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=top_n)
         k = "train" if "train" in f else "test"
         data[k] = {"is_same": df.iloc[:, 0].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
     vocab = set()
@@ -118,7 +119,7 @@ class MRPCData4BERT:
         data, self.v2i, self.i2v, max_len = _process_mrpc(data_dir, go="", end=" <SEP>")
 
         self.max_len = max_len * 2
-        mlm_x = data["train"]["s1id"] + data["train"]["s2id"]
+        mlm_x = data["train"]["s1id"] + data["train"]["s2id"]  # list appending
         self.mlm_x = _pad_zero(mlm_x, max_len=self.max_len)
         nsp_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
         self.nsp_x = _pad_zero(nsp_x, max_len=self.max_len)
@@ -138,7 +139,6 @@ class MRPCData4BERT:
             self.nsp_seg[i, :si] = 0
             si_ = si + len(data["train"]["s2id"][i])
             self.nsp_seg[i, si:si_] = 1
-        self.normal_words = list(set(self.v2i.keys()).difference(["<SEP>", "<MASK>", "<PAD>"]))
 
     def sample_mlm(self, n):
         bi = np.random.randint(0, self.mlm_x.shape[0], size=n)
