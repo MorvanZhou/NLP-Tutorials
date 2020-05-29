@@ -56,12 +56,16 @@ class BERT(keras.Model):
         return embed     # [n. step, dim]
 
     def random_mask(self, embed, mask_rate, seq):
-        np_input_mask = np.random.rand(embed.shape[0], embed.shape[1]) > mask_rate  # [n, step]
+        input_mask = tf.cast(
+            tf.random.categorical(
+                tf.math.log([[mask_rate, 1-mask_rate]]), embed.shape[1]),
+            dtype=tf.float32)  # [1, step]
+        target_mask = - (input_mask - 1)
+        # np_input_mask = np.random.rand(embed.shape[0], embed.shape[1]) > mask_rate  # [n, step]
         pad_filter = seq != self.padding_idx
-        np_input_mask *= pad_filter
-        np_target_mask = np.logical_not(np_input_mask)
-        np_target_mask *= pad_filter
-        return np_input_mask, np_target_mask
+        input_mask *= pad_filter
+        target_mask *= pad_filter
+        return input_mask, target_mask
 
     def pad_mask(self, seqs):
         """
@@ -93,18 +97,18 @@ class BERTMLM(keras.Model):
         embed = self.bert.get_embeddings(seg, seq)   # [n. step, dim]
 
         # random mask
-        np_input_mask, np_target_mask = self.bert.random_mask(embed, mask_rate, seq)
-        input_mask = tf.expand_dims(tf.convert_to_tensor(np_input_mask.astype(np.float32)), axis=2)  # [n, step, 1]
-        target_mask = tf.expand_dims(tf.convert_to_tensor(np_target_mask.astype(np.float32)), axis=2)  # [n, step, 1]
+        input_mask2d, target_mask2d = self.bert.random_mask(embed, mask_rate, seq)
+        input_mask3d = tf.expand_dims(input_mask2d, axis=2)  # [n, step, 1]
+        target_mask3d = tf.expand_dims(target_mask2d, axis=2)  # [n, step, 1]
 
-        masked_embed = embed * input_mask
+        masked_embed = embed * input_mask3d
         z = self.bert.encoder(masked_embed, training=training, mask=self.bert.pad_mask(seg))
         mlm_logits = self.o_mlm(z)      # [n, step, n_vocab]
-        masked_logits = mlm_logits * target_mask
+        masked_logits = mlm_logits * target_mask3d
         inf = np.zeros(masked_logits.shape, dtype=np.float32)
         inf[:, :, 0] += 1e-9
-        masked_logits += tf.convert_to_tensor(inf)         # make softmax to the first word index in vocab
-        return masked_logits, np_target_mask
+        masked_logits += inf         # make softmax to the first word index in vocab
+        return masked_logits, target_mask2d.numpy()
 
     def step(self, data, batch_size, mask_rate=0.1):
         seq, seg = data.sample_mlm(batch_size)
@@ -151,7 +155,7 @@ def main():
     t0 = time.time()
     b_size = 64
     for t in range(20000):
-        loss_mlm, masked_pred, masked_target = mlm_model.step(data, b_size, mask_rate=0.1)
+        loss_mlm, masked_pred, masked_target = mlm_model.step(data, b_size, mask_rate=0.2)
         loss_nsp = nsp_model.step(data, b_size)
         if t % 10 == 0:
             t1 = time.time()
