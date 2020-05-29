@@ -55,7 +55,7 @@ class DateData:
         return len(self.vocab)
 
 
-def _pad_zero(seqs, max_len):
+def pad_zero(seqs, max_len):
     padded = np.full((len(seqs), max_len), fill_value=PAD_ID, dtype=np.int32)
     for i, seq in enumerate(seqs):
         padded[i, :len(seq)] = seq
@@ -120,9 +120,9 @@ class MRPCData4BERT:
 
         self.max_len = max_len * 2
         mlm_x = data["train"]["s1id"] + data["train"]["s2id"]  # list appending
-        self.mlm_x = _pad_zero(mlm_x, max_len=self.max_len)
+        self.mlm_x = pad_zero(mlm_x, max_len=self.max_len)
         nsp_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
-        self.nsp_x = _pad_zero(nsp_x, max_len=self.max_len)
+        self.nsp_x = pad_zero(nsp_x, max_len=self.max_len)
         self.nsp_y = data["train"]["is_same"][:, None]
 
         self.mlm_seg = np.full(self.mlm_x.shape, 2, np.int32)
@@ -161,9 +161,9 @@ class MRPCData4GPT:
         data, v2i, i2v, max_len = _process_mrpc(dir, go="<GO> ", end=" <EOS>")
         max_len = max_len * 2 + 1
         unsupervised_x = data["train"]["s1id"] + data["train"]["s2id"]
-        unsupervised_x = _pad_zero(unsupervised_x, max_len=max_len)
+        unsupervised_x = pad_zero(unsupervised_x, max_len=max_len)
         supervised_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
-        supervised_x = _pad_zero(supervised_x, max_len=max_len)
+        supervised_x = pad_zero(supervised_x, max_len=max_len)
         supervised_label = data["train"]["is_same"]
         print("task1 example: ", data["train"]["s1"][0])
         print("task2 example: ", data["train"]["s1"][0] + " " + data["train"]["s2"][0])

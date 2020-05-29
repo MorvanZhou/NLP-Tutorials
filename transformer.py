@@ -66,7 +66,7 @@ class MultiHead(keras.layers.Layer):
         _q = self.split_heads(_q)  # [n, h, q_step, h_dim]
         _k, _v = self.split_heads(_k), self.split_heads(_v)  # [n, h, step, h_dim]
         context = self.scaled_dot_product_attention(_q, _k, _v, training, mask)     # [n, q_step, h*dv]
-        o = self.o_dense(context)
+        o = self.o_dense(context)           # [n, step, model_dim]
         o = self.o_drop(o, training=training)
         return o
 
@@ -104,14 +104,13 @@ class PositionWiseFFN(keras.layers.Layer):
 class EncodeLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.bn1 = keras.layers.BatchNormalization()
-        self.bn2 = keras.layers.BatchNormalization()
+        self.bn = [keras.layers.BatchNormalization() for _ in range(2)]
         self.multi_head = MultiHead(n_head, model_dim, drop_rate)
         self.ffn = PositionWiseFFN(model_dim, drop_rate)
 
     def __call__(self, xz, training, mask):
-        xz = self.bn1(self.multi_head(xz, xz, xz, mask, training) + xz, training)
-        o = self.bn2(self.ffn(xz, training) + xz, training)
+        xz = self.bn[0](self.multi_head(xz, xz, xz, mask, training) + xz, training)  # [n, step, model_dim]
+        o = self.bn[1](self.ffn(xz, training) + xz, training)     # [n, step, model_dim]
         return o
 
 
@@ -129,17 +128,15 @@ class Encoder(keras.layers.Layer):
 class DecoderLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.bn1 = keras.layers.BatchNormalization()
-        self.bn2 = keras.layers.BatchNormalization()
-        self.bn3 = keras.layers.BatchNormalization()
+        self.bn = [keras.layers.BatchNormalization() for _ in range(3)]
         self.multi_head1 = MultiHead(n_head, model_dim, drop_rate)
         self.multi_head2 = MultiHead(n_head, model_dim, drop_rate)
         self.ffn = PositionWiseFFN(model_dim, drop_rate)
 
     def __call__(self, yz, xz, training, mask):
-        yz = self.bn1(self.multi_head1(yz, yz, yz, mask, training) + yz, training)
-        yz = self.bn2(self.multi_head2(yz, xz, xz, None, training) + yz, training)
-        o = self.bn3(self.ffn(yz, training) + yz, training)
+        yz = self.bn[0](self.multi_head1(yz, yz, yz, mask, training) + yz, training)
+        yz = self.bn[1](self.multi_head2(yz, xz, xz, None, training) + yz, training)
+        o = self.bn[2](self.ffn(yz, training) + yz, training)
         return o
 
 
@@ -157,8 +154,8 @@ class Decoder(keras.layers.Layer):
 class Transformer(keras.Model):
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1, padding_idx=0):
         super().__init__()
-        self.max_len = max_len
         self.padding_idx = padding_idx
+        self.max_len = max_len
 
         self.embedding = PositionEmbedding(max_len, model_dim, n_vocab)
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
@@ -170,8 +167,8 @@ class Transformer(keras.Model):
 
     def __call__(self, x, y, training=None):
         x_embed, y_embed = self.embedding(x, y)
-        encoded_z = self.encoder(x_embed, training, mask=self._pad_mask(x))
-        decoded_z = self.decoder(y_embed, encoded_z, training, mask=self._look_ahead_mask())
+        encoded_z = self.encoder(x_embed, training, self._pad_mask(x))
+        decoded_z = self.decoder(y_embed, encoded_z, training, self._look_ahead_mask())
         o = self.o(decoded_z)
         return o
 
@@ -184,17 +181,17 @@ class Transformer(keras.Model):
         return _loss.numpy()
 
     def _pad_mask(self, seqs):
-        seqs = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)
-        return seqs[:, tf.newaxis, tf.newaxis, :]  # (n, 1, 1, step)
+        _seqs = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)
+        return _seqs[:, tf.newaxis, tf.newaxis, :]  # (n, 1, 1, step)
 
     def _look_ahead_mask(self):
         mask = 1 - tf.linalg.band_part(tf.ones((self.max_len, self.max_len)), -1, 0)
         return mask  # (step, step)
 
     def translate(self, src, v2i, i2v):
-        src_pad = utils._pad_zero(np.array([v2i[v] for v in src])[None, :], self.max_len)
+        src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], self.max_len)
         tgt_seq = "<GO>"
-        tgt = utils._pad_zero(np.array([v2i[tgt_seq], ])[None, :], self.max_len + 1)
+        tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], self.max_len + 1)
         tgti = 0
         while True:
             logit = self(src_pad, tgt, False)[0, tgti, :]
@@ -229,7 +226,7 @@ if __name__ == "__main__":
     t0 = time.time()
     for t in range(1000):
         bx, by, seq_len = data.sample(64)
-        bx, by = utils._pad_zero(bx, max_len=MAX_LEN), utils._pad_zero(by, max_len=MAX_LEN + 1)
+        bx, by = utils.pad_zero(bx, max_len=MAX_LEN), utils.pad_zero(by, max_len=MAX_LEN + 1)
         loss = model.step(bx, by)
         if t % 50 == 0:
             logits = model(bx[:1, :], by[:1, :], False).numpy()
