@@ -66,7 +66,7 @@ class MultiHead(keras.layers.Layer):
         _q = self.split_heads(_q)  # [n, h, q_step, h_dim]
         _k, _v = self.split_heads(_k), self.split_heads(_v)  # [n, h, step, h_dim]
         context = self.scaled_dot_product_attention(_q, _k, _v, training, mask)     # [n, q_step, h*dv]
-        o = self.o_dense(context)
+        o = self.o_dense(context)       # [n, step, dim]
         o = self.o_drop(o, training=training)
         return o
 
@@ -90,7 +90,7 @@ class MultiHead(keras.layers.Layer):
 class PositionWiseFFN(keras.layers.Layer):
     def __init__(self, model_dim, drop_rate):
         super().__init__()
-        self.l = keras.layers.Conv1D(filters=32, kernel_size=1, activation=tf.nn.relu)
+        self.l = keras.layers.Conv1D(filters=32, kernel_size=1, activation=keras.activations.relu)
         self.o = keras.layers.Conv1D(filters=model_dim, kernel_size=1)
         self.drop = keras.layers.Dropout(rate=drop_rate)
 
@@ -98,7 +98,7 @@ class PositionWiseFFN(keras.layers.Layer):
         o = self.l(x)
         o = self.o(o)
         o = self.drop(o, training=training)
-        return o
+        return o         # [n, step, dim]
 
 
 class EncodeLayer(keras.layers.Layer):
@@ -110,8 +110,8 @@ class EncodeLayer(keras.layers.Layer):
         self.ffn = PositionWiseFFN(model_dim, drop_rate)
 
     def __call__(self, xz, training, mask):
-        xz = self.bn1(self.multi_head(xz, xz, xz, mask, training) + xz, training)
-        o = self.bn2(self.ffn(xz, training) + xz, training)
+        xz = self.bn1(self.multi_head(xz, xz, xz, mask, training) + xz, training)       # [n, step, dim]
+        o = self.bn2(self.ffn(xz, training) + xz, training)         # [n, step, dim]
         return o
 
 
@@ -123,7 +123,7 @@ class Encoder(keras.layers.Layer):
     def __call__(self, xz, training, mask):
         for l in self.ls:
             xz = l(xz, training, mask)
-        return xz
+        return xz       # [n, step, dim]
 
 
 class DecoderLayer(keras.layers.Layer):
@@ -192,9 +192,9 @@ class Transformer(keras.Model):
         return mask  # (step, step)
 
     def translate(self, src, v2i, i2v):
-        src_pad = utils._pad_zero(np.array([v2i[v] for v in src])[None, :], self.max_len)
+        src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], self.max_len)
         tgt_seq = "<GO>"
-        tgt = utils._pad_zero(np.array([v2i[tgt_seq], ])[None, :], self.max_len + 1)
+        tgt = utils.pad_zero(np.array([v2i[tgt_seq], ])[None, :], self.max_len + 1)
         tgti = 0
         while True:
             logit = self(src_pad, tgt, False)[0, tgti, :]
@@ -229,7 +229,7 @@ if __name__ == "__main__":
     t0 = time.time()
     for t in range(1000):
         bx, by, seq_len = data.sample(64)
-        bx, by = utils._pad_zero(bx, max_len=MAX_LEN), utils._pad_zero(by, max_len=MAX_LEN + 1)
+        bx, by = utils.pad_zero(bx, max_len=MAX_LEN), utils.pad_zero(by, max_len=MAX_LEN + 1)
         loss = model.step(bx, by)
         if t % 50 == 0:
             logits = model(bx[:1, :], by[:1, :], False).numpy()

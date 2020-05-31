@@ -11,11 +11,14 @@ import utils
 import time
 from transformer import Encoder
 
+tf.random.set_seed(1)
+np.random.seed(1)
 
 MODEL_DIM = 128
-N_LAYER = 3
-N_HEAD = 4
-MAX_SEG = 3   # sentence 1, sentence 2, padding
+N_LAYER = 6
+BATCH_SIZE = 5
+LEARNING_RATE = 1e-4
+MASK_RATE = 0.15
 
 
 class BERT(keras.Model):
@@ -23,11 +26,8 @@ class BERT(keras.Model):
         super().__init__()
         self.padding_idx = padding_idx
         self.n_vocab = n_vocab
+        self.max_len = max_len
 
-        self.word_emb = keras.layers.Embedding(
-            input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
-        )
         # I think task emb is not necessary for pretraining,
         # because the aim of all tasks is to train a universal sentence embedding
         # the body encoder is the same across all task, and the output layer defines each task.
@@ -37,6 +37,12 @@ class BERT(keras.Model):
         #     input_dim=n_task, output_dim=model_dim,  # [n_task, dim]
         #     embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         # )
+
+        self.word_emb = keras.layers.Embedding(
+            input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
+            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
+        )
+
         self.segment_emb = keras.layers.Embedding(
             input_dim=max_seg, output_dim=model_dim,  # [max_seg, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
@@ -45,39 +51,42 @@ class BERT(keras.Model):
             input_dim=max_len, output_dim=model_dim,  # [step, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
-        self.position_space = tf.expand_dims(tf.linspace(0., 1., max_len), axis=0)
+        self.position_emb = self.add_weight(
+            name="pos", shape=[max_len, model_dim], dtype=tf.float32,
+            initializer=keras.initializers.RandomNormal(0., 0.01))
+        self.position_space = tf.ones((1, max_len, max_len))
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
+        self.o_mlm = keras.layers.Dense(n_vocab)
+        self.o_nsp = keras.layers.Dense(2)
 
-        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(0.0003)
+        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction="none")
+        self.opt = keras.optimizers.Adam(LEARNING_RATE)
 
-    def get_embeddings(self, seg, seq):
-        embed = self.word_emb(seq) + self.segment_emb(seg) + self.position_emb(self.position_space)    # [n, step, dim]
-        return embed     # [n. step, dim]
+    def __call__(self, seqs, segs, training=False):
+        embed = self.input_emb(seqs, segs)  # [n, step, dim]
+        z = self.encoder(embed, training=training, mask=self.pad_mask(seqs))
+        mlm_logits = self.o_mlm(z)  # [n, step, n_vocab]
+        nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
+        return mlm_logits, nsp_logits
 
-    def random_mask(self, embed, mask_rate, seq):
-        input_mask = tf.cast(
-            tf.random.categorical(
-                tf.math.log([[mask_rate, 1-mask_rate]]), embed.shape[1]),
-            dtype=tf.float32)  # [1, step]
-        target_mask = - (input_mask - 1)
-        # np_input_mask = np.random.rand(embed.shape[0], embed.shape[1]) > mask_rate  # [n, step]
-        pad_filter = seq != self.padding_idx
-        input_mask *= pad_filter
-        target_mask *= pad_filter
-        return input_mask, target_mask
+    def step(self, seqs, segs, seqs_, loss_mask, nsp_labels):
+        with tf.GradientTape() as tape:
+            mlm_logits, nsp_logits = self(seqs, segs, training=True)
+            mlm_loss_batch = self.cross_entropy(seqs_, mlm_logits) * loss_mask
+            mlm_loss = tf.reduce_mean(mlm_loss_batch)
+            nsp_loss_batch = self.cross_entropy(nsp_labels, nsp_logits)
+            nsp_loss = tf.reduce_mean(nsp_loss_batch)
+            loss = mlm_loss + nsp_loss
+
+        grads = tape.gradient(loss, self.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.trainable_variables))
+        return loss.numpy(), mlm_logits.numpy().argmax(axis=2)
+
+    def input_emb(self, seqs, segs):
+        return self.word_emb(seqs) + self.segment_emb(segs) + tf.matmul(
+            self.position_space, self.position_emb)  # [n, step, dim]
 
     def pad_mask(self, seqs):
-        """
-        pad mask will look like this:
-        input|  T,1,2,P,P
-        target|
-        cls    [0,0,0,1,1]      - this line for predicting class
-        1      [0,0,0,1,1]
-        2      [0,0,0,1,1]
-        P      [1,1,1,1,1]
-        P      [1,1,1,1,1]
-        """
         _seqs = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)    # seg = 2 is padding
         return _seqs[:, tf.newaxis, tf.newaxis, :]  # (n, 1, 1, step)
 
@@ -87,93 +96,76 @@ class BERT(keras.Model):
         return attentions
 
 
-class BERTMLM(keras.Model):
-    def __init__(self, bert):
-        super().__init__()
-        self.bert = bert
-        self.o_mlm = keras.layers.Dense(bert.n_vocab)
-
-    def __call__(self, seg, seq, mask_rate=0.1, training=False):
-        embed = self.bert.get_embeddings(seg, seq)   # [n. step, dim]
-
-        # random mask
-        input_mask2d, target_mask2d = self.bert.random_mask(embed, mask_rate, seq)
-        input_mask3d = tf.expand_dims(input_mask2d, axis=2)  # [n, step, 1]
-        target_mask3d = tf.expand_dims(target_mask2d, axis=2)  # [n, step, 1]
-
-        masked_embed = embed * input_mask3d
-        z = self.bert.encoder(masked_embed, training=training, mask=self.bert.pad_mask(seg))
-        mlm_logits = self.o_mlm(z)      # [n, step, n_vocab]
-        masked_logits = mlm_logits * target_mask3d
-        inf = np.zeros(masked_logits.shape, dtype=np.float32)
-        inf[:, :, 0] += 1e-9
-        masked_logits += inf         # make softmax to the first word index in vocab
-        return masked_logits, target_mask2d.numpy()
-
-    def step(self, data, batch_size, mask_rate=0.1):
-        seq, seg = data.sample_mlm(batch_size)
-        with tf.GradientTape() as tape:
-            mlm_logits, target_mask = self(seg, seq, mask_rate, training=True)
-            target_words = seq * target_mask
-            loss = self.bert.cross_entropy(target_words, mlm_logits)
-        grads = tape.gradient(loss, self.trainable_variables)
-        self.bert.opt.apply_gradients(zip(grads, self.trainable_variables))
-        return loss.numpy(), mlm_logits.numpy().argmax(axis=2), target_words
+def do_mask(seq, len_arange, pad_id, mask_id):
+    rand_id = np.random.choice(len_arange, size=max(1, int(MASK_RATE*len(len_arange))), replace=False)
+    loss_mask = np.full_like(seq, pad_id)
+    loss_mask[rand_id] = 1
+    seq[rand_id] = mask_id
+    return loss_mask
 
 
-class BERTNSP(keras.Model):
-    def __init__(self, bert):
-        super().__init__()
-        self.bert = bert
-        self.o_nsp = keras.layers.Dense(2)
+def do_replace(seq, len_arange, pad_id, word_ids):
+    rand_id = np.random.choice(len_arange, size=max(1, int(MASK_RATE*len(len_arange))), replace=False)
+    loss_mask = np.full_like(seq, pad_id)
+    loss_mask[rand_id] = 1
+    seq[rand_id] = np.random.choice(word_ids, size=len(rand_id))
+    return loss_mask
 
-    def __call__(self, seg, seq, training=False):
-        embed = self.bert.get_embeddings(seg, seq)  # [n. step, dim]
-        z = self.bert.encoder(embed, training=training, mask=self.bert.pad_mask(seg))
-        z = tf.reshape(z, shape=[z.shape[0], -1])
-        logits = self.o_nsp(z)      # [n, n_cls]
-        return logits
 
-    def step(self, data, batch_size):
-        seq, seg, label = data.sample_nsp(batch_size)
-        with tf.GradientTape() as tape:
-            nsp_logits = self(seg, seq, training=True)
-            loss = self.bert.cross_entropy(label, nsp_logits)
-        grads = tape.gradient(loss, self.trainable_variables)
-        self.bert.opt.apply_gradients(zip(grads, self.trainable_variables))
-        return loss.numpy()
+def random_mask_or_replace(data):
+    seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
+    seqs_ = seqs.copy()
+    arange = np.arange(0, seqs.shape[1])
+    if np.random.random() > 0.3:
+        # mask
+        loss_mask = np.vstack(
+            [do_mask(
+                seqs[i],
+                np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
+                data.pad_id,
+                data.v2i["<MASK>"]) for i in range(len(seqs))])
+    else:
+        # replace
+        loss_mask = np.vstack(
+            [do_replace(
+                seqs[i],
+                np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
+                data.pad_id,
+                data.word_ids) for i in range(len(seqs))])
+    return seqs, segs, seqs_, loss_mask, xlen, nsp_labels
 
 
 def main():
     # get and process data
     data = utils.MRPCData4BERT("./MRPC")
-    bert = BERT(
-        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=N_HEAD, n_vocab=data.num_word,
-        max_seg=MAX_SEG, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
-    mlm_model = BERTMLM(bert)
-    nsp_model = BERTNSP(bert)
+    model = BERT(
+        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
+        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
     t0 = time.time()
-    b_size = 32
     for t in range(20000):
-        loss_mlm, masked_pred, masked_target = mlm_model.step(data, b_size, mask_rate=0.2)
-        loss_nsp = nsp_model.step(data, b_size)
-        if t % 10 == 0:
+        seqs, segs, seqs_, loss_mask, xlen, nsp_labels = random_mask_or_replace(data)
+        loss, pred = model.step(seqs, segs, seqs_, loss_mask, nsp_labels)
+        if t % 20 == 0:
             t1 = time.time()
             print(
-                    "\n\nstep: ", t,
-                    "| time: %.2f" % (t1 - t0),
-                    "| loss_mlm: %.3f | loss_nsp: %.3f" % (loss_mlm, loss_nsp),
-                    "\n| mlm tgt: ", [data.i2v[i] for i in masked_target[0] if (i != data.v2i["<PAD>"]) and i != 0],
-                    "\n| mlm prd: ", [data.i2v[i] for i in masked_pred[0] if (i != data.v2i["<PAD>"]) and i != 0],
+                "\n\nstep: ", t,
+                "| time: %.2f" % (t1 - t0),
+                "| loss: %.3f" % loss,
+                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0][:xlen[0].sum()+1]]),
+                "\n| prd: ", " ".join([data.i2v[i] for i in pred[0][:xlen[0].sum()+1]]),
+                "\n| tgt word: ", [data.i2v[i] for i in seqs_[0]*loss_mask[0] if i != data.v2i["<PAD>"]],
+                "\n| prd word: ", [data.i2v[i] for i in pred[0]*loss_mask[0] if i != data.v2i["<PAD>"]],
                 )
             t0 = t1
 
+    model.save_weights("./visual_helper/bert.ckpt")
     # save attention matrix for visualization
     # attentions, cls_logits_, seq_logits_ = model.sess.run([model.attentions, model.cls_logits, model.seq_logits], {model.tfx: bx, model.training: False})
     # data = {"src": bx, "label": cls_logits_.argmax(axis=1), "seq": seq_logits_.argmax(axis=-1), "attentions": attentions, "i2v": i2v}
     # import pickle
     # with open("./visual_helper/GPT_attention_matrix.pkl", "wb") as f:
     #     pickle.dump(data, f)
+
 
 if __name__ == "__main__":
     main()
