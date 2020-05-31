@@ -15,9 +15,9 @@ tf.random.set_seed(1)
 np.random.seed(1)
 
 MODEL_DIM = 128
-N_LAYER = 6
+N_LAYER = 4
 BATCH_SIZE = 5
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 MASK_RATE = 0.15
 
 
@@ -69,10 +69,10 @@ class BERT(keras.Model):
         nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
 
-    def step(self, seqs, segs, seqs_, loss_mask, nsp_labels):
+    def step(self, seqs, segs, mlm_labels, nsp_labels):
         with tf.GradientTape() as tape:
             mlm_logits, nsp_logits = self(seqs, segs, training=True)
-            mlm_loss_batch = self.cross_entropy(seqs_, mlm_logits) * loss_mask
+            mlm_loss_batch = self.cross_entropy(mlm_labels, mlm_logits) * np.where(mlm_labels == utils.PAD_ID, 0.1, 1)
             mlm_loss = tf.reduce_mean(mlm_loss_batch)
             nsp_loss_batch = self.cross_entropy(nsp_labels, nsp_logits)
             nsp_loss = tf.reduce_mean(nsp_loss_batch)
@@ -98,27 +98,26 @@ class BERT(keras.Model):
 
 def do_mask(seq, len_arange, pad_id, mask_id):
     rand_id = np.random.choice(len_arange, size=max(1, int(MASK_RATE*len(len_arange))), replace=False)
-    loss_mask = np.full_like(seq, pad_id)
-    loss_mask[rand_id] = 1
+    mlm_labels = np.full_like(seq, pad_id)
+    mlm_labels[rand_id] = seq[rand_id]
     seq[rand_id] = mask_id
-    return loss_mask
+    return mlm_labels
 
 
 def do_replace(seq, len_arange, pad_id, word_ids):
     rand_id = np.random.choice(len_arange, size=max(1, int(MASK_RATE*len(len_arange))), replace=False)
-    loss_mask = np.full_like(seq, pad_id)
-    loss_mask[rand_id] = 1
+    mlm_labels = np.full_like(seq, pad_id)
+    mlm_labels[rand_id] = seq[rand_id]
     seq[rand_id] = np.random.choice(word_ids, size=len(rand_id))
-    return loss_mask
+    return mlm_labels
 
 
 def random_mask_or_replace(data):
     seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
-    seqs_ = seqs.copy()
     arange = np.arange(0, seqs.shape[1])
     if np.random.random() > 0.3:
         # mask
-        loss_mask = np.vstack(
+        mlm_labels = np.vstack(
             [do_mask(
                 seqs[i],
                 np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
@@ -126,13 +125,13 @@ def random_mask_or_replace(data):
                 data.v2i["<MASK>"]) for i in range(len(seqs))])
     else:
         # replace
-        loss_mask = np.vstack(
+        mlm_labels = np.vstack(
             [do_replace(
                 seqs[i],
                 np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
                 data.pad_id,
                 data.word_ids) for i in range(len(seqs))])
-    return seqs, segs, seqs_, loss_mask, xlen, nsp_labels
+    return seqs, segs, mlm_labels, xlen, nsp_labels
 
 
 def main():
@@ -143,18 +142,27 @@ def main():
         max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
     t0 = time.time()
     for t in range(20000):
-        seqs, segs, seqs_, loss_mask, xlen, nsp_labels = random_mask_or_replace(data)
-        loss, pred = model.step(seqs, segs, seqs_, loss_mask, nsp_labels)
+        seqs, segs, mlm_labels, xlen, nsp_labels = random_mask_or_replace(data)
+        loss, pred = model.step(seqs, segs, mlm_labels, nsp_labels)
         if t % 20 == 0:
             t1 = time.time()
+            prd_mask = mlm_labels[0] != data.pad_id
+            tgt = mlm_labels[0] * prd_mask
+            prd = pred[0] * prd_mask
+            tgt_str = []
+            prd_str = []
+            for i in range(len(mlm_labels[0])):
+                if tgt[i] != data.v2i["<PAD>"]:
+                    tgt_str.append(data.i2v[tgt[i]])
+                    prd_str.append(data.i2v[prd[i]])
             print(
                 "\n\nstep: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.3f" % loss,
                 "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0][:xlen[0].sum()+1]]),
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred[0][:xlen[0].sum()+1]]),
-                "\n| tgt word: ", [data.i2v[i] for i in seqs_[0]*loss_mask[0] if i != data.v2i["<PAD>"]],
-                "\n| prd word: ", [data.i2v[i] for i in pred[0]*loss_mask[0] if i != data.v2i["<PAD>"]],
+                "\n| tgt word: ", tgt_str,
+                "\n| prd word: ", prd_str,
                 )
             t0 = t1
 
