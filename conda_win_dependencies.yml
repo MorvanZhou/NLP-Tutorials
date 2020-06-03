@@ -19,12 +19,10 @@ dependencies:
   - cudnn=7.6.5=cuda10.1_0
   - cycler=0.10.0=py37_0
   - freetype=2.9.1=ha9979f8_1
-  - gast=0.2.2=py37_0
   - google-auth=1.14.1=py_0
   - google-auth-oauthlib=0.4.1=py_2
   - google-pasta=0.2.0=py_0
   - grpcio=1.27.2=py37h351948d_0
-  - h5py=2.8.0=py37hf7173ca_0
   - hdf5=1.8.18=vc14h7a021fe_0
   - icc_rt=2019.0.0=h0cc432a_1
   - icu=58.2=vc14hc45fdbb_0
@@ -76,9 +74,6 @@ dependencies:
   - sqlite=3.31.1=h2a8f88b_1
   - tensorboard=2.2.1=pyh532a8cf_0
   - tensorboard-plugin-wit=1.6.0=py_0
-  - tensorflow=2.1.0=gpu_py37h7db9008_0
-  - tensorflow-base=2.1.0=gpu_py37h55f5790_0
-  - tensorflow-estimator=2.1.0=pyhd54b08b_0
   - tensorflow-gpu=2.1.0=h0d30ee6_0
   - termcolor=1.1.0=py37_1
   - tornado=6.0.4=py37he774522_1
@@ -91,5 +86,13 @@ dependencies:
   - wincertstore=0.2=py37_0
   - wrapt=1.12.1=py37he774522_1
   - zlib=1.2.11=vc14h1cdd9ab_1
+  - pip:
+    - astunparse==1.6.3
+    - gast==0.3.3
+    - h5py==2.10.0
+    - tensorflow==2.2.0
+    - tensorflow-addons==0.10.0
+    - tensorflow-estimator==2.2.0
+    - typeguard==2.7.1
 prefix: C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp
 
