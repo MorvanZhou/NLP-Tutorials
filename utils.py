@@ -21,7 +21,7 @@ class DateData:
         self.vocab = set(
             [str(i) for i in range(0, 10)] + ["-", "/", "<GO>", "<EOS>"] + [
                 i.split("/")[1] for i in self.date_en])
-        self.v2i = {v: i for i, v in enumerate(self.vocab, start=1)}
+        self.v2i = {v: i for i, v in enumerate(sorted(list(self.vocab)), start=1)}
         self.v2i["<PAD>"] = PAD_ID
         self.vocab.add("<PAD>")
         self.i2v = {i: v for v, i in self.v2i.items()}
@@ -89,7 +89,7 @@ def _text_standardize(text):
 def _process_mrpc(dir="./MRPC"):
     data = {"train": None, "test": None}
     files = os.listdir(dir)
-    top_n = 10
+    top_n = 50
     for f in files:
         df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=top_n)
         k = "train" if "train" in f else "test"
@@ -110,7 +110,8 @@ def _process_mrpc(dir="./MRPC"):
         for m in ["s1", "s2"]:
             data[n][m+"id"] = [[v2i[v] for v in c.split(" ")] for c in data[n][m]]
     max_len = max(
-        [len(s1) + len(s2) + 1 for s1, s2 in zip(data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"]+ data["test"]["s2id"])])
+        [len(s1) + len(s2) + 1 for s1, s2 in zip(
+            data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"] + data["test"]["s2id"])])
     return data, v2i, i2v, max_len
 
 
@@ -152,6 +153,34 @@ class MRPCData4BERT:
     def num_word(self):
         return len(self.v2i)
 
+
+class MRPCData4BERTDataset:
+    num_seg = 3
+
+    def __init__(self, data_dir="./MRPC/", proxy=None):
+        maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
+        data, self.v2i, self.i2v, self.max_len = _process_mrpc(data_dir)
+        self.train_s1 = data["train"]["s1id"]
+        self.train_s2 = data["train"]["s2id"]
+        self.train_labels = data["train"]["is_same"][:, None]
+        self.word_ids = np.array(list(set(self.i2v.keys()).difference(
+            [self.v2i[v] for v in ["<PAD>", "<MASK>", "<SEP>"]])))
+
+    @property
+    def mask_id(self):
+        return self.v2i["<MASK>"]
+
+    @property
+    def num_word(self):
+        return len(self.v2i)
+
+    @property
+    def sep_id(self):
+        return self.v2i["<SEP>"]
+
+    @property
+    def pad_id(self):
+        return self.v2i["<PAD>"]
 
 class MRPCData4GPT:
     def __init__(self, data_dir="./MRPC/", proxy=None):

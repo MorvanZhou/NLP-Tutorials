@@ -10,14 +10,16 @@ from tensorflow import keras
 import utils
 import time
 from transformer import Encoder
+import pickle
+
 
 tf.random.set_seed(1)
 np.random.seed(1)
 
-MODEL_DIM = 128
+MODEL_DIM = 256
 N_LAYER = 4
-BATCH_SIZE = 5
-LEARNING_RATE = 1e-3
+BATCH_SIZE = 24
+LEARNING_RATE = 1e-4
 MASK_RATE = 0.15
 
 
@@ -69,18 +71,17 @@ class BERT(keras.Model):
         nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
 
-    def step(self, seqs, segs, mlm_labels, nsp_labels):
+    def step(self, seqs, segs, seqs_, loss_mask, nsp_labels):
         with tf.GradientTape() as tape:
             mlm_logits, nsp_logits = self(seqs, segs, training=True)
-            mlm_loss_batch = self.cross_entropy(mlm_labels, mlm_logits) * np.where(mlm_labels == utils.PAD_ID, 0.1, 1)
+            mlm_loss_batch = tf.boolean_mask(self.cross_entropy(seqs_, mlm_logits), loss_mask)
             mlm_loss = tf.reduce_mean(mlm_loss_batch)
             nsp_loss_batch = self.cross_entropy(nsp_labels, nsp_logits)
             nsp_loss = tf.reduce_mean(nsp_loss_batch)
             loss = mlm_loss + nsp_loss
-
-        grads = tape.gradient(loss, self.trainable_variables)
-        self.opt.apply_gradients(zip(grads, self.trainable_variables))
-        return loss.numpy(), mlm_logits.numpy().argmax(axis=2)
+            grads = tape.gradient(loss, self.trainable_variables)
+            self.opt.apply_gradients(zip(grads, self.trainable_variables))
+        return loss, mlm_logits
 
     def input_emb(self, seqs, segs):
         return self.word_emb(seqs) + self.segment_emb(segs) + tf.matmul(
@@ -92,87 +93,103 @@ class BERT(keras.Model):
 
     @property
     def attentions(self):
-        attentions = [l.multi_head.attention.numpy() for l in self.encoder.ls]
+        attentions = [l.mh.attention.numpy() for l in self.encoder.ls]
         return attentions
 
 
+def _get_loss_mask(len_arange, seq, pad_id):
+    rand_id = np.random.choice(len_arange, size=max(2, int(MASK_RATE * len(len_arange))), replace=False)
+    loss_mask = np.full_like(seq, pad_id, dtype=np.bool)
+    loss_mask[rand_id] = True
+    return loss_mask[None, :], rand_id
+
+
 def do_mask(seq, len_arange, pad_id, mask_id):
-    rand_id = np.random.choice(len_arange, size=max(1, int(MASK_RATE*len(len_arange))), replace=False)
-    mlm_labels = np.full_like(seq, pad_id)
-    mlm_labels[rand_id] = seq[rand_id]
+    loss_mask, rand_id = _get_loss_mask(len_arange, seq, pad_id)
     seq[rand_id] = mask_id
-    return mlm_labels
+    return loss_mask
 
 
 def do_replace(seq, len_arange, pad_id, word_ids):
-    rand_id = np.random.choice(len_arange, size=max(1, int(MASK_RATE*len(len_arange))), replace=False)
-    mlm_labels = np.full_like(seq, pad_id)
-    mlm_labels[rand_id] = seq[rand_id]
+    loss_mask, rand_id = _get_loss_mask(len_arange, seq, pad_id)
     seq[rand_id] = np.random.choice(word_ids, size=len(rand_id))
-    return mlm_labels
+    return loss_mask
 
 
-def random_mask_or_replace(data):
+def do_nothing(seq, len_arange, pad_id):
+    loss_mask, _ = _get_loss_mask(len_arange, seq, pad_id)
+    return loss_mask
+
+
+def random_mask_or_replace(data, arange):
     seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
-    arange = np.arange(0, seqs.shape[1])
-    if np.random.random() > 0.3:
+    seqs_ = seqs.copy()
+    p = np.random.random()
+    if p < 0.7:
         # mask
-        mlm_labels = np.vstack(
+        loss_mask = np.concatenate(
             [do_mask(
                 seqs[i],
                 np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
                 data.pad_id,
-                data.v2i["<MASK>"]) for i in range(len(seqs))])
+                data.v2i["<MASK>"]) for i in range(len(seqs))], axis=0)
+    elif p < 0.85:
+        # do nothing
+        loss_mask = np.concatenate(
+            [do_nothing(
+                seqs[i],
+                np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
+                data.pad_id) for i in range(len(seqs))], axis=0)
     else:
         # replace
-        mlm_labels = np.vstack(
+        loss_mask = np.concatenate(
             [do_replace(
                 seqs[i],
                 np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
                 data.pad_id,
-                data.word_ids) for i in range(len(seqs))])
-    return seqs, segs, mlm_labels, xlen, nsp_labels
+                data.word_ids) for i in range(len(seqs))], axis=0)
+    return seqs, segs, seqs_, loss_mask, xlen, nsp_labels
 
 
 def main():
     # get and process data
     data = utils.MRPCData4BERT("./MRPC")
+    print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
         max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
     t0 = time.time()
-    for t in range(20000):
-        seqs, segs, mlm_labels, xlen, nsp_labels = random_mask_or_replace(data)
-        loss, pred = model.step(seqs, segs, mlm_labels, nsp_labels)
+    arange = np.arange(0, data.max_len)
+    for t in range(20):
+        seqs, segs, seqs_, loss_mask, xlen, nsp_labels = random_mask_or_replace(data, arange)
+        loss, pred = model.step(seqs, segs, seqs_, loss_mask, nsp_labels)
         if t % 20 == 0:
+            pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
-            prd_mask = mlm_labels[0] != data.pad_id
-            tgt = mlm_labels[0] * prd_mask
-            prd = pred[0] * prd_mask
-            tgt_str = []
-            prd_str = []
-            for i in range(len(mlm_labels[0])):
-                if tgt[i] != data.v2i["<PAD>"]:
-                    tgt_str.append(data.i2v[tgt[i]])
-                    prd_str.append(data.i2v[prd[i]])
             print(
                 "\n\nstep: ", t,
                 "| time: %.2f" % (t1 - t0),
-                "| loss: %.3f" % loss,
+                "| loss: %.3f" % loss.numpy(),
                 "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0][:xlen[0].sum()+1]]),
-                "\n| prd: ", " ".join([data.i2v[i] for i in pred[0][:xlen[0].sum()+1]]),
-                "\n| tgt word: ", tgt_str,
-                "\n| prd word: ", prd_str,
+                "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
+                "\n| tgt word: ", [data.i2v[i] for i in seqs_[0]*loss_mask[0] if i != data.v2i["<PAD>"]],
+                "\n| prd word: ", [data.i2v[i] for i in pred*loss_mask[0] if i != data.v2i["<PAD>"]],
                 )
             t0 = t1
 
-    model.save_weights("./visual_helper/bert.ckpt")
+    model.save_weights("./visual_helper/bert/model.ckpt")
     # save attention matrix for visualization
-    # attentions, cls_logits_, seq_logits_ = model.sess.run([model.attentions, model.cls_logits, model.seq_logits], {model.tfx: bx, model.training: False})
-    # data = {"src": bx, "label": cls_logits_.argmax(axis=1), "seq": seq_logits_.argmax(axis=-1), "attentions": attentions, "i2v": i2v}
-    # import pickle
-    # with open("./visual_helper/GPT_attention_matrix.pkl", "wb") as f:
-    #     pickle.dump(data, f)
+    src_seq = "02-11-30"
+    print("src: ", src_seq, "\nprediction: ", model.translate(src_seq, data.v2i, data.i2v))
+
+    # save attention matrix for visualization
+    test_seq = seqs[:1, segs[0] == 0]
+    _ = model(test_seq, np.zeros_like(test_seq), training=False)
+
+    data = {"src": [data.i2v[i] for i in data.x[0]], "tgt": [data.i2v[i] for i in data.y[0]],
+            "attentions": model.attentions}
+    with open("./visual_helper/bert_attention_matrix.pkl", "wb") as f:
+        pickle.dump(data, f)
 
 
 if __name__ == "__main__":
