@@ -150,8 +150,8 @@ class Decoder(keras.layers.Layer):
 
     def __call__(self, yz, xz, training, mask):
         for l in self.ls:
-            xz = l(yz, xz, training, mask)
-        return xz
+            yz = l(yz, xz, training, mask)
+        return yz
 
 
 class Transformer(keras.Model):
@@ -206,7 +206,7 @@ class Transformer(keras.Model):
             tgt[0, tgti] = idx
             if idx == v2i["<EOS>"] or tgti >= self.max_len:
                 break
-        return logit, "".join([i2v[i] for i in tgt[0, 1:tgti]])
+        return "".join([i2v[i] for i in tgt[0, 1:tgti]])
 
     @property
     def attentions(self):
@@ -234,16 +234,15 @@ def main():
         bx, by, seq_len = data.sample(64)
         bx, by = utils.pad_zero(bx, max_len=MAX_LEN), utils.pad_zero(by, max_len=MAX_LEN + 1)
         loss = model.step(bx, by)
-        if t % 5 == 0:
-            logits = model(bx[:1], by[:1, :-1], False).numpy()
-            p_, logits2 = model.translate("".join([data.i2v[i] for i in bx[0] if i != data.v2i["<PAD>"]]), data.v2i, data.i2v)
+        if t % 50 == 0:
+            logits = model(bx[:1], by[:1, :-1], False)[0].numpy()
             t1 = time.time()
             print(
                 "step: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.4f" % loss.numpy(),
                 "| target: ", "".join([data.i2v[i] for i in by[0, 1:] if i != data.v2i["<PAD>"]]),
-                "| inference: ", "".join([data.i2v[i] for i in np.argmax(logits[0], axis=1) if i != data.v2i["<PAD>"]]),
+                "| inference: ", "".join([data.i2v[i] for i in np.argmax(logits, axis=1) if i != data.v2i["<PAD>"]]),
             )
             t0 = t1
 
@@ -276,4 +275,4 @@ def load():
 
 if __name__ == "__main__":
     main()
-    load()
+    # load()
