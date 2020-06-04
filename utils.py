@@ -154,49 +154,6 @@ class MRPCData4BERT:
         return len(self.v2i)
 
 
-class MRPCData4BERTDataset:
-    num_seg = 3
-
-    def __init__(self, data_dir="./MRPC/", proxy=None):
-        maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
-        data, self.v2i, self.i2v, self.max_len = _process_mrpc(data_dir)
-        self.train_s1 = data["train"]["s1id"]
-        self.train_s2 = data["train"]["s2id"]
-        self.train_labels = data["train"]["is_same"][:, None]
-        self.word_ids = np.array(list(set(self.i2v.keys()).difference(
-            [self.v2i[v] for v in ["<PAD>", "<MASK>", "<SEP>"]])))
-
-    @property
-    def mask_id(self):
-        return self.v2i["<MASK>"]
-
-    @property
-    def num_word(self):
-        return len(self.v2i)
-
-    @property
-    def sep_id(self):
-        return self.v2i["<SEP>"]
-
-    @property
-    def pad_id(self):
-        return self.v2i["<PAD>"]
-
-class MRPCData4GPT:
-    def __init__(self, data_dir="./MRPC/", proxy=None):
-        maybe_download_mrpc(save_dir="./MRPC/", proxy=proxy)
-        data, v2i, i2v, max_len = _process_mrpc(dir, go="<GO> ", end=" <EOS>")
-        max_len = max_len * 2 + 1
-        unsupervised_x = data["train"]["s1id"] + data["train"]["s2id"]
-        unsupervised_x = pad_zero(unsupervised_x, max_len=max_len)
-        supervised_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
-        supervised_x = pad_zero(supervised_x, max_len=max_len)
-        supervised_label = data["train"]["is_same"]
-        print("task1 example: ", data["train"]["s1"][0])
-        print("task2 example: ", data["train"]["s1"][0] + " " + data["train"]["s2"][0])
-        return v2i, i2v, max_len, unsupervised_x, supervised_x, supervised_label
-
-
 class Dataset:
     def __init__(self, x, y, v2i, i2v):
         self.x, self.y = x, y
