@@ -11,14 +11,11 @@ import utils
 import time
 from transformer import Encoder
 import pickle
+import os
 
-
-tf.random.set_seed(1)
-np.random.seed(1)
-
-MODEL_DIM = 256
+MODEL_DIM = 512
 N_LAYER = 4
-BATCH_SIZE = 24
+BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
 MASK_RATE = 0.15
 
@@ -93,7 +90,9 @@ class BERT(keras.Model):
 
     @property
     def attentions(self):
-        attentions = [l.mh.attention.numpy() for l in self.encoder.ls]
+        attentions = {
+            "encoder": [l.mh.attention.numpy() for l in self.encoder.ls],
+        }
         return attentions
 
 
@@ -160,7 +159,7 @@ def main():
         max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
     t0 = time.time()
     arange = np.arange(0, data.max_len)
-    for t in range(20):
+    for t in range(10000):
         seqs, segs, seqs_, loss_mask, xlen, nsp_labels = random_mask_or_replace(data, arange)
         loss, pred = model.step(seqs, segs, seqs_, loss_mask, nsp_labels)
         if t % 20 == 0:
@@ -176,23 +175,27 @@ def main():
                 "\n| prd word: ", [data.i2v[i] for i in pred*loss_mask[0] if i != data.v2i["<PAD>"]],
                 )
             t0 = t1
-
+    os.makedirs("./visual_helper/bert", exist_ok=True)
     model.save_weights("./visual_helper/bert/model.ckpt")
-    # save attention matrix for visualization
-    src_seq = "02-11-30"
-    print("src: ", src_seq, "\nprediction: ", model.translate(src_seq, data.v2i, data.i2v))
+
+
+def export_attention():
+    data = utils.MRPCData4BERT("./MRPC")
+    print("num word: ", data.num_word)
+    model = BERT(
+        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
+        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
+    model.load_weights("./visual_helper/bert/model.ckpt")
 
     # save attention matrix for visualization
-    test_seq = seqs[:1, segs[0] == 0]
-    _ = model(test_seq, np.zeros_like(test_seq), training=False)
-
-    data = {"src": [data.i2v[i] for i in data.x[0]], "tgt": [data.i2v[i] for i in data.y[0]],
-            "attentions": model.attentions}
+    seqs, segs, xlen, nsp_labels = data.sample(1)
+    model(seqs, segs, False)
+    data = {"src": [data.i2v[i] for i in seqs[0]], "attentions": model.attentions}
     with open("./visual_helper/bert_attention_matrix.pkl", "wb") as f:
         pickle.dump(data, f)
 
 
 if __name__ == "__main__":
     main()
-
+    export_attention()
 
