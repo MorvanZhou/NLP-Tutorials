@@ -16,14 +16,13 @@ import utils
 import time
 import pickle
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 MODEL_DIM = 32
 MAX_LEN = 12
 N_LAYER = 3
 N_HEAD = 4
-DROP_RATE = 0.
+DROP_RATE = 0.1
 
 
 class PositionEmbedding(keras.layers.Layer):
