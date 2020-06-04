@@ -89,7 +89,7 @@ def _text_standardize(text):
 def _process_mrpc(dir="./MRPC"):
     data = {"train": None, "test": None}
     files = os.listdir(dir)
-    top_n = 50
+    top_n = 1000
     for f in files:
         df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=top_n)
         k = "train" if "train" in f else "test"
@@ -101,7 +101,7 @@ def _process_mrpc(dir="./MRPC"):
                 data[n][m][i] = _text_standardize(data[n][m][i].lower())
                 cs = data[n][m][i].split(" ")
                 vocab.update(set(cs))
-    v2i = {v: i for i, v in enumerate(vocab, start=1)}
+    v2i = {v: i for i, v in enumerate(sorted(vocab), start=1)}
     v2i["<PAD>"] = PAD_ID
     v2i["<MASK>"] = len(v2i)
     v2i["<SEP>"] = len(v2i)
