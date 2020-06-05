@@ -140,26 +140,24 @@ def self_attention(bert_or_gpt="bert"):
     plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
     plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
 
-    case = 1
+    case = 7
     s_len = 0
     for s in src[case]:
-        s_len += 1
-        if s == "<PAD>":
+        if s == "<SEP>":
             break
+        s_len += 1
 
     plt.figure(0, (7, 28))
     for j in range(4):
         plt.subplot(4, 1, j + 1)
-        plt.imshow(encoder_atten[-1][case, j][:s_len, :s_len], vmax=1, vmin=0, cmap="rainbow")
-        if bert_or_gpt == "bert":
-            plt.xticks(range(s_len), src[case][:s_len], rotation=90)
-            plt.yticks(range(s_len), src[case][:s_len])
-        else:
-            plt.xticks(range(s_len), src[case][:s_len-1], rotation=90)
-            plt.yticks(range(s_len), src[case][1:s_len])
+        img = encoder_atten[-1][case, j][:s_len-1, :s_len-1]
+        plt.imshow(img, vmax=img.max(), vmin=0, cmap="rainbow")
+        plt.xticks(range(s_len-1), src[case][:s_len-1], rotation=90)
+        plt.yticks(range(s_len-1), src[case][1:s_len])
         plt.xlabel("head %i" % j)
     plt.subplots_adjust(top=0.9)
-    plt.savefig(bert_or_gpt+"_encoder_self_attention.png", dpi=800)
+    plt.tight_layout()
+    plt.savefig(bert_or_gpt+"_self_attention.png", dpi=500)
     # plt.show()
 
 

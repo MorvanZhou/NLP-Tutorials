@@ -12,10 +12,10 @@ from transformer import Encoder
 import pickle
 import os
 
-MODEL_DIM = 32
-N_LAYER = 3
+MODEL_DIM = 128
+N_LAYER = 4
 BATCH_SIZE = 12
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-4
 
 
 class BERT(keras.Model):
@@ -39,7 +39,6 @@ class BERT(keras.Model):
             input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
-
         self.segment_emb = keras.layers.Embedding(
             input_dim=max_seg, output_dim=model_dim,  # [max_seg, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
@@ -69,11 +68,11 @@ class BERT(keras.Model):
     def step(self, seqs, segs, seqs_, nsp_labels):
         with tf.GradientTape() as tape:
             mlm_logits, nsp_logits = self(seqs, segs, training=True)
-            mlm_loss = self.cross_entropy(seqs_, mlm_logits)
+            pred_loss = self.cross_entropy(seqs_, mlm_logits)
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
-            loss = mlm_loss + 0.1 * nsp_loss
-        grads = tape.gradient(loss, self.trainable_variables)
-        self.opt.apply_gradients(zip(grads, self.trainable_variables))
+            loss = pred_loss + 0.2 * nsp_loss
+            grads = tape.gradient(loss, self.trainable_variables)
+            self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, mlm_logits
 
     def input_emb(self, seqs, segs):
@@ -86,6 +85,16 @@ class BERT(keras.Model):
         b010011
         c001011
         d000111
+        -000011
+        -000001
+
+        the mask shows below will see itself by embeddings in the encoder residual layer.
+        # o1 = self.bn[0](attn + xz, training) #
+         abcd--
+        a100011
+        b010011
+        c001011
+        d000101
         -000011
         -000001
         """
@@ -104,13 +113,13 @@ class BERT(keras.Model):
 
 def main():
     # get and process data
-    data = utils.MRPCData("./MRPC")
+    data = utils.MRPCData("./MRPC", rows=2000)
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.2, padding_idx=data.pad_id)
+        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     t0 = time.time()
-    for t in range(2500):
+    for t in range(5000):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
         loss, pred = model.step(seqs[:, :-1], segs[:, :-1], seqs[:, 1:], nsp_labels)
         if t % 50 == 0:
@@ -129,11 +138,11 @@ def main():
 
 
 def export_attention():
-    data = utils.MRPCData("./MRPC")
+    data = utils.MRPCData("./MRPC", rows=2000)
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0, padding_idx=data.pad_id)
+        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     model.load_weights("./visual_helper/bert/model.ckpt")
 
     # save attention matrix for visualization
