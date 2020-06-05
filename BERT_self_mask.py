@@ -4,7 +4,6 @@ https://zhuanlan.zhihu.com/p/49271699
 https://jalammar.github.io/illustrated-bert/
 """
 
-import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 import utils
@@ -13,11 +12,10 @@ from transformer import Encoder
 import pickle
 import os
 
-MODEL_DIM = 256
-N_LAYER = 4
+MODEL_DIM = 32
+N_LAYER = 3
 BATCH_SIZE = 12
-LEARNING_RATE = 1e-4
-MASK_RATE = 0.15
+LEARNING_RATE = 1e-3
 
 
 class BERT(keras.Model):
@@ -63,18 +61,17 @@ class BERT(keras.Model):
 
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
-        mask = self.self_mask(seqs)
-        z = self.encoder(embed, training=training, mask=mask)
+        z = self.encoder(embed, training=training, mask=self.self_mask(seqs))
         mlm_logits = self.o_mlm(z)  # [n, step, n_vocab]
         nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
-        return mlm_logits, nsp_logits, mask
+        return mlm_logits, nsp_logits
 
-    def step(self, seqs, segs, seqs_, nsp_labels):
+    def step(self, seqs, segs, nsp_labels):
         with tf.GradientTape() as tape:
-            mlm_logits, nsp_logits, mask = self(seqs, segs, training=True)
-            mlm_loss = self.cross_entropy(seqs_, mlm_logits)
+            mlm_logits, nsp_logits = self(seqs, segs, training=True)
+            mlm_loss = self.cross_entropy(seqs, mlm_logits)
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
-            loss = mlm_loss + 0.2 * nsp_loss
+            loss = mlm_loss + 0.1 * nsp_loss
         grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, mlm_logits
@@ -104,37 +101,18 @@ class BERT(keras.Model):
         return attentions
 
 
-def do_mask(seq, len_arange, pad_id):
-    rand_id = np.random.choice(len_arange, size=max(2, int(MASK_RATE * len(len_arange))), replace=False)
-    mask = np.full_like(seq, pad_id, dtype=np.bool)
-    mask[rand_id] = True
-    return mask[None, :]
-
-
-def random_mask(data, arange):
-    seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
-    seqs_ = seqs.copy()
-    # mask
-    mask = np.concatenate(
-        [do_mask(
-            seqs[i],
-            np.concatenate((arange[:xlen[i, 0]], arange[xlen[i, 0] + 1:xlen[i].sum() + 1])),
-            data.pad_id) for i in range(len(seqs))], axis=0)
-    return seqs, segs, seqs_, mask, xlen, nsp_labels
-
-
 def main():
     # get and process data
     data = utils.MRPCData4BERT("./MRPC")
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
+        max_seg=data.num_seg, drop_rate=0.2, padding_idx=data.pad_id)
     t0 = time.time()
-    for t in range(4000):
+    for t in range(2500):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
-        loss, pred = model.step(seqs, segs, seqs, nsp_labels)
-        if t % 20 == 0:
+        loss, pred = model.step(seqs, segs, nsp_labels)
+        if t % 50 == 0:
             pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
             print(
@@ -154,7 +132,7 @@ def export_attention():
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
+        max_seg=data.num_seg, drop_rate=0, padding_idx=data.pad_id)
     model.load_weights("./visual_helper/bert/model.ckpt")
 
     # save attention matrix for visualization
@@ -166,6 +144,6 @@ def export_attention():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     export_attention()
 
