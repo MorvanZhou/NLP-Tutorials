@@ -12,7 +12,7 @@ from transformer import Encoder
 import pickle
 import os
 
-MODEL_DIM = 256
+MODEL_DIM = 128
 N_LAYER = 4
 BATCH_SIZE = 12
 LEARNING_RATE = 1e-4
@@ -77,6 +77,8 @@ class GPT(keras.Model):
         d000111
         -000011
         -000001
+
+        force head not to see afterward
         """
         mask = 1 - tf.linalg.band_part(tf.ones((self.max_len, self.max_len)), -1, 0)
         return mask  # (step, step)
@@ -95,7 +97,7 @@ def main():
     print("num word: ", data.num_word)
     model = GPT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
+        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     t0 = time.time()
     for t in range(5000):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
@@ -120,7 +122,7 @@ def export_attention():
     print("num word: ", data.num_word)
     model = GPT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
+        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     model.load_weights("./visual_helper/gpt/model.ckpt")
 
     # save attention matrix for visualization
@@ -132,6 +134,6 @@ def export_attention():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     export_attention()
 
