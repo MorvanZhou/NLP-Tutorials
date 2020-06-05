@@ -11,5 +11,6 @@ dependencies:
     - scikit-learn==0.23.0
     - scipy==1.4.1
     - tensorflow==2.2.0
+    - tensorflow_addons==0.10.0
 prefix: /anaconda3/envs/nlp
 
