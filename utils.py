@@ -86,12 +86,11 @@ def _text_standardize(text):
     return text.strip()
 
 
-def _process_mrpc(dir="./MRPC"):
+def _process_mrpc(dir="./MRPC", rows=None):
     data = {"train": None, "test": None}
     files = os.listdir(dir)
-    top_n = 1000
     for f in files:
-        df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=top_n)
+        df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=rows)
         k = "train" if "train" in f else "test"
         data[k] = {"is_same": df.iloc[:, 0].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
     vocab = set()
@@ -119,9 +118,9 @@ class MRPCData4BERT:
     num_seg = 3
     pad_id = PAD_ID
 
-    def __init__(self, data_dir="./MRPC/", proxy=None):
+    def __init__(self, data_dir="./MRPC/", rows=None, proxy=None):
         maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
-        data, self.v2i, self.i2v, self.max_len = _process_mrpc(data_dir)
+        data, self.v2i, self.i2v, self.max_len = _process_mrpc(data_dir, rows)
 
         self.xlen = np.array([
             [
@@ -152,6 +151,10 @@ class MRPCData4BERT:
     @property
     def num_word(self):
         return len(self.v2i)
+
+    @property
+    def mask_id(self):
+        return self.v2i["<MASK>"]
 
 
 class Dataset:
