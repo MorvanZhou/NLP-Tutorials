@@ -12,23 +12,34 @@ from transformer import Encoder
 import pickle
 import os
 
-MODEL_DIM = 256
-N_LAYER = 4
+MODEL_DIM = 32
+N_LAYER = 3
 BATCH_SIZE = 12
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 
 
-class GPT(keras.Model):
+class BERT(keras.Model):
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, max_seg=3, drop_rate=0.1, padding_idx=0):
         super().__init__()
         self.padding_idx = padding_idx
         self.n_vocab = n_vocab
         self.max_len = max_len
 
+        # I think task emb is not necessary for pretraining,
+        # because the aim of all tasks is to train a universal sentence embedding
+        # the body encoder is the same across all task, and the output layer defines each task.
+        # finetuning replaces output layer and leaves the body encoder unchanged.
+
+        # self.task_emb = keras.layers.Embedding(
+        #     input_dim=n_task, output_dim=model_dim,  # [n_task, dim]
+        #     embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
+        # )
+
         self.word_emb = keras.layers.Embedding(
             input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
+
         self.segment_emb = keras.layers.Embedding(
             input_dim=max_seg, output_dim=model_dim,  # [max_seg, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
@@ -50,28 +61,37 @@ class GPT(keras.Model):
 
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
-        z = self.encoder(embed, training=training, mask=self.look_ahead_mask())
+        z = self.encoder(embed, training=training, mask=self.self_mask(seqs))
         mlm_logits = self.o_mlm(z)  # [n, step, n_vocab]
         nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
 
-    def step(self, seqs, segs, seqs_, nsp_labels):
+    def step(self, seqs, segs, nsp_labels):
         with tf.GradientTape() as tape:
             mlm_logits, nsp_logits = self(seqs, segs, training=True)
-            pred_loss = self.cross_entropy(seqs_, mlm_logits)
+            mlm_loss = self.cross_entropy(seqs, mlm_logits)
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
-            loss = pred_loss + 0.2 * nsp_loss
-            grads = tape.gradient(loss, self.trainable_variables)
-            self.opt.apply_gradients(zip(grads, self.trainable_variables))
+            loss = mlm_loss + 0.1 * nsp_loss
+        grads = tape.gradient(loss, self.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, mlm_logits
 
     def input_emb(self, seqs, segs):
         return self.word_emb(seqs) + self.segment_emb(segs) + tf.matmul(
             self.position_space, self.position_emb)  # [n, step, dim]
 
-    def look_ahead_mask(self):
-        mask = 1 - tf.linalg.band_part(tf.ones((self.max_len, self.max_len)), -1, 0)
-        return mask  # (step, step)
+    def self_mask(self, seqs):
+        """
+        10001
+        01001
+        00101
+        00011
+        00001
+        """
+        eye = tf.eye(self.max_len, batch_shape=[len(seqs)], dtype=tf.float32)
+        pad = tf.math.equal(seqs, self.padding_idx)
+        _mask = tf.where(pad[:, tf.newaxis, tf.newaxis, :], 1, eye[:, tf.newaxis, :, :])
+        return _mask  # [n, 1, step, step]
 
     @property
     def attentions(self):
@@ -83,15 +103,15 @@ class GPT(keras.Model):
 
 def main():
     # get and process data
-    data = utils.MRPCData4BERT("./MRPC", rows=2000)
+    data = utils.MRPCData4BERT("./MRPC")
     print("num word: ", data.num_word)
-    model = GPT(
-        model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
+    model = BERT(
+        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
+        max_seg=data.num_seg, drop_rate=0.2, padding_idx=data.pad_id)
     t0 = time.time()
-    for t in range(5000):
+    for t in range(2500):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
-        loss, pred = model.step(seqs[:, :-1], segs[:, :-1], seqs[:, 1:], nsp_labels)
+        loss, pred = model.step(seqs, segs, nsp_labels)
         if t % 50 == 0:
             pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
@@ -99,31 +119,31 @@ def main():
                 "\n\nstep: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.3f" % loss.numpy(),
-                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0, 1:][:xlen[0].sum()+1]]),
+                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0][:xlen[0].sum()+1]]),
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
             t0 = t1
-    os.makedirs("./visual_helper/gpt", exist_ok=True)
-    model.save_weights("./visual_helper/gpt/model.ckpt")
+    os.makedirs("./visual_helper/bert", exist_ok=True)
+    model.save_weights("./visual_helper/bert/model.ckpt")
 
 
 def export_attention():
-    data = utils.MRPCData4BERT("./MRPC", rows=2000)
+    data = utils.MRPCData4BERT("./MRPC")
     print("num word: ", data.num_word)
-    model = GPT(
-        model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
-    model.load_weights("./visual_helper/gpt/model.ckpt")
+    model = BERT(
+        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
+        max_seg=data.num_seg, drop_rate=0, padding_idx=data.pad_id)
+    model.load_weights("./visual_helper/bert/model.ckpt")
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(32)
-    model(seqs[:, :-1], segs[:, :-1], False)
+    model(seqs, segs, False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
-    with open("./visual_helper/gpt_attention_matrix.pkl", "wb") as f:
+    with open("./visual_helper/bert_attention_matrix.pkl", "wb") as f:
         pickle.dump(data, f)
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     export_attention()
 
