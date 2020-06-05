@@ -139,26 +139,32 @@ def self_attention(bert_or_gpt="bert"):
     encoder_atten = attentions["encoder"]
     plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
     plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
+
+    case = 1
     s_len = 0
-    for s in src:
-        if s != "<PAD>":
-            s_len += 1
+    for s in src[case]:
+        s_len += 1
+        if s == "<PAD>":
+            break
 
-    plt.figure(0, (14, 7))
-    for j in range(2):
-        plt.subplot(1, 2, j + 1)
-        plt.imshow(encoder_atten[-1].squeeze()[j][:s_len, :s_len], vmax=1, vmin=0, cmap="rainbow")
-        plt.xticks(range(s_len), src[:s_len], rotation=90)
-        plt.yticks(range(s_len), src[:s_len])
+    plt.figure(0, (7, 28))
+    for j in range(4):
+        plt.subplot(4, 1, j + 1)
+        plt.imshow(encoder_atten[-1][case, j][:s_len, :s_len], vmax=1, vmin=0, cmap="rainbow")
+        if bert_or_gpt == "bert":
+            plt.xticks(range(s_len), src[case][:s_len], rotation=90)
+            plt.yticks(range(s_len), src[case][:s_len])
+        else:
+            plt.xticks(range(s_len), src[case][:s_len-1], rotation=90)
+            plt.yticks(range(s_len), src[case][1:s_len])
         plt.xlabel("head %i" % j)
-    plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig(bert_or_gpt+"_encoder_self_attention.png", dpi=300)
-    plt.show()
+    plt.savefig(bert_or_gpt+"_encoder_self_attention.png", dpi=800)
+    # plt.show()
 
 
-# pad_mask(padded_id_seqs)
+# self_mask(padded_id_seqs)
 # output_mask(padded_id_seqs)
 # position_embedding()
 # attention_matrix()
-self_attention("gpt")
+self_attention("bert")
