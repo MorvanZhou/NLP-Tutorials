@@ -109,12 +109,12 @@ def _process_mrpc(dir="./MRPC", rows=None):
         for m in ["s1", "s2"]:
             data[n][m+"id"] = [[v2i[v] for v in c.split(" ")] for c in data[n][m]]
     max_len = max(
-        [len(s1) + len(s2) + 1 for s1, s2 in zip(
+        [len(s1) + len(s2) + 2 for s1, s2 in zip(
             data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"] + data["test"]["s2id"])])
     return data, v2i, i2v, max_len
 
 
-class MRPCData4BERT:
+class MRPCData:
     num_seg = 3
     pad_id = PAD_ID
 
@@ -127,7 +127,7 @@ class MRPCData4BERT:
                 len(data["train"]["s1id"][i]), len(data["train"]["s2id"][i])
              ] for i in range(len(data["train"]["s1id"]))], dtype=int)
         x = [
-            data["train"]["s1id"][i] + [self.v2i["<SEP>"]] + data["train"]["s2id"][i]
+            data["train"]["s1id"][i] + [self.v2i["<SEP>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
             for i in range(len(self.xlen))
         ]
         self.x = pad_zero(x, max_len=self.max_len)
