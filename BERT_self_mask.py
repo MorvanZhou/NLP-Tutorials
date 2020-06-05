@@ -66,10 +66,10 @@ class BERT(keras.Model):
         nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
 
-    def step(self, seqs, segs, nsp_labels):
+    def step(self, seqs, segs, seqs_, nsp_labels):
         with tf.GradientTape() as tape:
             mlm_logits, nsp_logits = self(seqs, segs, training=True)
-            mlm_loss = self.cross_entropy(seqs, mlm_logits)
+            mlm_loss = self.cross_entropy(seqs_, mlm_logits)
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
             loss = mlm_loss + 0.1 * nsp_loss
         grads = tape.gradient(loss, self.trainable_variables)
@@ -82,16 +82,17 @@ class BERT(keras.Model):
 
     def self_mask(self, seqs):
         """
-        10001
-        01001
-        00101
-        00011
-        00001
+         abcd--
+        b010011
+        c001011
+        d000111
+        -000011
+        -000001
         """
-        eye = tf.eye(self.max_len, batch_shape=[len(seqs)], dtype=tf.float32)
+        eye = tf.eye(self.max_len+1, batch_shape=[len(seqs)], dtype=tf.float32)[:, 1:, :-1]
         pad = tf.math.equal(seqs, self.padding_idx)
-        _mask = tf.where(pad[:, tf.newaxis, tf.newaxis, :], 1, eye[:, tf.newaxis, :, :])
-        return _mask  # [n, 1, step, step]
+        mask = tf.where(pad[:, tf.newaxis, tf.newaxis, :], 1, eye[:, tf.newaxis, :, :])
+        return mask  # [n, 1, step, step]
 
     @property
     def attentions(self):
@@ -103,15 +104,15 @@ class BERT(keras.Model):
 
 def main():
     # get and process data
-    data = utils.MRPCData4BERT("./MRPC")
+    data = utils.MRPCData("./MRPC")
     print("num word: ", data.num_word)
     model = BERT(
-        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
+        model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
         max_seg=data.num_seg, drop_rate=0.2, padding_idx=data.pad_id)
     t0 = time.time()
     for t in range(2500):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
-        loss, pred = model.step(seqs, segs, nsp_labels)
+        loss, pred = model.step(seqs[:, :-1], segs[:, :-1], seqs[:, 1:], nsp_labels)
         if t % 50 == 0:
             pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
@@ -119,7 +120,7 @@ def main():
                 "\n\nstep: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.3f" % loss.numpy(),
-                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0][:xlen[0].sum()+1]]),
+                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0, 1:][:xlen[0].sum()+1]]),
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
             t0 = t1
@@ -128,16 +129,16 @@ def main():
 
 
 def export_attention():
-    data = utils.MRPCData4BERT("./MRPC")
+    data = utils.MRPCData("./MRPC")
     print("num word: ", data.num_word)
     model = BERT(
-        model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
+        model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
         max_seg=data.num_seg, drop_rate=0, padding_idx=data.pad_id)
     model.load_weights("./visual_helper/bert/model.ckpt")
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(32)
-    model(seqs, segs, False)
+    model(seqs[:, :-1], segs[:, :-1], False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
     with open("./visual_helper/bert_attention_matrix.pkl", "wb") as f:
         pickle.dump(data, f)
