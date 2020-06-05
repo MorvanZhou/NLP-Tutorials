@@ -49,7 +49,7 @@ class ELMO(keras.Model):
 
 
 def main():
-    data = utils.MRPCData4BERT("./MRPC")
+    data = utils.MRPCData("./MRPC")
     print("num word: ", data.num_word)
     model = ELMO(data.num_word, 32, 32)
     for t in range(2500):
