@@ -50,7 +50,7 @@ class GPT(keras.Model):
 
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
-        z = self.encoder(embed, training=training, mask=self.look_ahead_mask())
+        z = self.encoder(embed, training=training, mask=self.look_ahead_mask())     # [n, step, dim]
         mlm_logits = self.o_mlm(z)  # [n, step, n_vocab]
         nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
@@ -70,6 +70,14 @@ class GPT(keras.Model):
             self.position_space, self.position_emb)  # [n, step, dim]
 
     def look_ahead_mask(self):
+        """
+         abcd--
+        b011111
+        c001111
+        d000111
+        -000011
+        -000001
+        """
         mask = 1 - tf.linalg.band_part(tf.ones((self.max_len, self.max_len)), -1, 0)
         return mask  # (step, step)
 
@@ -83,7 +91,7 @@ class GPT(keras.Model):
 
 def main():
     # get and process data
-    data = utils.MRPCData4BERT("./MRPC", rows=2000)
+    data = utils.MRPCData("./MRPC", rows=2000)
     print("num word: ", data.num_word)
     model = GPT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
@@ -108,7 +116,7 @@ def main():
 
 
 def export_attention():
-    data = utils.MRPCData4BERT("./MRPC", rows=2000)
+    data = utils.MRPCData("./MRPC", rows=2000)
     print("num word: ", data.num_word)
     model = GPT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
