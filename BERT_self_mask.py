@@ -52,8 +52,8 @@ class BERT(keras.Model):
             initializer=keras.initializers.RandomNormal(0., 0.01))
         self.position_space = tf.ones((1, max_len, max_len))
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
-        self.o_mlm = keras.layers.Dense(n_vocab)
-        self.o_nsp = keras.layers.Dense(2)
+        self.task_mlm = keras.layers.Dense(n_vocab)
+        self.task_nsp = keras.layers.Dense(2)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.opt = keras.optimizers.Adam(LEARNING_RATE)
@@ -61,8 +61,8 @@ class BERT(keras.Model):
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
         z = self.encoder(embed, training=training, mask=self.self_mask(seqs))
-        mlm_logits = self.o_mlm(z)  # [n, step, n_vocab]
-        nsp_logits = self.o_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
+        mlm_logits = self.task_mlm(z)  # [n, step, n_vocab]
+        nsp_logits = self.task_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
 
     def step(self, seqs, segs, seqs_, nsp_labels):
