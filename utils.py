@@ -137,7 +137,7 @@ class MRPCData:
         for i in range(len(x)):
             si = self.xlen[i][0] + 1
             self.seg[i, :si] = 0
-            si_ = si + self.xlen[i][1]
+            si_ = si + self.xlen[i][1] + 1
             self.seg[i, si:si_] = 1
 
         self.word_ids = np.array(list(set(self.i2v.keys()).difference(
