@@ -13,9 +13,9 @@ from transformer import Encoder
 import pickle
 import os
 
-MODEL_DIM = 512
+MODEL_DIM = 256
 N_LAYER = 4
-BATCH_SIZE = 32
+BATCH_SIZE = 12
 LEARNING_RATE = 1e-4
 MASK_RATE = 0.15
 
@@ -73,9 +73,8 @@ class BERT(keras.Model):
             mlm_logits, nsp_logits = self(seqs, segs, training=True)
             mlm_loss_batch = tf.boolean_mask(self.cross_entropy(seqs_, mlm_logits), loss_mask)
             mlm_loss = tf.reduce_mean(mlm_loss_batch)
-            nsp_loss_batch = self.cross_entropy(nsp_labels, nsp_logits)
-            nsp_loss = tf.reduce_mean(nsp_loss_batch)
-            loss = mlm_loss + nsp_loss
+            nsp_loss = tf.reduce_mean(self.cross_entropy(nsp_labels, nsp_logits))
+            loss = mlm_loss + 0.2 * nsp_loss
             grads = tape.gradient(loss, self.trainable_variables)
             self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, mlm_logits
@@ -85,8 +84,8 @@ class BERT(keras.Model):
             self.position_space, self.position_emb)  # [n, step, dim]
 
     def pad_mask(self, seqs):
-        _seqs = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)    # seg = 2 is padding
-        return _seqs[:, tf.newaxis, tf.newaxis, :]  # (n, 1, 1, step)
+        mask = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)
+        return mask[:, tf.newaxis, tf.newaxis, :]  # [n, 1, 1, step]
 
     @property
     def attentions(self):
