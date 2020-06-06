@@ -104,14 +104,12 @@ def _process_mrpc(dir="./MRPC", rows=None):
     v2i["<PAD>"] = PAD_ID
     v2i["<MASK>"] = len(v2i)
     v2i["<SEP>"] = len(v2i)
+    v2i["<GO>"] = len(v2i)
     i2v = {i: v for v, i in v2i.items()}
     for n in ["train", "test"]:
         for m in ["s1", "s2"]:
             data[n][m+"id"] = [[v2i[v] for v in c.split(" ")] for c in data[n][m]]
-    max_len = max(
-        [len(s1) + len(s2) + 2 for s1, s2 in zip(
-            data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"] + data["test"]["s2id"])])
-    return data, v2i, i2v, max_len
+    return data, v2i, i2v
 
 
 class MRPCData:
@@ -120,14 +118,17 @@ class MRPCData:
 
     def __init__(self, data_dir="./MRPC/", rows=None, proxy=None):
         maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
-        data, self.v2i, self.i2v, self.max_len = _process_mrpc(data_dir, rows)
+        data, self.v2i, self.i2v = _process_mrpc(data_dir, rows)
+        self.max_len = max(
+            [len(s1) + len(s2) + 3 for s1, s2 in zip(
+                data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"] + data["test"]["s2id"])])
 
         self.xlen = np.array([
             [
                 len(data["train"]["s1id"][i]), len(data["train"]["s2id"][i])
              ] for i in range(len(data["train"]["s1id"]))], dtype=int)
         x = [
-            data["train"]["s1id"][i] + [self.v2i["<SEP>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
+            [self.v2i["<GO>"]] + data["train"]["s1id"][i] + [self.v2i["<SEP>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
             for i in range(len(self.xlen))
         ]
         self.x = pad_zero(x, max_len=self.max_len)
@@ -135,7 +136,7 @@ class MRPCData:
 
         self.seg = np.full(self.x.shape, self.num_seg-1, np.int32)
         for i in range(len(x)):
-            si = self.xlen[i][0] + 1
+            si = self.xlen[i][0] + 2
             self.seg[i, :si] = 0
             si_ = si + self.xlen[i][1] + 1
             self.seg[i, si:si_] = 1
@@ -155,6 +156,29 @@ class MRPCData:
     @property
     def mask_id(self):
         return self.v2i["<MASK>"]
+
+
+class MRPCSingle:
+    pad_id = PAD_ID
+
+    def __init__(self, data_dir="./MRPC/", rows=None, proxy=None):
+        maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
+        data, self.v2i, self.i2v = _process_mrpc(data_dir, rows)
+
+        self.max_len = max([len(s) for s in data["train"]["s1id"] + data["train"]["s2id"]])
+
+        x = data["train"]["s1id"] + data["train"]["s2id"]          # list appending
+        self.x = pad_zero(x, max_len=self.max_len)
+        self.word_ids = np.array(list(set(self.i2v.keys()).difference([self.v2i["<PAD>"]])))
+
+    def sample(self, n):
+        bi = np.random.randint(0, self.x.shape[0], size=n)
+        bx = self.x[bi]
+        return bx
+
+    @property
+    def num_word(self):
+        return len(self.v2i)
 
 
 class Dataset:

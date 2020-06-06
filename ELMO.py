@@ -5,9 +5,9 @@ import time
 import os
 import numpy as np
 
-UNITS = 64
-EMB_DIM = 64
-N_LAYERS = 1
+UNITS = 128
+EMB_DIM = 128
+N_LAYERS = 2
 BATCH_SIZE = 12
 LEARNING_RATE = 1e-4
 
@@ -17,9 +17,9 @@ class ELMO(keras.Model):
         super().__init__()
 
         # encoder
-        self.embed = keras.layers.Embedding(
+        self.word_embed = keras.layers.Embedding(
             input_dim=v_dim, output_dim=emb_dim,  # [n_vocab, emb_dim]
-            embeddings_initializer=keras.initializers.RandomNormal(0., 0.1),
+            embeddings_initializer=keras.initializers.RandomNormal(0., 0.01),
             mask_zero=True,
         )
         f_rnn_cells = [tf.keras.layers.LSTMCell(units) for _ in range(n_layers)]
@@ -30,13 +30,12 @@ class ELMO(keras.Model):
         self.b_stacked_lstm = tf.keras.layers.StackedRNNCells(b_rnn_cells)
         self.lstm_backward = tf.keras.layers.RNN(self.b_stacked_lstm, return_sequences=True, go_backwards=True)
         self.word_pred = keras.layers.Dense(v_dim)
-        self.nsp = keras.layers.Dense(2)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(lr)
+        self.opt = keras.optimizers.Adam(lr, clipnorm=0.01)
 
-    def __call__(self, x):
-        o = self.embed(x)       # [n, step, dim]
+    def __call__(self, seqs):
+        embedded = self.word_embed(seqs)        # [n, step, dim]
         """
         0123    forward
          1234   backward
@@ -44,29 +43,26 @@ class ELMO(keras.Model):
          0123   backward predict
          123    overall prediction
         """
-        mask = self.embed.compute_mask(x)
+        mask = self.word_embed.compute_mask(seqs)
         f = self.lstm_forward(
-            o[:, :-1],
+            embedded[:, :-1],
             mask=mask[:, :-1],
             initial_state=self.f_stacked_lstm.get_initial_state(
-                batch_size=x.shape[0], dtype=tf.float32))      # [n, step-1, dim]
+                batch_size=embedded.shape[0], dtype=tf.float32))      # [n, step-1, dim]
         b = self.lstm_backward(
-            o[:, 1:],
+            embedded[:, 1:],
             mask=mask[:, 1:],
             initial_state=self.f_stacked_lstm.get_initial_state(
-                batch_size=x.shape[0], dtype=tf.float32))      # [n, step-1, dim]
+                batch_size=embedded.shape[0], dtype=tf.float32))      # [n, step-1, dim]
         b_reverse = tf.reverse(b, axis=[1])
         o = tf.concat((f[:, :-1], b_reverse[:, 1:]), axis=-1)       # [n, step-2, 2*dim]
         word_logits = self.word_pred(o)                     # [n, step-2, vocab]
-        nsp_logits = self.nsp(tf.reshape(o, [o.shape[0], -1]))   # [n, 2]
-        return word_logits, nsp_logits
+        return word_logits
 
-    def step(self, seqs, nsp_labels):
+    def step(self, seqs):
         with tf.GradientTape() as tape:
-            word_logits, nsp_logits = self(seqs)
-            pred_loss = self.cross_entropy(seqs[:, 1:-1], word_logits)  # [n, step-2, vocab]
-            nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
-            loss = pred_loss + 0.2 * nsp_loss
+            word_logits = self(seqs)
+            loss = self.cross_entropy(seqs[:, 1:-1], word_logits)
         grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, word_logits
@@ -88,13 +84,14 @@ class ELMO(keras.Model):
 
 
 def main():
-    data = utils.MRPCData("./MRPC", rows=100)
+    data = utils.MRPCSingle("./MRPC", rows=1000)
     print("num word: ", data.num_word)
-    model = ELMO(data.num_word, emb_dim=EMB_DIM, units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE,)
+    model = ELMO(data.num_word, emb_dim=EMB_DIM,
+                 units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE)
     t0 = time.time()
     for t in range(2500):
-        seqs, _, xlen, nsp_labels = data.sample(BATCH_SIZE)
-        loss, pred = model.step(seqs, nsp_labels)
+        seqs = data.sample(BATCH_SIZE)
+        loss, pred = model.step(seqs)
         if t % 50 == 0:
             pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
@@ -102,8 +99,8 @@ def main():
                 "\n\nstep: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.3f" % loss.numpy(),
-                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0, 1:][:xlen[0].sum()+1]]),
-                "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
+                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0, 1:]]),
+                "\n| prd: ", " ".join([data.i2v[i] for i in pred]),
                 )
             t0 = t1
     os.makedirs("./visual_helper/elmo", exist_ok=True)
