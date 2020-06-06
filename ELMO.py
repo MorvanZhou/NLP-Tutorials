@@ -5,39 +5,58 @@ import time
 import os
 import numpy as np
 
-BATCH_SIZE = 32
+UNITS = 64
+EMB_DIM = 64
+N_LAYERS = 1
+BATCH_SIZE = 12
+LEARNING_RATE = 1e-4
 
 
 class ELMO(keras.Model):
-    def __init__(self, v_dim, emb_dim, units):
+    def __init__(self, v_dim, emb_dim, units, n_layers, lr):
         super().__init__()
-        self.units = units
 
         # encoder
         self.embed = keras.layers.Embedding(
             input_dim=v_dim, output_dim=emb_dim,  # [n_vocab, emb_dim]
             embeddings_initializer=keras.initializers.RandomNormal(0., 0.1),
+            mask_zero=True,
         )
-        self.lstm_forward = keras.layers.LSTM(units=units, return_sequences=True)
-        self.lstm_backward = keras.layers.LSTM(units=units, return_sequences=True, go_backwards=True)
+        f_rnn_cells = [tf.keras.layers.LSTMCell(units) for _ in range(n_layers)]
+        self.f_stacked_lstm = tf.keras.layers.StackedRNNCells(f_rnn_cells)
+        self.lstm_forward = tf.keras.layers.RNN(self.f_stacked_lstm, return_sequences=True)
+
+        b_rnn_cells = [tf.keras.layers.LSTMCell(units) for _ in range(n_layers)]
+        self.b_stacked_lstm = tf.keras.layers.StackedRNNCells(b_rnn_cells)
+        self.lstm_backward = tf.keras.layers.RNN(self.b_stacked_lstm, return_sequences=True, go_backwards=True)
         self.word_pred = keras.layers.Dense(v_dim)
         self.nsp = keras.layers.Dense(2)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(0.001)
+        self.opt = keras.optimizers.Adam(lr)
 
     def __call__(self, x):
         o = self.embed(x)       # [n, step, dim]
-        init_s = [tf.zeros((x.shape[0], self.units)), tf.zeros((x.shape[0], self.units))]
-        f = self.lstm_forward(o[:, :-1], initial_state=init_s)      # [n, step-1, dim]
-        b = self.lstm_backward(o[:, 1:], initial_state=init_s)      # [n, step-1, dim]
         """
         0123    forward
          1234   backward
         1234    forward predict
          0123   backward predict
+         123    overall prediction
         """
-        o = tf.concat((f[:, :-1], b[:, 1:]), axis=-1)       # [n, step-2, dim]
+        mask = self.embed.compute_mask(x)
+        f = self.lstm_forward(
+            o[:, :-1],
+            mask=mask,
+            initial_state=self.f_stacked_lstm.get_initial_state(
+                batch_size=x.shape[0], dtype=tf.float32))      # [n, step-1, dim]
+        b = self.lstm_backward(
+            o[:, 1:],
+            mask=mask,
+            initial_state=self.f_stacked_lstm.get_initial_state(
+                batch_size=x.shape[0], dtype=tf.float32))      # [n, step-1, dim]
+
+        o = tf.concat((f[:, :-1], b[:, 1:]), axis=-1)       # [n, step-2, 2*dim]
         word_logits = self.word_pred(o)                     # [n, step-2, vocab]
         nsp_logits = self.nsp(tf.reshape(o, [o.shape[0], -1]))   # [n, 2]
         return word_logits, nsp_logits
@@ -45,7 +64,7 @@ class ELMO(keras.Model):
     def step(self, seqs, nsp_labels):
         with tf.GradientTape() as tape:
             word_logits, nsp_logits = self(seqs)
-            pred_loss = self.cross_entropy(seqs[:, 1:-1], word_logits)
+            pred_loss = self.cross_entropy(seqs[:, 1:-1], word_logits)  # [n, step-2, vocab]
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
             loss = pred_loss + 0.2 * nsp_loss
         grads = tape.gradient(loss, self.trainable_variables)
@@ -69,9 +88,9 @@ class ELMO(keras.Model):
 
 
 def main():
-    data = utils.MRPCData("./MRPC")
+    data = utils.MRPCData("./MRPC", rows=100)
     print("num word: ", data.num_word)
-    model = ELMO(data.num_word, 32, 32)
+    model = ELMO(data.num_word, emb_dim=EMB_DIM, units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE,)
     t0 = time.time()
     for t in range(2500):
         seqs, _, xlen, nsp_labels = data.sample(BATCH_SIZE)
