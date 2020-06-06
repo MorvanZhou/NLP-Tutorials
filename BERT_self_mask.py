@@ -35,10 +35,11 @@ class BERT(GPT):
 
 
 if __name__ == "__main__":
-    MODEL_DIM = 128
+    MODEL_DIM = 256
     N_LAYER = 4
     LEARNING_RATE = 1e-4
     d = utils.MRPCData("./MRPC", 2000)
+    print("num word: ", d.num_word)
     m = BERT(
         model_dim=MODEL_DIM, max_len=d.max_len - 1, n_layer=N_LAYER, n_head=4, n_vocab=d.num_word,
         lr=LEARNING_RATE, max_seg=d.num_seg, drop_rate=0.2, padding_idx=d.pad_id)
