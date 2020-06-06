@@ -3,13 +3,6 @@ import tensorflow as tf
 import utils
 import time
 import os
-import numpy as np
-
-UNITS = 128
-EMB_DIM = 128
-N_LAYERS = 2
-BATCH_SIZE = 12
-LEARNING_RATE = 1e-4
 
 
 class ELMO(keras.Model):
@@ -22,17 +15,17 @@ class ELMO(keras.Model):
             embeddings_initializer=keras.initializers.RandomNormal(0., 0.01),
             mask_zero=True,
         )
-        f_rnn_cells = [tf.keras.layers.LSTMCell(units) for _ in range(n_layers)]
-        self.f_stacked_lstm = tf.keras.layers.StackedRNNCells(f_rnn_cells)
-        self.lstm_forward = tf.keras.layers.RNN(self.f_stacked_lstm, return_sequences=True)
+        f_rnn_cells = [keras.layers.LSTMCell(units) for _ in range(n_layers)]
+        self.f_stacked_lstm = keras.layers.StackedRNNCells(f_rnn_cells)
+        self.lstm_forward = keras.layers.RNN(self.f_stacked_lstm, return_sequences=True)
 
-        b_rnn_cells = [tf.keras.layers.LSTMCell(units) for _ in range(n_layers)]
-        self.b_stacked_lstm = tf.keras.layers.StackedRNNCells(b_rnn_cells)
-        self.lstm_backward = tf.keras.layers.RNN(self.b_stacked_lstm, return_sequences=True, go_backwards=True)
+        b_rnn_cells = [keras.layers.LSTMCell(units) for _ in range(n_layers)]
+        self.b_stacked_lstm = keras.layers.StackedRNNCells(b_rnn_cells)
+        self.lstm_backward = keras.layers.RNN(self.b_stacked_lstm, return_sequences=True, go_backwards=True)
         self.word_pred = keras.layers.Dense(v_dim)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(lr, clipnorm=0.01)
+        self.opt = keras.optimizers.Adam(lr)
 
     def __call__(self, seqs):
         embedded = self.word_embed(seqs)        # [n, step, dim]
@@ -67,40 +60,36 @@ class ELMO(keras.Model):
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, word_logits
 
-    def inference(self, x):
-        s = self.encode(x)
-        done, i, s = self.decoder_eval.initialize(
-            self.dec_embeddings.variables[0],
-            start_tokens=tf.fill([x.shape[0], ], self.start_token),
-            end_token=self.end_token,
-            initial_state=s,
-        )
-        pred_id = np.zeros((x.shape[0], self.max_pred_len), dtype=np.int32)
-        for l in range(self.max_pred_len):
-            o, s, i, done = self.decoder_eval.step(
-                time=l, inputs=i, state=s, training=False)
-            pred_id[:, l] = o.sample_id
-        return pred_id
+    # def inference(self, x):
+    #     s = self.encode(x)
+    #     done, i, s = self.decoder_eval.initialize(
+    #         self.dec_embeddings.variables[0],
+    #         start_tokens=tf.fill([x.shape[0], ], self.start_token),
+    #         end_token=self.end_token,
+    #         initial_state=s,
+    #     )
+    #     pred_id = np.zeros((x.shape[0], self.max_pred_len), dtype=np.int32)
+    #     for l in range(self.max_pred_len):
+    #         o, s, i, done = self.decoder_eval.step(
+    #             time=l, inputs=i, state=s, training=False)
+    #         pred_id[:, l] = o.sample_id
+    #     return pred_id
 
 
-def main():
-    data = utils.MRPCSingle("./MRPC", rows=1000)
-    print("num word: ", data.num_word)
-    model = ELMO(data.num_word, emb_dim=EMB_DIM,
-                 units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE)
+def train(model, data, step):
     t0 = time.time()
-    for t in range(2500):
+    for t in range(step):
         seqs = data.sample(BATCH_SIZE)
         loss, pred = model.step(seqs)
-        if t % 50 == 0:
+        if t % 100 == 0:
             pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
             print(
                 "\n\nstep: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.3f" % loss.numpy(),
-                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0, 1:]]),
-                "\n| prd: ", " ".join([data.i2v[i] for i in pred]),
+                "\n| tgt: ", " ".join([data.i2v[i] for i in seqs[0, 1:] if i != data.pad_id]),
+                "\n| prd: ", " ".join([data.i2v[i] for i in pred if i != data.pad_id]),
                 )
             t0 = t1
     os.makedirs("./visual_helper/elmo", exist_ok=True)
@@ -108,4 +97,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    UNITS = 128
+    EMB_DIM = 128
+    N_LAYERS = 2
+    BATCH_SIZE = 16
+    LEARNING_RATE = 1e-4
+    d = utils.MRPCSingle("./MRPC", rows=50)
+    print("num word: ", d.num_word)
+    m = ELMO(d.num_word, emb_dim=EMB_DIM, units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE)
+    train(m, d, 5000)
