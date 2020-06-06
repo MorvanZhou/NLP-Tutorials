@@ -5,7 +5,6 @@ https://jalammar.github.io/illustrated-bert/
 """
 
 import tensorflow as tf
-from tensorflow import keras
 import utils
 import time
 from GPT import GPT
@@ -19,8 +18,8 @@ LEARNING_RATE = 1e-4
 
 
 class BERT(GPT):
-    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, max_seg=3, drop_rate=0.1, padding_idx=0):
-        super().__init__(model_dim, max_len, n_layer, n_head, n_vocab, max_seg, drop_rate, padding_idx)
+    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg=3, drop_rate=0.1, padding_idx=0):
+        super().__init__(model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg, drop_rate, padding_idx)
 
     def mask(self, seqs):
         """
@@ -53,7 +52,7 @@ def main():
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
+        lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     t0 = time.time()
     for t in range(5000):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
@@ -78,7 +77,7 @@ def export_attention():
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
+        lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     model.load_weights("./visual_helper/bert/model.ckpt")
 
     # save attention matrix for visualization
