@@ -50,7 +50,7 @@ class GPT(keras.Model):
 
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
-        z = self.encoder(embed, training=training, mask=self.look_ahead_mask())     # [n, step, dim]
+        z = self.encoder(embed, training=training, mask=self.mask())     # [n, step, dim]
         mlm_logits = self.task_mlm(z)  # [n, step, n_vocab]
         nsp_logits = self.task_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
@@ -61,15 +61,15 @@ class GPT(keras.Model):
             pred_loss = self.cross_entropy(seqs_, mlm_logits)
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
             loss = pred_loss + 0.2 * nsp_loss
-            grads = tape.gradient(loss, self.trainable_variables)
-            self.opt.apply_gradients(zip(grads, self.trainable_variables))
+        grads = tape.gradient(loss, self.trainable_variables)
+        self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, mlm_logits
 
     def input_emb(self, seqs, segs):
         return self.word_emb(seqs) + self.segment_emb(segs) + tf.matmul(
             self.position_space, self.position_emb)  # [n, step, dim]
 
-    def look_ahead_mask(self):
+    def mask(self, *args, **kwargs):
         """
          abcd--
         b011111
