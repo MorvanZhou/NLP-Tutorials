@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
+from matplotlib.pyplot import cm
 
 SEQS = ["I love you", "My name is M", "This is a very long seq", "Short one"]
 vocabs = set((" ".join(SEQS)).split(" "))
@@ -87,9 +88,9 @@ def attention_matrix():
             plt.xticks(range(len(src)), src)
             plt.yticks(range(len(src)), src)
             if j == 0:
-                plt.ylabel("layer %i" % i)
+                plt.ylabel("layer %i" % (i+1))
             if i == 2:
-                plt.xlabel("head %i" % j)
+                plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
     plt.savefig("transformer_encoder_self_attention.png", dpi=200)
@@ -104,9 +105,9 @@ def attention_matrix():
             plt.xticks(range(len(tgt)-1), tgt[:-1], rotation=45, fontsize=7)
             plt.yticks(range(len(tgt)-1), tgt[1:], rotation=45, fontsize=7)
             if j == 0:
-                plt.ylabel("layer %i" % i)
+                plt.ylabel("layer %i" % (i+1))
             if i == 2:
-                plt.xlabel("head %i" % j)
+                plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
     plt.savefig("transformer_decoder_self_attention.png", dpi=200)
@@ -121,16 +122,16 @@ def attention_matrix():
             plt.xticks(range(len(src)), src, fontsize=7)
             plt.yticks(range(len(tgt)-1), tgt[1:], rotation=45, fontsize=7)
             if j == 0:
-                plt.ylabel("layer %i" % i)
+                plt.ylabel("layer %i" % (i+1))
             if i == 2:
-                plt.xlabel("head %i" % j)
+                plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
     plt.savefig("transformer_decoder_encoder_attention.png", dpi=200)
     plt.show()
 
 
-def self_attention(bert_or_gpt="bert"):
+def self_attention(bert_or_gpt="bert", case=0):
     with open(bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"]
@@ -140,7 +141,6 @@ def self_attention(bert_or_gpt="bert"):
     plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
     plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
 
-    case = 7
     s_len = 0
     for s in src[case]:
         if s == "<SEP>":
@@ -152,17 +152,56 @@ def self_attention(bert_or_gpt="bert"):
         plt.subplot(4, 1, j + 1)
         img = encoder_atten[-1][case, j][:s_len-1, :s_len-1]
         plt.imshow(img, vmax=img.max(), vmin=0, cmap="rainbow")
-        plt.xticks(range(s_len-1), src[case][:s_len-1], rotation=90)
-        plt.yticks(range(s_len-1), src[case][1:s_len])
-        plt.xlabel("head %i" % j)
+        plt.xticks(range(s_len-1), src[case][:s_len-1], rotation=90, fontsize=9)
+        plt.yticks(range(s_len-1), src[case][1:s_len], fontsize=9)
+        plt.xlabel("head %i" % (j+1))
     plt.subplots_adjust(top=0.9)
     plt.tight_layout()
     plt.savefig(bert_or_gpt+"_self_attention.png", dpi=500)
     # plt.show()
 
 
+def self_attention_line(bert_or_gpt="bert", case=0):
+    with open(bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
+        data = pickle.load(f)
+    src = data["src"]
+    attentions = data["attentions"]
+
+    encoder_atten = attentions["encoder"]
+
+    s_len = 0
+    print(" ".join(src[case]))
+    for s in src[case]:
+        if s == "<SEP>":
+            break
+        s_len += 1
+    y_label = src[case][:s_len][::-1]
+    fig, ax = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(7, 14))
+
+    for i in range(2):
+        for j in range(2):
+            ax[i, j].set_yticks(np.arange(len(y_label)))
+            ax[i, j].tick_params(labelright=True)
+            ax[i, j].set_yticklabels(y_label, fontsize=9)     # input
+
+            img = encoder_atten[-1][case, i+j][:s_len - 1, :s_len - 1]
+            color = cm.rainbow(np.linspace(0, 1, img.shape[0]))
+            for row, c in zip(range(img.shape[0]), color):
+                for col in range(img.shape[1]):
+                    alpha = (img[row, col] / img[row].max()) ** 7
+                    ax[i, j].plot([1, 0], [img.shape[0]-row-1, img.shape[1]-col], alpha=alpha, c=c)
+            ax[i, j].set_xticks(())
+            ax[i, j].set_xlabel("head %i" % (j+1+i))
+            ax[i, j].set_xlim(0, 1)
+    plt.subplots_adjust(top=0.9)
+    plt.tight_layout()
+    plt.savefig(bert_or_gpt+"_self_attention_line%i.png" % case, dpi=100)
+
+
 # self_mask(padded_id_seqs)
 # output_mask(padded_id_seqs)
 # position_embedding()
 # attention_matrix()
-self_attention("bert")
+# self_attention("bert", case=2)
+self_attention_line("bert", case=10)
+self_attention_line("gpt", case=4)
