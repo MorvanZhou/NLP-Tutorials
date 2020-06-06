@@ -165,9 +165,15 @@ class MRPCSingle:
         maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
         data, self.v2i, self.i2v = _process_mrpc(data_dir, rows)
 
-        self.max_len = max([len(s) for s in data["train"]["s1id"] + data["train"]["s2id"]])
-
-        x = data["train"]["s1id"] + data["train"]["s2id"]          # list appending
+        self.max_len = max([len(s) + 2 for s in data["train"]["s1id"] + data["train"]["s2id"]])
+        x = [
+            [self.v2i["<GO>"]] + data["train"]["s1id"][i] + [self.v2i["<SEP>"]]
+            for i in range(len(data["train"]["s1id"]))
+        ]
+        x += [
+            [self.v2i["<GO>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
+            for i in range(len(data["train"]["s2id"]))
+        ]
         self.x = pad_zero(x, max_len=self.max_len)
         self.word_ids = np.array(list(set(self.i2v.keys()).difference([self.v2i["<PAD>"]])))
 
