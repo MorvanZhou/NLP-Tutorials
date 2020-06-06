@@ -12,11 +12,6 @@ from transformer import Encoder
 import pickle
 import os
 
-MODEL_DIM = 128
-N_LAYER = 4
-BATCH_SIZE = 12
-LEARNING_RATE = 1e-4
-
 
 class GPT(keras.Model):
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg=3, drop_rate=0.1, padding_idx=0):
@@ -50,7 +45,7 @@ class GPT(keras.Model):
 
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
-        z = self.encoder(embed, training=training, mask=self.mask())     # [n, step, dim]
+        z = self.encoder(embed, training=training, mask=self.mask(seqs))     # [n, step, dim]
         mlm_logits = self.task_mlm(z)  # [n, step, n_vocab]
         nsp_logits = self.task_nsp(tf.reshape(z, [z.shape[0], -1]))  # [n, n_cls]
         return mlm_logits, nsp_logits
@@ -61,26 +56,33 @@ class GPT(keras.Model):
             pred_loss = self.cross_entropy(seqs_, mlm_logits)
             nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
             loss = pred_loss + 0.2 * nsp_loss
-        grads = tape.gradient(loss, self.trainable_variables)
-        self.opt.apply_gradients(zip(grads, self.trainable_variables))
+            grads = tape.gradient(loss, self.trainable_variables)
+            self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, mlm_logits
 
     def input_emb(self, seqs, segs):
         return self.word_emb(seqs) + self.segment_emb(segs) + tf.matmul(
             self.position_space, self.position_emb)  # [n, step, dim]
 
-    def mask(self, *args, **kwargs):
+    def mask(self, seqs):
         """
          abcd--
-        b011111
-        c001111
-        d000111
+        a011111
+        b001111
+        c000111
+        d000011
         -000011
-        -000001
+        -000011
 
-        force head not to see afterward
+        force head not to see afterward. eg.
+        a is a embedding for a---
+        b is a embedding for ab--
+        c is a embedding for abc-
+        later, b embedding will + b another embedding from previous residual input to predict c
         """
         mask = 1 - tf.linalg.band_part(tf.ones((self.max_len, self.max_len)), -1, 0)
+        pad = tf.math.equal(seqs, self.padding_idx)
+        mask = tf.where(pad[:, tf.newaxis, tf.newaxis, :], 1, mask[tf.newaxis, tf.newaxis, :, :])
         return mask  # (step, step)
 
     @property
@@ -91,18 +93,12 @@ class GPT(keras.Model):
         return attentions
 
 
-def main():
-    # get and process data
-    data = utils.MRPCData("./MRPC", rows=2000)
-    print("num word: ", data.num_word)
-    model = GPT(
-        model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
+def train(model, data, step=10000, name="gpt"):
     t0 = time.time()
-    for t in range(5000):
-        seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
+    for t in range(step):
+        seqs, segs, xlen, nsp_labels = data.sample(16)
         loss, pred = model.step(seqs[:, :-1], segs[:, :-1], seqs[:, 1:], nsp_labels)
-        if t % 50 == 0:
+        if t % 100 == 0:
             pred = pred[0].numpy().argmax(axis=1)
             t1 = time.time()
             print(
@@ -113,27 +109,30 @@ def main():
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
             t0 = t1
-    os.makedirs("./visual_helper/gpt", exist_ok=True)
-    model.save_weights("./visual_helper/gpt/model.ckpt")
+    os.makedirs("./visual_helper/%s" % name, exist_ok=True)
+    model.save_weights("./visual_helper/%s/model.ckpt" % name)
 
 
-def export_attention():
-    data = utils.MRPCData("./MRPC", rows=2000)
-    print("num word: ", data.num_word)
-    model = GPT(
-        model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
-    model.load_weights("./visual_helper/gpt/model.ckpt")
+def export_attention(model, data, name="gpt"):
+    model.load_weights("./visual_helper/%s/model.ckpt" % name)
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(32)
     model(seqs[:, :-1], segs[:, :-1], False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
-    with open("./visual_helper/gpt_attention_matrix.pkl", "wb") as f:
+    with open("./visual_helper/%s_attention_matrix.pkl" % name, "wb") as f:
         pickle.dump(data, f)
 
 
 if __name__ == "__main__":
-    main()
-    export_attention()
+    MODEL_DIM = 128
+    N_LAYER = 4
+    LEARNING_RATE = 1e-4
+    d = utils.MRPCData("./MRPC", 2000)
+    print("num word: ", d.num_word)
+    m = GPT(
+        model_dim=MODEL_DIM, max_len=d.max_len - 1, n_layer=N_LAYER, n_head=4, n_vocab=d.num_word,
+        lr=LEARNING_RATE, max_seg=d.num_seg, drop_rate=0.1, padding_idx=d.pad_id)
+    train(m, d, step=5000, name="gpt")
+    export_attention(m, d, name="gpt")
 
