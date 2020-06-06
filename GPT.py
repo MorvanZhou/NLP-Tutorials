@@ -19,7 +19,7 @@ LEARNING_RATE = 1e-4
 
 
 class GPT(keras.Model):
-    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, max_seg=3, drop_rate=0.1, padding_idx=0):
+    def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg=3, drop_rate=0.1, padding_idx=0):
         super().__init__()
         self.padding_idx = padding_idx
         self.n_vocab = n_vocab
@@ -46,7 +46,7 @@ class GPT(keras.Model):
         self.task_nsp = keras.layers.Dense(2)
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(LEARNING_RATE)
+        self.opt = keras.optimizers.Adam(lr)
 
     def __call__(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
@@ -97,7 +97,7 @@ def main():
     print("num word: ", data.num_word)
     model = GPT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
+        lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     t0 = time.time()
     for t in range(5000):
         seqs, segs, xlen, nsp_labels = data.sample(BATCH_SIZE)
@@ -122,7 +122,7 @@ def export_attention():
     print("num word: ", data.num_word)
     model = GPT(
         model_dim=MODEL_DIM, max_len=data.max_len-1, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
-        max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
+        lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.pad_id)
     model.load_weights("./visual_helper/gpt/model.ckpt")
 
     # save attention matrix for visualization
