@@ -47,16 +47,16 @@ class ELMO(keras.Model):
         mask = self.embed.compute_mask(x)
         f = self.lstm_forward(
             o[:, :-1],
-            mask=mask,
+            mask=mask[:, :-1],
             initial_state=self.f_stacked_lstm.get_initial_state(
                 batch_size=x.shape[0], dtype=tf.float32))      # [n, step-1, dim]
         b = self.lstm_backward(
             o[:, 1:],
-            mask=mask,
+            mask=mask[:, 1:],
             initial_state=self.f_stacked_lstm.get_initial_state(
                 batch_size=x.shape[0], dtype=tf.float32))      # [n, step-1, dim]
-
-        o = tf.concat((f[:, :-1], b[:, 1:]), axis=-1)       # [n, step-2, 2*dim]
+        b_reverse = tf.reverse(b, axis=[1])
+        o = tf.concat((f[:, :-1], b_reverse[:, 1:]), axis=-1)       # [n, step-2, 2*dim]
         word_logits = self.word_pred(o)                     # [n, step-2, vocab]
         nsp_logits = self.nsp(tf.reshape(o, [o.shape[0], -1]))   # [n, 2]
         return word_logits, nsp_logits
