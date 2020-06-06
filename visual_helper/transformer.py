@@ -203,5 +203,5 @@ def self_attention_line(bert_or_gpt="bert", case=0):
 # position_embedding()
 # attention_matrix()
 # self_attention("bert", case=2)
-self_attention_line("bert", case=10)
-self_attention_line("gpt", case=4)
+self_attention_line("bert", case=1)
+# self_attention_line("gpt", case=4)
