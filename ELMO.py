@@ -60,21 +60,6 @@ class ELMO(keras.Model):
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, word_logits
 
-    # def inference(self, x):
-    #     s = self.encode(x)
-    #     done, i, s = self.decoder_eval.initialize(
-    #         self.dec_embeddings.variables[0],
-    #         start_tokens=tf.fill([x.shape[0], ], self.start_token),
-    #         end_token=self.end_token,
-    #         initial_state=s,
-    #     )
-    #     pred_id = np.zeros((x.shape[0], self.max_pred_len), dtype=np.int32)
-    #     for l in range(self.max_pred_len):
-    #         o, s, i, done = self.decoder_eval.step(
-    #             time=l, inputs=i, state=s, training=False)
-    #         pred_id[:, l] = o.sample_id
-    #     return pred_id
-
 
 def train(model, data, step):
     t0 = time.time()
@@ -97,12 +82,12 @@ def train(model, data, step):
 
 
 if __name__ == "__main__":
-    UNITS = 128
+    UNITS = 256
     EMB_DIM = 128
     N_LAYERS = 2
     BATCH_SIZE = 16
     LEARNING_RATE = 1e-4
-    d = utils.MRPCSingle("./MRPC", rows=50)
+    d = utils.MRPCSingle("./MRPC", rows=100)
     print("num word: ", d.num_word)
     m = ELMO(d.num_word, emb_dim=EMB_DIM, units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE)
-    train(m, d, 5000)
+    train(m, d, 10000)
