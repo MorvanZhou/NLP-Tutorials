@@ -39,7 +39,7 @@ class PositionEmbedding(keras.layers.Layer):
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
 
-    def __call__(self, x):
+    def call(self, x):
         x_embed = self.embeddings(x) + self.pe  # [n, step, dim]
         return x_embed
 
@@ -58,7 +58,7 @@ class MultiHead(keras.layers.Layer):
         self.o_drop = keras.layers.Dropout(rate=drop_rate)
         self.attention = None
 
-    def __call__(self, q, k, v, mask, training):
+    def call(self, q, k, v, mask, training):
         _q = self.wq(q)      # [n, q_step, h*h_dim]
         _k, _v = self.wk(k), self.wv(v)     # [n, step, h*h_dim]
         _q = self.split_heads(_q)  # [n, h, q_step, h_dim]
@@ -91,7 +91,7 @@ class PositionWiseFFN(keras.layers.Layer):
         self.l = keras.layers.Dense(dff, activation=keras.activations.relu)
         self.o = keras.layers.Dense(model_dim)
 
-    def __call__(self, x):
+    def call(self, x):
         o = self.l(x)
         o = self.o(o)
         return o         # [n, step, dim]
@@ -105,10 +105,10 @@ class EncodeLayer(keras.layers.Layer):
         self.ffn = PositionWiseFFN(model_dim)
         self.drop = keras.layers.Dropout(drop_rate)
 
-    def __call__(self, xz, training, mask):
-        attn = self.mh(xz, xz, xz, mask, training)       # [n, step, dim]
+    def call(self, xz, training, mask):
+        attn = self.mh.call(xz, xz, xz, mask, training)       # [n, step, dim]
         o1 = self.bn[0](attn + xz, training)
-        ffn = self.drop(self.ffn(o1), training)
+        ffn = self.drop(self.ffn.call(o1), training)
         o = self.bn[1](ffn + xz, training)         # [n, step, dim]
         return o
 
@@ -118,9 +118,9 @@ class Encoder(keras.layers.Layer):
         super().__init__()
         self.ls = [EncodeLayer(n_head, model_dim, drop_rate) for _ in range(n_layer)]
 
-    def __call__(self, xz, training, mask):
+    def call(self, xz, training, mask):
         for l in self.ls:
-            xz = l(xz, training, mask)
+            xz = l.call(xz, training, mask)
         return xz       # [n, step, dim]
 
 
@@ -132,12 +132,12 @@ class DecoderLayer(keras.layers.Layer):
         self.mh = [MultiHead(n_head, model_dim, drop_rate) for _ in range(2)]
         self.ffn = PositionWiseFFN(model_dim)
 
-    def __call__(self, yz, xz, training, mask):
-        attn = self.mh[0](yz, yz, yz, mask, training)       # decoder self attention
+    def call(self, yz, xz, training, look_ahead_mask, pad_mask):
+        attn = self.mh[0].call(yz, yz, yz, look_ahead_mask, training)       # decoder self attention
         o1 = self.bn[0](attn + yz, training)
-        attn = self.mh[1](o1, xz, xz, None, training)       # decoder + encoder attention
+        attn = self.mh[1].call(o1, xz, xz, pad_mask, training)       # decoder + encoder attention
         o2 = self.bn[1](attn + o1, training)
-        ffn = self.drop(self.ffn(o2), training)
+        ffn = self.drop(self.ffn.call(o2), training)
         o = self.bn[2](ffn + o2, training)
         return o
 
@@ -147,9 +147,9 @@ class Decoder(keras.layers.Layer):
         super().__init__()
         self.ls = [DecoderLayer(n_head, model_dim, drop_rate) for _ in range(n_layer)]
 
-    def __call__(self, yz, xz, training, mask):
+    def call(self, yz, xz, training, look_ahead_mask, pad_mask):
         for l in self.ls:
-            yz = l(yz, xz, training, mask)
+            yz = l.call(yz, xz, training, look_ahead_mask, pad_mask)
         return yz
 
 
@@ -164,41 +164,50 @@ class Transformer(keras.Model):
         self.decoder = Decoder(n_head, model_dim, drop_rate, n_layer)
         self.o = keras.layers.Dense(n_vocab)
 
-        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction="none")
         self.opt = keras.optimizers.Adam(0.002)
 
-    def __call__(self, x, y, training=None):
+    def call(self, x, y, training=None):
         x_embed, y_embed = self.embed(x), self.embed(y)
-        encoded_z = self.encoder(x_embed, training, mask=self._pad_mask(x))
-        decoded_z = self.decoder(y_embed, encoded_z, training, mask=self._look_ahead_mask())
+        pad_mask = self._pad_mask(x)
+        encoded_z = self.encoder.call(x_embed, training, mask=pad_mask)
+        decoded_z = self.decoder.call(
+            y_embed, encoded_z, training, look_ahead_mask=self._look_ahead_mask(x), pad_mask=pad_mask)
         o = self.o(decoded_z)
         return o
 
     def step(self, x, y):
         with tf.GradientTape() as tape:
-            _logits = self(x, y[:, :-1], training=True)
-            _loss = self.cross_entropy(y[:, 1:], _logits)
-        grads = tape.gradient(_loss, self.trainable_variables)
+            logits = self.call(x, y[:, :-1], training=True)
+            pad_mask = tf.math.not_equal(y[:, 1:], self.padding_idx)
+            loss = tf.reduce_mean(tf.boolean_mask(self.cross_entropy(y[:, 1:], logits), pad_mask))
+        grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
-        return _loss
+        return loss, logits
+
+    def _pad_bool(self, seqs):
+        return tf.math.equal(seqs, self.padding_idx)
 
     def _pad_mask(self, seqs):
-        _seqs = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)
-        return _seqs[:, tf.newaxis, tf.newaxis, :]  # (n, 1, 1, step)
+        mask = tf.cast(self._pad_bool(seqs), tf.float32)
+        return mask[:, tf.newaxis, tf.newaxis, :]  # (n, 1, 1, step)
 
-    def _look_ahead_mask(self):
+    def _look_ahead_mask(self, seqs):
         mask = 1 - tf.linalg.band_part(tf.ones((self.max_len, self.max_len)), -1, 0)
+        mask = tf.where(self._pad_bool(seqs)[:, tf.newaxis, tf.newaxis, :], 1, mask[tf.newaxis, tf.newaxis, :, :])
         return mask  # (step, step)
 
     def translate(self, src, v2i, i2v):
-        src_pad = utils.pad_zero(np.array([v2i[v] for v in src])[None, :], self.max_len)
-        tgt = utils.pad_zero(np.array([v2i["<GO>"], ])[None, :], self.max_len+1)
+        src_pad = utils.pad_zero(src, self.max_len)
+        tgt = utils.pad_zero(np.array([[v2i["<GO>"], ] for _ in range(len(src))]), self.max_len+1)
         tgti = 0
         x_embed = self.embed(src_pad)
-        encoded_z = self.encoder(x_embed, False, mask=self._pad_mask(src_pad))
+        encoded_z = self.encoder.call(x_embed, False, mask=self._pad_mask(src_pad))
         while True:
-            y_embed = self.embed(tgt[:, :-1])
-            decoded_z = self.decoder(y_embed, encoded_z, False, mask=self._look_ahead_mask())
+            y = tgt[:, :-1]
+            y_embed = self.embed(y)
+            decoded_z = self.decoder.call(
+                y_embed, encoded_z, False, look_ahead_mask=self._look_ahead_mask(y), pad_mask=self._pad_mask(y))
             logit = self.o(decoded_z)[0, tgti, :].numpy()
             idx = np.argmax(logit)
             tgti += 1
@@ -218,30 +227,22 @@ class Transformer(keras.Model):
         return attentions
 
 
-def main():
-    # get and process data
-    data = utils.DateData(2000)
-    print("Chinese time order: yy/mm/dd ", data.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", data.date_en[:3])
-    print("vocabularies: ", data.vocab)
-    print("x index sample: \n{}\n{}".format(data.idx2str(data.x[0]), data.x[0]),
-          "\ny index sample: \n{}\n{}".format(data.idx2str(data.y[0]), data.y[0]))
-
-    model = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, data.num_word, DROP_RATE)
+def train(model, data, step):
     # training
     t0 = time.time()
-    for t in range(1000):
+    for t in range(step):
         bx, by, seq_len = data.sample(64)
         bx, by = utils.pad_zero(bx, max_len=MAX_LEN), utils.pad_zero(by, max_len=MAX_LEN + 1)
-        loss = model.step(bx, by)
+        loss, logits = model.step(bx, by)
         if t % 50 == 0:
-            logits = model(bx[:1], by[:1, :-1], False)[0].numpy()
+            logits = logits[0].numpy()
             t1 = time.time()
             print(
                 "step: ", t,
                 "| time: %.2f" % (t1 - t0),
                 "| loss: %.4f" % loss.numpy(),
-                "| target: ", "".join([data.i2v[i] for i in by[0, 1:] if i != data.v2i["<PAD>"]]),
-                "| inference: ", "".join([data.i2v[i] for i in np.argmax(logits, axis=1) if i != data.v2i["<PAD>"]]),
+                "| target: ", "".join([data.i2v[i] for i in by[0, 1:10]]),
+                "| inference: ", "".join([data.i2v[i] for i in np.argmax(logits, axis=1)[:10]]),
             )
             t0 = t1
 
@@ -250,28 +251,28 @@ def main():
     with open("./visual_helper/transformer_v2i_i2v.pkl", "wb") as f:
         pickle.dump({"v2i": data.v2i, "i2v": data.i2v}, f)
 
-    # prediction
-    src_seq = "02-11-30"
-    print("src: ", src_seq, "\nprediction: ", model.translate(src_seq, data.v2i, data.i2v))
 
-    # save attention matrix for visualization
-    _ = model(bx[:1], by[:1, :-1], training=False)
-
-    data = {"src": [data.i2v[i] for i in data.x[0]], "tgt": [data.i2v[i] for i in data.y[0]],
-            "attentions": model.attentions}
-    with open("./visual_helper/transformer_attention_matrix.pkl", "wb") as f:
-        pickle.dump(data, f)
-
-
-def load():
+def export_attention(model, data):
     with open("./visual_helper/transformer_v2i_i2v.pkl", "rb") as f:
         dic = pickle.load(f)
-    model = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, len(dic["v2i"]), DROP_RATE)
     model.load_weights("./visual_helper/transformer/model.ckpt")
-    src = "08-10-08"
-    print(src, model.translate(src, dic["v2i"], dic["i2v"]))
+    bx, by, seq_len = data.sample(32)
+    model.translate(bx, dic["v2i"], dic["i2v"])
+    attn_data = {
+        "src": [[data.i2v[i] for i in bx[j]] for j in range(len(bx))],
+        "tgt": [[data.i2v[i] for i in by[j]] for j in range(len(by))],
+        "attentions": model.attentions}
+    with open("./visual_helper/transformer_attention_matrix.pkl", "wb") as f:
+        pickle.dump(attn_data, f)
 
 
 if __name__ == "__main__":
-    main()
-    # load()
+    d = utils.DateData(4000)
+    print("Chinese time order: yy/mm/dd ", d.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", d.date_en[:3])
+    print("vocabularies: ", d.vocab)
+    print("x index sample: \n{}\n{}".format(d.idx2str(d.x[0]), d.x[0]),
+          "\ny index sample: \n{}\n{}".format(d.idx2str(d.y[0]), d.y[0]))
+
+    m = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, d.num_word, DROP_RATE)
+    train(m, d, step=600)
+    export_attention(m, d)
