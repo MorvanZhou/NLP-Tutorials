@@ -66,11 +66,11 @@ def position_embedding():
     plt.show()
 
 
-def attention_matrix():
+def transformer_attention_matrix(case=0):
     with open("./transformer_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
-    src = data["src"]
-    tgt = data["tgt"]
+    src = data["src"][case]
+    tgt = data["tgt"][case]
     attentions = data["attentions"]
 
     encoder_atten = attentions["encoder"]
@@ -84,7 +84,7 @@ def attention_matrix():
     for i in range(3):
         for j in range(4):
             plt.subplot(3, 4, i * 4 + j + 1)
-            plt.imshow(encoder_atten[i].squeeze()[j][:len(src), :len(src)], vmax=1, vmin=0, cmap="rainbow")
+            plt.imshow(encoder_atten[i][case, j][:len(src), :len(src)], vmax=1, vmin=0, cmap="rainbow")
             plt.xticks(range(len(src)), src)
             plt.yticks(range(len(src)), src)
             if j == 0:
@@ -93,7 +93,7 @@ def attention_matrix():
                 plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig("transformer_encoder_self_attention.png", dpi=200)
+    plt.savefig("transformer_encoder_self_attention%d.png" % case, dpi=200)
     plt.show()
 
     plt.figure(1, (7, 7))
@@ -101,37 +101,73 @@ def attention_matrix():
     for i in range(3):
         for j in range(4):
             plt.subplot(3, 4, i * 4 + j + 1)
-            plt.imshow(decoder_tgt_atten[i].squeeze()[j][:len(tgt) - 1, :len(tgt) - 1], vmax=1, vmin=0, cmap="rainbow")
-            plt.xticks(range(len(tgt)-1), tgt[:-1], rotation=45, fontsize=7)
-            plt.yticks(range(len(tgt)-1), tgt[1:], rotation=45, fontsize=7)
+            plt.imshow(decoder_tgt_atten[i][case, j][:len(tgt), :len(tgt)], vmax=1, vmin=0, cmap="rainbow")
+            plt.xticks(range(len(tgt)), tgt, rotation=90, fontsize=7)
+            plt.yticks(range(len(tgt)), tgt, fontsize=7)
             if j == 0:
                 plt.ylabel("layer %i" % (i+1))
             if i == 2:
                 plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig("transformer_decoder_self_attention.png", dpi=200)
+    plt.savefig("transformer_decoder_self_attention%d.png" % case, dpi=200)
     plt.show()
 
-    plt.figure(2, (7, 7))
+    plt.figure(2, (7, 8))
     plt.suptitle("Decoder-Encoder attention")
     for i in range(3):
         for j in range(4):
             plt.subplot(3, 4, i*4+j+1)
-            plt.imshow(decoder_src_atten[i].squeeze()[j][:len(tgt)-1, :len(src)], vmax=1, vmin=0, cmap="rainbow")
+            plt.imshow(decoder_src_atten[i][case, j][:len(tgt), :len(src)], vmax=1, vmin=0, cmap="rainbow")
             plt.xticks(range(len(src)), src, fontsize=7)
-            plt.yticks(range(len(tgt)-1), tgt[1:], rotation=45, fontsize=7)
+            plt.yticks(range(len(tgt)), tgt, fontsize=7)
             if j == 0:
                 plt.ylabel("layer %i" % (i+1))
             if i == 2:
                 plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig("transformer_decoder_encoder_attention.png", dpi=200)
+    plt.savefig("transformer_decoder_encoder_attention%d.png" % case, dpi=200)
     plt.show()
 
 
-def self_attention(bert_or_gpt="bert", case=0):
+def transformer_attention_line(case=0):
+    with open("./transformer_attention_matrix.pkl", "rb") as f:
+        data = pickle.load(f)
+    src = data["src"][case]
+    tgt = data["tgt"][case]
+    attentions = data["attentions"]
+
+    decoder_src_atten = attentions["decoder"]["mh2"]
+
+    tgt_label = tgt[1:11][::-1]
+    src_label = ["" for _ in range(2)] + src[::-1]
+    fig, ax = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(7, 14))
+
+    for i in range(2):
+        for j in range(2):
+            ax[i, j].set_yticks(np.arange(len(src_label)))
+            ax[i, j].set_yticklabels(src_label, fontsize=9)  # src
+            ax[i, j].set_ylim(0, len(src_label)-1)
+            ax_ = ax[i, j].twinx()
+            ax_.set_yticks(np.linspace(ax_.get_yticks()[0], ax_.get_yticks()[-1], len(ax[i, j].get_yticks())))
+            ax_.set_yticklabels(tgt_label, fontsize=9)      # tgt
+            img = decoder_src_atten[-1][case, i + j][:10, :8]
+            color = cm.rainbow(np.linspace(0, 1, img.shape[0]))
+            left_top, right_top = img.shape[1], img.shape[0]
+            for ri, c in zip(range(right_top), color):      # tgt
+                for li in range(left_top):                 # src
+                    alpha = (img[ri, li] / img[ri].max()) ** 7
+                    ax[i, j].plot([0, 1], [left_top - li + 1, right_top - 1 - ri], alpha=alpha, c=c)
+            ax[i, j].set_xticks(())
+            ax[i, j].set_xlabel("head %i" % (j + 1 + i * 2))
+            ax[i, j].set_xlim(0, 1)
+    plt.subplots_adjust(top=0.9)
+    plt.tight_layout()
+    plt.savefig("transformer_encoder_decoder_attention_line%i.png" % case, dpi=100)
+
+
+def self_attention_matrix(bert_or_gpt="bert", case=0):
     with open(bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"]
@@ -164,18 +200,18 @@ def self_attention(bert_or_gpt="bert", case=0):
 def self_attention_line(bert_or_gpt="bert", case=0):
     with open(bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
-    src = data["src"]
+    src = data["src"][case]
     attentions = data["attentions"]
 
     encoder_atten = attentions["encoder"]
 
     s_len = 0
-    print(" ".join(src[case]))
-    for s in src[case]:
+    print(" ".join(src))
+    for s in src:
         if s == "<SEP>":
             break
         s_len += 1
-    y_label = src[case][:s_len][::-1]
+    y_label = src[:s_len][::-1]
     fig, ax = plt.subplots(nrows=2, ncols=2, sharex=True, figsize=(7, 14))
 
     for i in range(2):
@@ -189,9 +225,10 @@ def self_attention_line(bert_or_gpt="bert", case=0):
             for row, c in zip(range(img.shape[0]), color):
                 for col in range(img.shape[1]):
                     alpha = (img[row, col] / img[row].max()) ** 7
-                    ax[i, j].plot([1, 0], [img.shape[0]-row-1, img.shape[1]-col], alpha=alpha, c=c)
+                    ax[i, j].plot([0, 1], [img.shape[1]-col, img.shape[0]-row-1], alpha=alpha, c=c)
+                    print(img.shape[1]-col, img.shape[0]-row-1)
             ax[i, j].set_xticks(())
-            ax[i, j].set_xlabel("head %i" % (j+1+i))
+            ax[i, j].set_xlabel("head %i" % (j+1+i*2))
             ax[i, j].set_xlim(0, 1)
     plt.subplots_adjust(top=0.9)
     plt.tight_layout()
@@ -201,7 +238,8 @@ def self_attention_line(bert_or_gpt="bert", case=0):
 # self_mask(padded_id_seqs)
 # output_mask(padded_id_seqs)
 # position_embedding()
-# attention_matrix()
-# self_attention("bert", case=2)
-self_attention_line("bert", case=1)
-# self_attention_line("gpt", case=4)
+# transformer_attention_matrix(case=0)
+# transformer_attention_line(case=0)
+# self_attention_matrix("bert", case=2)
+self_attention_line("bert", case=6)
+# self_attention_line("gpt", case=1)

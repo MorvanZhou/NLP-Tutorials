@@ -12,6 +12,7 @@ PAD_ID = 0
 
 class DateData:
     def __init__(self, n):
+        np.random.seed(1)
         self.date_cn = []
         self.date_en = []
         for timestamp in np.random.randint(143835585, 2043835585, n):
