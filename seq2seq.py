@@ -45,9 +45,9 @@ class Seq2Seq(keras.Model):
         self.end_token = end_token
 
     def encode(self, x):
-        o = self.enc_embeddings(x)
+        embedded = self.enc_embeddings(x)
         init_s = [tf.zeros((x.shape[0], self.units)), tf.zeros((x.shape[0], self.units))]
-        o, h, c = self.encoder(o, initial_state=init_s)
+        o, h, c = self.encoder(embedded, initial_state=init_s)
         return [h, c]
 
     def inference(self, x):
@@ -83,32 +83,35 @@ class Seq2Seq(keras.Model):
         return _loss.numpy()
 
 
-# get and process data
-data = utils.DateData(2000)
-print("Chinese time order: yy/mm/dd ", data.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", data.date_en[:3])
-print("vocabularies: ", data.vocab)
-print("x index sample: \n{}\n{}".format(data.idx2str(data.x[0]), data.x[0]),
-      "\ny index sample: \n{}\n{}".format(data.idx2str(data.y[0]), data.y[0]))
+def train():
+    # get and process data
+    data = utils.DateData(4000)
+    print("Chinese time order: yy/mm/dd ", data.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", data.date_en[:3])
+    print("vocabularies: ", data.vocab)
+    print("x index sample: \n{}\n{}".format(data.idx2str(data.x[0]), data.x[0]),
+          "\ny index sample: \n{}\n{}".format(data.idx2str(data.y[0]), data.y[0]))
 
-model = Seq2Seq(
-    data.num_word, data.num_word, emb_dim=16, units=32,
-    max_pred_len=11, start_token=data.start_token, end_token=data.end_token)
+    model = Seq2Seq(
+        data.num_word, data.num_word, emb_dim=16, units=32,
+        max_pred_len=11, start_token=data.start_token, end_token=data.end_token)
 
-# training
-for t in range(1500):
-    bx, by, decoder_len = data.sample(32)
-    loss = model.step(bx, by, decoder_len)
-    if t % 30 == 0:
-        target = data.idx2str(by[0, 1:-1])
-        pred = model.inference(bx[0:1])
-        res = data.idx2str(pred[0])
-        src = data.idx2str(bx[0])
-        print(
-            "t: ", t,
-            "| loss: %.3f" % loss,
-            "| input: ", src,
-            "| target: ", target,
-            "| inference: ", res,
-        )
+    # training
+    for t in range(1500):
+        bx, by, decoder_len = data.sample(32)
+        loss = model.step(bx, by, decoder_len)
+        if t % 30 == 0:
+            target = data.idx2str(by[0, 1:-1])
+            pred = model.inference(bx[0:1])
+            res = data.idx2str(pred[0])
+            src = data.idx2str(bx[0])
+            print(
+                "t: ", t,
+                "| loss: %.3f" % loss,
+                "| input: ", src,
+                "| target: ", target,
+                "| inference: ", res,
+            )
 
 
+if __name__ == "__main__":
+    train()

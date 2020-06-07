@@ -40,10 +40,10 @@ class GPT(keras.Model):
         self.task_mlm = keras.layers.Dense(n_vocab)
         self.task_nsp = keras.layers.Dense(2)
 
-        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction="none")
         self.opt = keras.optimizers.Adam(lr)
 
-    def __call__(self, seqs, segs, training=False):
+    def call(self, seqs, segs, training=False):
         embed = self.input_emb(seqs, segs)  # [n, step, dim]
         z = self.encoder(embed, training=training, mask=self.mask(seqs))     # [n, step, dim]
         mlm_logits = self.task_mlm(z)  # [n, step, n_vocab]
@@ -52,9 +52,10 @@ class GPT(keras.Model):
 
     def step(self, seqs, segs, seqs_, nsp_labels):
         with tf.GradientTape() as tape:
-            mlm_logits, nsp_logits = self(seqs, segs, training=True)
-            pred_loss = self.cross_entropy(seqs_, mlm_logits)
-            nsp_loss = self.cross_entropy(nsp_labels, nsp_logits)
+            mlm_logits, nsp_logits = self.call(seqs, segs, training=True)
+            pad_mask = tf.math.not_equal(seqs_, self.padding_idx)
+            pred_loss = tf.reduce_mean(tf.boolean_mask(self.cross_entropy(seqs_, mlm_logits), pad_mask))
+            nsp_loss = tf.reduce_mean(self.cross_entropy(nsp_labels, nsp_logits))
             loss = pred_loss + 0.2 * nsp_loss
             grads = tape.gradient(loss, self.trainable_variables)
             self.opt.apply_gradients(zip(grads, self.trainable_variables))
