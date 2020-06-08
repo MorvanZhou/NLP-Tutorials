@@ -246,23 +246,23 @@ def train(model, data, step):
             )
             t0 = t1
 
-    os.makedirs("./visual_helper/models/transformer", exist_ok=True)
-    model.save_weights("./visual_helper/models/transformer/model.ckpt")
-    with open("./visual_helper/tmp/transformer_v2i_i2v.pkl", "wb") as f:
+    os.makedirs("./visual/models/transformer", exist_ok=True)
+    model.save_weights("./visual/models/transformer/model.ckpt")
+    with open("./visual/tmp/transformer_v2i_i2v.pkl", "wb") as f:
         pickle.dump({"v2i": data.v2i, "i2v": data.i2v}, f)
 
 
 def export_attention(model, data):
-    with open("./visual_helper/tmp/transformer_v2i_i2v.pkl", "rb") as f:
+    with open("./visual/tmp/transformer_v2i_i2v.pkl", "rb") as f:
         dic = pickle.load(f)
-    model.load_weights("./visual_helper/models/transformer/model.ckpt")
+    model.load_weights("./visual/models/transformer/model.ckpt")
     bx, by, seq_len = data.sample(32)
     model.translate(bx, dic["v2i"], dic["i2v"])
     attn_data = {
         "src": [[data.i2v[i] for i in bx[j]] for j in range(len(bx))],
         "tgt": [[data.i2v[i] for i in by[j]] for j in range(len(by))],
         "attentions": model.attentions}
-    with open("./visual_helper/tmp/transformer_attention_matrix.pkl", "wb") as f:
+    with open("./visual/tmp/transformer_attention_matrix.pkl", "wb") as f:
         pickle.dump(attn_data, f)
 
 

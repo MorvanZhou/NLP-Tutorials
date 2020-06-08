@@ -77,8 +77,8 @@ def train(model, data, step):
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred if i != data.pad_id]),
                 )
             t0 = t1
-    os.makedirs("./visual_helper/models/elmo", exist_ok=True)
-    model.save_weights("./visual_helper/models/elmo/model.ckpt")
+    os.makedirs("./visual/models/elmo", exist_ok=True)
+    model.save_weights("./visual/models/elmo/model.ckpt")
 
 
 if __name__ == "__main__":

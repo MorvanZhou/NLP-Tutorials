@@ -88,4 +88,4 @@ for t in range(2500):
         print("step: {} | loss: {}".format(t, loss))
 
 # plotting
-show_w2v_word_embedding(model, data, "visual_helper/skip_gram.png")
+show_w2v_word_embedding(model, data, "visual/skip_gram.png")

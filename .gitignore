@@ -1,5 +1,5 @@
 .idea/
-visual_helper/models
-visual_helper/tmp
-visual_helper/results
+visual/models
+visual/tmp
+visual/results
 MRPC
