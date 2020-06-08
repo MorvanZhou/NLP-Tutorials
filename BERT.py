@@ -174,8 +174,8 @@ def main():
                 "\n| prd word: ", [data.i2v[i] for i in pred*loss_mask[0] if i != data.v2i["<PAD>"]],
                 )
             t0 = t1
-    os.makedirs("./visual_helper/models/bert", exist_ok=True)
-    model.save_weights("./visual_helper/models/bert/model.ckpt")
+    os.makedirs("./visual/models/bert", exist_ok=True)
+    model.save_weights("./visual/models/bert/model.ckpt")
 
 
 def export_attention():
@@ -184,13 +184,13 @@ def export_attention():
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
         lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
-    model.load_weights("./visual_helper/models/bert/model.ckpt")
+    model.load_weights("./visual/models/bert/model.ckpt")
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(1)
     model(seqs, segs, False)
     data = {"src": [data.i2v[i] for i in seqs[0]], "attentions": model.attentions}
-    with open("./visual_helper/tmp/bert_attention_matrix.pkl", "wb") as f:
+    with open("./visual/tmp/bert_attention_matrix.pkl", "wb") as f:
         pickle.dump(data, f)
 
 
