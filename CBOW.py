@@ -1,6 +1,7 @@
 from tensorflow import keras
 import tensorflow as tf
-from utils import process_w2v_data, show_w2v_word_embedding
+from utils import process_w2v_data
+from visual import show_w2v_word_embedding
 
 corpus = [
     # numbers
@@ -83,4 +84,4 @@ for t in range(2500):
         print("step: {} | loss: {}".format(t, loss))
 
 # plotting
-show_w2v_word_embedding(model, data, "visual/cbow.png")
+show_w2v_word_embedding(model, data)
