@@ -265,7 +265,6 @@ def self_attention_line(bert_or_gpt="bert", case=0):
                 for col in range(img.shape[1]):
                     alpha = (img[row, col] / img[row].max()) ** 7
                     ax[i, j].plot([0, 1], [img.shape[1]-col, img.shape[0]-row-1], alpha=alpha, c=c)
-                    print(img.shape[1]-col, img.shape[0]-row-1)
             ax[i, j].set_xticks(())
             ax[i, j].set_xlabel("head %i" % (j+1+i*2))
             ax[i, j].set_xlim(0, 1)
@@ -276,13 +275,11 @@ def self_attention_line(bert_or_gpt="bert", case=0):
 
 if __name__ == "__main__":
     os.makedirs("./visual/results", exist_ok=True)
-    all_mask_kinds()
+    # all_mask_kinds()
     # seq2seq_attention()
-    # self_mask(padded_id_seqs)
-    # output_mask(padded_id_seqs)
     # position_embedding()
     # transformer_attention_matrix(case=0)
     # transformer_attention_line(case=0)
     # self_attention_matrix("bert", case=2)
     # self_attention_line("bert", case=6)
-    # self_attention_line("gpt", case=1)
+    self_attention_line("gpt", case=1)
