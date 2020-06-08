@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
-from utils import process_w2v_data, show_w2v_word_embedding
+from utils import process_w2v_data
+from visual import show_w2v_word_embedding
 
 corpus = [
     # numbers
@@ -88,4 +89,4 @@ for t in range(2500):
         print("step: {} | loss: {}".format(t, loss))
 
 # plotting
-show_w2v_word_embedding(model, data, "visual/skip_gram.png")
+show_w2v_word_embedding(model, data, "./visual/results/skip_gram.png")

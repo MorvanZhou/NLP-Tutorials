@@ -2,53 +2,92 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 from matplotlib.pyplot import cm
-
-SEQS = ["I love you", "My name is M", "This is a very long seq", "Short one"]
-vocabs = set((" ".join(SEQS)).split(" "))
-i2v = {i: v for i, v in enumerate(vocabs, start=1)}
-i2v["<PAD>"] = 0     # add 0 idx for <PAD>
-v2i = {v: i for i, v in i2v.items()}
-
-id_seqs = [[v2i[v] for v in seq.split(" ")] for seq in SEQS]
-padded_id_seqs = np.array([l + [0] * (6-len(l)) for l in id_seqs])
+import os
+import utils
 
 
-def pad_mask(seqs):
-    mask = np.where(seqs == 0, np.zeros_like(seqs), np.ones_like(seqs))  # 0 idx is padding
-    mask = np.expand_dims(mask, axis=1) * np.expand_dims(mask, axis=2)  # [n, step, step]
-    print(mask)
+def show_w2v_word_embedding(model, data: utils.Dataset):
+    word_emb = model.embeddings.get_weights()[0]
+    for i in range(data.num_word):
+        c = "blue"
+        try:
+            int(data.i2v[i])
+        except ValueError:
+            c = "red"
+        plt.text(word_emb[i, 0], word_emb[i, 1], s=data.i2v[i], color=c, weight="bold")
+    plt.xlim(word_emb[:, 0].min() - .5, word_emb[:, 0].max() + .5)
+    plt.ylim(word_emb[:, 1].min() - .5, word_emb[:, 1].max() + .5)
+    plt.xticks(())
+    plt.yticks(())
+    plt.xlabel("embedding dim1")
+    plt.ylabel("embedding dim2")
+    plt.savefig("./visual/results/cbow.png", dpi=300, format="png")
+    plt.show()
+
+
+def seq2seq_attention():
+    with open("./visual/tmp/attention_align.pkl", "rb") as f:
+        data = pickle.load(f)
+    i2v, x, y, align = data["i2v"], data["x"], data["y"], data["align"]
+    plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
+    plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
+    for i in range(6):
+        plt.subplot(2, 3, i + 1)
+        x_vocab = [i2v[j] for j in np.ravel(x[i])]
+        y_vocab = [i2v[j] for j in y[i, 1:]]
+        plt.imshow(align[i], cmap="YlGn", vmin=0., vmax=1.)
+        plt.yticks([j for j in range(len(y_vocab))], y_vocab)
+        plt.xticks([j for j in range(len(x_vocab))], x_vocab)
+        if i == 0 or i == 3:
+            plt.ylabel("Output")
+        if i >= 3:
+            plt.xlabel("Input")
+    plt.tight_layout()
+    plt.savefig("./visual/results/seq2seq_attention.png", format="png", dpi=200)
+    plt.show()
+
+
+def all_mask_kinds():
+    seqs = ["I love you", "My name is M", "This is a very long seq", "Short one"]
+    vocabs = set((" ".join(seqs)).split(" "))
+    i2v = {i: v for i, v in enumerate(vocabs, start=1)}
+    i2v["<PAD>"] = 0  # add 0 idx for <PAD>
+    v2i = {v: i for i, v in i2v.items()}
+
+    id_seqs = [[v2i[v] for v in seq.split(" ")] for seq in seqs]
+    padded_id_seqs = np.array([l + [0] * (6 - len(l)) for l in id_seqs])
+
+    # padding mask
+    pmask = np.where(padded_id_seqs == 0, np.ones_like(padded_id_seqs), np.zeros_like(padded_id_seqs))  # 0 idx is padding
+    pmask = np.repeat(pmask[:, None, :], pmask.shape[-1], axis=1)  # [n, step, step]
     plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
     plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
     for i in range(1, 5):
         plt.subplot(2, 2, i)
-        plt.imshow(mask[i-1], vmax=1, vmin=0, cmap="YlGn")
-        plt.xticks(range(6), SEQS[i - 1].split(" "), rotation=45)
-        plt.yticks(range(6), SEQS[i - 1].split(" "),)
+        plt.imshow(pmask[i-1], vmax=1, vmin=0, cmap="YlGn")
+        plt.xticks(range(6), seqs[i - 1].split(" "), rotation=45)
+        plt.yticks(range(6), seqs[i - 1].split(" "),)
         plt.grid(which="minor", c="w", lw=0.5, linestyle="-")
     plt.tight_layout()
-    plt.savefig("transformer_pad_mask.png", dpi=200)
+    plt.savefig("./visual/results/transformer_pad_mask.png", dpi=200)
     plt.show()
 
+    # look ahead mask
+    max_len = pmask.shape[-1]
+    omask = ~np.triu(np.ones((max_len, max_len), dtype=np.bool), 1)
+    omask = np.tile(np.expand_dims(omask, axis=0), [np.shape(seqs)[0], 1, 1])  # [n, step, step]
+    omask = np.where(omask, pmask, 1)
 
-def output_mask(seqs):
-    max_len = 6
-    pmask = np.where(seqs == 0, np.zeros_like(seqs), np.ones_like(seqs))  # 0 idx is padding
-    pmask = np.expand_dims(pmask, axis=1) * np.expand_dims(pmask, axis=2)  # [n, step, step]
-    mask = ~np.triu(np.ones((max_len, max_len), dtype=np.bool), 1)
-    mask = np.tile(np.expand_dims(mask, axis=0), [np.shape(seqs)[0], 1, 1])  # [n, step, step]
-    omask = np.where(mask, pmask, np.zeros_like(pmask))
-
-    print(mask)
     plt.rcParams['xtick.bottom'] = plt.rcParams['xtick.labelbottom'] = False
     plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
     for i in range(1, 5):
         plt.subplot(2, 2, i)
         plt.imshow(omask[i - 1], vmax=1, vmin=0, cmap="YlGn")
-        plt.xticks(range(6), SEQS[i - 1].split(" "), rotation=45)
-        plt.yticks(range(6), SEQS[i - 1].split(" "), )
+        plt.xticks(range(6), seqs[i - 1].split(" "), rotation=45)
+        plt.yticks(range(6), seqs[i - 1].split(" "), )
         plt.grid(which="minor", c="w", lw=0.5, linestyle="-")
     plt.tight_layout()
-    plt.savefig("transformer_output_mask.png", dpi=200)
+    plt.savefig("./visual/results/transformer_look_ahead_mask.png", dpi=200)
     plt.show()
 
 
@@ -62,12 +101,12 @@ def position_embedding():
     plt.imshow(pe, vmax=1, vmin=-1, cmap="rainbow")
     plt.ylabel("word position")
     plt.xlabel("embedding dim")
-    plt.savefig("transformer_position_embedding.png", dpi=200)
+    plt.savefig("./visual/results/transformer_position_embedding.png", dpi=200)
     plt.show()
 
 
 def transformer_attention_matrix(case=0):
-    with open("./tmp/transformer_attention_matrix.pkl", "rb") as f:
+    with open("./visual/tmp/transformer_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"][case]
     tgt = data["tgt"][case]
@@ -93,7 +132,7 @@ def transformer_attention_matrix(case=0):
                 plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig("transformer_encoder_self_attention%d.png" % case, dpi=200)
+    plt.savefig("./visual/results/transformer%d_encoder_self_attention.png" % case, dpi=200)
     plt.show()
 
     plt.figure(1, (7, 7))
@@ -110,7 +149,7 @@ def transformer_attention_matrix(case=0):
                 plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig("transformer_decoder_self_attention%d.png" % case, dpi=200)
+    plt.savefig("./visual/results/transformer%d_decoder_self_attention.png" % case, dpi=200)
     plt.show()
 
     plt.figure(2, (7, 8))
@@ -127,12 +166,12 @@ def transformer_attention_matrix(case=0):
                 plt.xlabel("head %i" % (j+1))
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
-    plt.savefig("transformer_decoder_encoder_attention%d.png" % case, dpi=200)
+    plt.savefig("./visual/results/transformer%d_decoder_encoder_attention.png" % case, dpi=200)
     plt.show()
 
 
 def transformer_attention_line(case=0):
-    with open("./tmp/transformer_attention_matrix.pkl", "rb") as f:
+    with open("./visual/tmp/transformer_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"][case]
     tgt = data["tgt"][case]
@@ -164,11 +203,11 @@ def transformer_attention_line(case=0):
             ax[i, j].set_xlim(0, 1)
     plt.subplots_adjust(top=0.9)
     plt.tight_layout()
-    plt.savefig("transformer_encoder_decoder_attention_line%i.png" % case, dpi=100)
+    plt.savefig("./visual/results/transformer%d_encoder_decoder_attention_line.png" % case, dpi=100)
 
 
 def self_attention_matrix(bert_or_gpt="bert", case=0):
-    with open("./tmp/"+bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
+    with open("./visual/tmp/"+bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"]
     attentions = data["attentions"]
@@ -193,12 +232,12 @@ def self_attention_matrix(bert_or_gpt="bert", case=0):
         plt.xlabel("head %i" % (j+1))
     plt.subplots_adjust(top=0.9)
     plt.tight_layout()
-    plt.savefig(bert_or_gpt+"_self_attention.png", dpi=500)
+    plt.savefig("./visual/results/"+bert_or_gpt+"%d_self_attention.png" % case, dpi=500)
     # plt.show()
 
 
 def self_attention_line(bert_or_gpt="bert", case=0):
-    with open("./tmp/"+bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
+    with open("./visual/tmp/"+bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"][case]
     attentions = data["attentions"]
@@ -232,14 +271,18 @@ def self_attention_line(bert_or_gpt="bert", case=0):
             ax[i, j].set_xlim(0, 1)
     plt.subplots_adjust(top=0.9)
     plt.tight_layout()
-    plt.savefig(bert_or_gpt+"_self_attention_line%i.png" % case, dpi=100)
+    plt.savefig("./visual/results/"+bert_or_gpt+"%d_self_attention_line.png" % case, dpi=100)
 
 
-# self_mask(padded_id_seqs)
-# output_mask(padded_id_seqs)
-# position_embedding()
-# transformer_attention_matrix(case=0)
-# transformer_attention_line(case=0)
-# self_attention_matrix("bert", case=2)
-self_attention_line("bert", case=6)
-# self_attention_line("gpt", case=1)
+if __name__ == "__main__":
+    os.makedirs("./visual/results", exist_ok=True)
+    all_mask_kinds()
+    # seq2seq_attention()
+    # self_mask(padded_id_seqs)
+    # output_mask(padded_id_seqs)
+    # position_embedding()
+    # transformer_attention_matrix(case=0)
+    # transformer_attention_line(case=0)
+    # self_attention_matrix("bert", case=2)
+    # self_attention_line("bert", case=6)
+    # self_attention_line("gpt", case=1)
