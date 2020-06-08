@@ -22,7 +22,7 @@ def plot_attention(i2v, sample_x, sample_y, alignments):
     plt.show()
 
 
-with open("./attention_align.pkl", "rb") as f:
+with open("./tmp/attention_align.pkl", "rb") as f:
     data = pickle.load(f)
     i2v, x, y, align = data["i2v"], data["x"], data["y"], data["align"]
 plot_attention(i2v, x, y, align)

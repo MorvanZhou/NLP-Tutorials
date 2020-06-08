@@ -67,7 +67,7 @@ def position_embedding():
 
 
 def transformer_attention_matrix(case=0):
-    with open("./transformer_attention_matrix.pkl", "rb") as f:
+    with open("./tmp/transformer_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"][case]
     tgt = data["tgt"][case]
@@ -132,7 +132,7 @@ def transformer_attention_matrix(case=0):
 
 
 def transformer_attention_line(case=0):
-    with open("./transformer_attention_matrix.pkl", "rb") as f:
+    with open("./tmp/transformer_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"][case]
     tgt = data["tgt"][case]
@@ -168,7 +168,7 @@ def transformer_attention_line(case=0):
 
 
 def self_attention_matrix(bert_or_gpt="bert", case=0):
-    with open(bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
+    with open("./tmp/"+bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"]
     attentions = data["attentions"]
@@ -198,7 +198,7 @@ def self_attention_matrix(bert_or_gpt="bert", case=0):
 
 
 def self_attention_line(bert_or_gpt="bert", case=0):
-    with open(bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
+    with open("./tmp/"+bert_or_gpt+"_attention_matrix.pkl", "rb") as f:
         data = pickle.load(f)
     src = data["src"][case]
     attentions = data["attentions"]
