@@ -12,6 +12,7 @@ PAD_ID = 0
 
 class DateData:
     def __init__(self, n):
+        np.random.seed(1)
         self.date_cn = []
         self.date_en = []
         for timestamp in np.random.randint(143835585, 2043835585, n):
@@ -21,7 +22,7 @@ class DateData:
         self.vocab = set(
             [str(i) for i in range(0, 10)] + ["-", "/", "<GO>", "<EOS>"] + [
                 i.split("/")[1] for i in self.date_en])
-        self.v2i = {v: i for i, v in enumerate(self.vocab, start=1)}
+        self.v2i = {v: i for i, v in enumerate(sorted(list(self.vocab)), start=1)}
         self.v2i["<PAD>"] = PAD_ID
         self.vocab.add("<PAD>")
         self.i2v = {i: v for v, i in self.v2i.items()}
@@ -82,92 +83,109 @@ def _text_standardize(text):
     text = re.sub(r'–', '-', text)
     text = re.sub(r'―', '-', text)
     text = re.sub(r" \d+(,\d+)?(\.\d+)? ", " <NUM> ", text)
-    text = re.sub(r" \d+-", " <NUM>-", text)
+    text = re.sub(r" \d+-+?\d*", " <NUM>-", text)
     return text.strip()
 
 
-def _process_mrpc(dir="./MRPC", go="<GO> ", end=" <EOS>"):
+def _process_mrpc(dir="./MRPC", rows=None):
     data = {"train": None, "test": None}
     files = os.listdir(dir)
-    top_n = 50
     for f in files:
-        df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=top_n)
+        df = pd.read_csv(os.path.join(dir, f), sep='\t', nrows=rows)
         k = "train" if "train" in f else "test"
         data[k] = {"is_same": df.iloc[:, 0].values, "s1": df["#1 String"].values, "s2": df["#2 String"].values}
     vocab = set()
     for n in ["train", "test"]:
         for m in ["s1", "s2"]:
             for i in range(len(data[n][m])):
-                data[n][m][i] = go + _text_standardize(data[n][m][i].lower()) + end
+                data[n][m][i] = _text_standardize(data[n][m][i].lower())
                 cs = data[n][m][i].split(" ")
                 vocab.update(set(cs))
-    v2i = {v: i for i, v in enumerate(vocab, start=1)}
+    v2i = {v: i for i, v in enumerate(sorted(vocab), start=1)}
     v2i["<PAD>"] = PAD_ID
-    vocab.update(["<PAD>"])
+    v2i["<MASK>"] = len(v2i)
+    v2i["<SEP>"] = len(v2i)
+    v2i["<GO>"] = len(v2i)
     i2v = {i: v for v, i in v2i.items()}
     for n in ["train", "test"]:
         for m in ["s1", "s2"]:
             data[n][m+"id"] = [[v2i[v] for v in c.split(" ")] for c in data[n][m]]
-    max_len = max(
-        [len(s) for s in data["train"]["s1id"] + data["train"]["s2id"] + data["test"]["s1id"] + data["test"]["s2id"]])
-    return data, v2i, i2v, max_len
+    return data, v2i, i2v
 
 
-class MRPCData4BERT:
-    def __init__(self, data_dir="./MRPC/", proxy=None):
+class MRPCData:
+    num_seg = 3
+    pad_id = PAD_ID
+
+    def __init__(self, data_dir="./MRPC/", rows=None, proxy=None):
         maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
-        data, self.v2i, self.i2v, max_len = _process_mrpc(data_dir, go="", end=" <SEP>")
+        data, self.v2i, self.i2v = _process_mrpc(data_dir, rows)
+        self.max_len = max(
+            [len(s1) + len(s2) + 3 for s1, s2 in zip(
+                data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"] + data["test"]["s2id"])])
 
-        self.max_len = max_len * 2
-        mlm_x = data["train"]["s1id"] + data["train"]["s2id"]  # list appending
-        self.mlm_x = pad_zero(mlm_x, max_len=self.max_len)
-        nsp_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
-        self.nsp_x = pad_zero(nsp_x, max_len=self.max_len)
+        self.xlen = np.array([
+            [
+                len(data["train"]["s1id"][i]), len(data["train"]["s2id"][i])
+             ] for i in range(len(data["train"]["s1id"]))], dtype=int)
+        x = [
+            [self.v2i["<GO>"]] + data["train"]["s1id"][i] + [self.v2i["<SEP>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
+            for i in range(len(self.xlen))
+        ]
+        self.x = pad_zero(x, max_len=self.max_len)
         self.nsp_y = data["train"]["is_same"][:, None]
 
-        self.mlm_seg = np.full(self.mlm_x.shape, 2, np.int32)
-        for i in range(len(data["train"]["s1id"])):
-            si = len(data["train"]["s1id"][i])
-            self.mlm_seg[i, :si] = 0
-            si = len(data["train"]["s2id"][i])
-            self.mlm_seg[i + len(data["train"]["s1id"]), :si] = 0
+        self.seg = np.full(self.x.shape, self.num_seg-1, np.int32)
+        for i in range(len(x)):
+            si = self.xlen[i][0] + 2
+            self.seg[i, :si] = 0
+            si_ = si + self.xlen[i][1] + 1
+            self.seg[i, si:si_] = 1
 
-        self.nsp_seg = np.full(self.nsp_x.shape, 2, np.int32)
-        for i in range(len(data["train"]["s1id"])):
-            si = 1  # task seg
-            si += len(data["train"]["s1id"][i])
-            self.nsp_seg[i, :si] = 0
-            si_ = si + len(data["train"]["s2id"][i])
-            self.nsp_seg[i, si:si_] = 1
+        self.word_ids = np.array(list(set(self.i2v.keys()).difference(
+            [self.v2i[v] for v in ["<PAD>", "<MASK>", "<SEP>"]])))
 
-    def sample_mlm(self, n):
-        bi = np.random.randint(0, self.mlm_x.shape[0], size=n)
-        bx, bs = self.mlm_x[bi], self.mlm_seg[bi]
-        return bx, bs
-
-    def sample_nsp(self, n):
-        bi = np.random.randint(0, self.nsp_x.shape[0], size=n)
-        bx, bs, by = self.nsp_x[bi], self.nsp_seg[bi], self.nsp_y[bi]
-        return bx, bs, by
+    def sample(self, n):
+        bi = np.random.randint(0, self.x.shape[0], size=n)
+        bx, bs, bl, by = self.x[bi], self.seg[bi], self.xlen[bi], self.nsp_y[bi]
+        return bx, bs, bl, by
 
     @property
     def num_word(self):
         return len(self.v2i)
 
+    @property
+    def mask_id(self):
+        return self.v2i["<MASK>"]
 
-class MRPCData4GPT:
-    def __init__(self, data_dir="./MRPC/", proxy=None):
-        maybe_download_mrpc(save_dir="./MRPC/", proxy=proxy)
-        data, v2i, i2v, max_len = _process_mrpc(dir, go="<GO> ", end=" <EOS>")
-        max_len = max_len * 2 + 1
-        unsupervised_x = data["train"]["s1id"] + data["train"]["s2id"]
-        unsupervised_x = pad_zero(unsupervised_x, max_len=max_len)
-        supervised_x = [data["train"]["s1id"][i] + data["train"]["s2id"][i] for i in range(len(data["train"]["s1id"]))]
-        supervised_x = pad_zero(supervised_x, max_len=max_len)
-        supervised_label = data["train"]["is_same"]
-        print("task1 example: ", data["train"]["s1"][0])
-        print("task2 example: ", data["train"]["s1"][0] + " " + data["train"]["s2"][0])
-        return v2i, i2v, max_len, unsupervised_x, supervised_x, supervised_label
+
+class MRPCSingle:
+    pad_id = PAD_ID
+
+    def __init__(self, data_dir="./MRPC/", rows=None, proxy=None):
+        maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
+        data, self.v2i, self.i2v = _process_mrpc(data_dir, rows)
+
+        self.max_len = max([len(s) + 2 for s in data["train"]["s1id"] + data["train"]["s2id"]])
+        x = [
+            [self.v2i["<GO>"]] + data["train"]["s1id"][i] + [self.v2i["<SEP>"]]
+            for i in range(len(data["train"]["s1id"]))
+        ]
+        x += [
+            [self.v2i["<GO>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
+            for i in range(len(data["train"]["s2id"]))
+        ]
+        self.x = pad_zero(x, max_len=self.max_len)
+        self.word_ids = np.array(list(set(self.i2v.keys()).difference([self.v2i["<PAD>"]])))
+
+    def sample(self, n):
+        bi = np.random.randint(0, self.x.shape[0], size=n)
+        bx = self.x[bi]
+        return bx
+
+    @property
+    def num_word(self):
+        return len(self.v2i)
 
 
 class Dataset:
