@@ -99,6 +99,7 @@ class Seq2Seq(keras.Model):
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return _loss.numpy()
 
+
 def train():
     # get and process data
     data = utils.DateData(2000)
@@ -130,7 +131,7 @@ def train():
 
     pkl_data = {"i2v": data.i2v, "x": data.x[:6], "y": data.y[:6], "align": model.inference(data.x[:6], return_align=True)}
 
-    with open("./visual_helper/attention_align.pkl", "wb") as f:
+    with open("./visual_helper/tmp/attention_align.pkl", "wb") as f:
         pickle.dump(pkl_data, f)
 
 
