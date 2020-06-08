@@ -1,5 +1,3 @@
 .idea/
-visual/models
-visual/tmp
-visual/results
-MRPC
+visual/
+MRPC/

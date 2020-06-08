@@ -110,7 +110,7 @@ def train(model, data, step=10000, name="gpt"):
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
             t0 = t1
-    os.makedirs("./visual/models/models/%s" % name, exist_ok=True)
+    os.makedirs("./visual/models/%s" % name, exist_ok=True)
     model.save_weights("./visual/models/%s/model.ckpt" % name)
 
 
