@@ -110,18 +110,18 @@ def train(model, data, step=10000, name="gpt"):
                 "\n| prd: ", " ".join([data.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
             t0 = t1
-    os.makedirs("./visual_helper/%s" % name, exist_ok=True)
-    model.save_weights("./visual_helper/%s/model.ckpt" % name)
+    os.makedirs("./visual_helper/models/models/%s" % name, exist_ok=True)
+    model.save_weights("./visual_helper/models/%s/model.ckpt" % name)
 
 
 def export_attention(model, data, name="gpt"):
-    model.load_weights("./visual_helper/%s/model.ckpt" % name)
+    model.load_weights("./visual_helper/models/%s/model.ckpt" % name)
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(32)
     model(seqs[:, :-1], segs[:, :-1], False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
-    with open("./visual_helper/%s_attention_matrix.pkl" % name, "wb") as f:
+    with open("./visual_helper/tmp/%s_attention_matrix.pkl" % name, "wb") as f:
         pickle.dump(data, f)
 
 
