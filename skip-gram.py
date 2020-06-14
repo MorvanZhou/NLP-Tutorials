@@ -72,7 +72,7 @@ class SkipGram(keras.Model):
 
     def step(self, x, y):
         with tf.GradientTape() as tape:
-            _loss: tf.Tensor = self.loss(x, y, True)
+            _loss = self.loss(x, y, True)
             grads = tape.gradient(_loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return _loss.numpy()
@@ -89,4 +89,4 @@ for t in range(2500):
         print("step: {} | loss: {}".format(t, loss))
 
 # plotting
-show_w2v_word_embedding(model, data, "./visual/results/skip_gram.png")
+show_w2v_word_embedding(model, data)
