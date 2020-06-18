@@ -5,7 +5,7 @@ This repo includes many simple implementations of models in Neural Language Proc
 All code implementations in this tutorial are organized as following:
 
 1. Search Engine
-  - [TF-IDF numpy](/tf_idf.py) [TF-IDF skearn](/tf_idf_sklearn.py)
+  - [TF-IDF numpy](/tf_idf.py) / [TF-IDF skearn](/tf_idf_sklearn.py)
 2. Understand Word
   - [Continuous Bag of Words (CBOW)](/CBOW.py)
   - [Skip-Gram](/skip-gram.py)
