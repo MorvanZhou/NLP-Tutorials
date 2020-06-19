@@ -36,18 +36,18 @@ class CBOW(keras.Model):
         self.v_dim = v_dim
         self.embeddings = keras.layers.Embedding(
             input_dim=v_dim, output_dim=emb_dim,  # [n_vocab, emb_dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
+            embeddings_initializer=keras.initializers.RandomNormal(0., 0.1),
         )
 
         # noise-contrastive estimation
         self.nce_w = self.add_weight(
             name="nce_w", shape=[v_dim, emb_dim],
-            initializer=tf.initializers.TruncatedNormal(0., 1.))  # [n_vocab, emb_dim]
+            initializer=keras.initializers.TruncatedNormal(0., 1.))  # [n_vocab, emb_dim]
         self.nce_b = self.add_weight(
             name="nce_b", shape=(v_dim,),
-            initializer=tf.initializers.Constant(0.1))  # [n_vocab, ]
+            initializer=keras.initializers.Constant(0.1))  # [n_vocab, ]
 
-        self.opt = tf.optimizers.Adam(0.01)
+        self.opt = keras.optimizers.Adam(0.01)
 
     def call(self, x, training=None, mask=None):
         # x.shape = [n, skip_window*2]
@@ -66,22 +66,24 @@ class CBOW(keras.Model):
 
     def step(self, x, y):
         with tf.GradientTape() as tape:
-            _loss: tf.Tensor = self.loss(x, y, True)
-            grads = tape.gradient(_loss, self.trainable_variables)
+            loss: tf.Tensor = self.loss(x, y, True)
+            grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
-        return _loss.numpy()
+        return loss.numpy()
 
 
-data = process_w2v_data(corpus, skip_window=2, method="cbow")
-model = CBOW(data.num_word, 2)
+def train(model, data):
+    for t in range(2500):
+        bx, by = data.sample(8)
+        loss = model.step(bx, by)
+        if t % 200 == 0:
+            print("step: {} | loss: {}".format(t, loss))
 
 
-# training
-for t in range(2500):
-    bx, by = data.sample(8)
-    loss = model.step(bx, by)
-    if t % 200 == 0:
-        print("step: {} | loss: {}".format(t, loss))
+if __name__ == "__main__":
+    d = process_w2v_data(corpus, skip_window=2, method="cbow")
+    m = CBOW(d.num_word, 2)
+    train(m, d)
 
-# plotting
-show_w2v_word_embedding(model, data)
+    # plotting
+    show_w2v_word_embedding(m, d, "./visual/results/cbow.png")
