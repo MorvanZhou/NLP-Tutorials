@@ -66,7 +66,7 @@ class CBOW(keras.Model):
 
     def step(self, x, y):
         with tf.GradientTape() as tape:
-            loss: tf.Tensor = self.loss(x, y, True)
+            loss = self.loss(x, y, True)
             grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss.numpy()
