@@ -6,7 +6,7 @@ import os
 import utils
 
 
-def show_w2v_word_embedding(model, data: utils.Dataset):
+def show_w2v_word_embedding(model, data: utils.Dataset, path):
     word_emb = model.embeddings.get_weights()[0]
     for i in range(data.num_word):
         c = "blue"
@@ -21,7 +21,7 @@ def show_w2v_word_embedding(model, data: utils.Dataset):
     plt.yticks(())
     plt.xlabel("embedding dim1")
     plt.ylabel("embedding dim2")
-    plt.savefig("./visual/results/cbow.png", dpi=300, format="png")
+    plt.savefig(path, dpi=300, format="png")
     plt.show()
 
 
