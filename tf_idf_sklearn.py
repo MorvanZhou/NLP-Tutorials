@@ -1,5 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from visual import show_tfidf
 
 
 docs = [
@@ -32,3 +33,6 @@ res = cosine_similarity(tf_idf, qtf_idf)
 res = res.ravel().argsort()[-3:]
 print("\ntop 3 docs for '{}':\n{}".format(q, [docs[i] for i in res[::-1]]))
 
+
+i2v = {i: v for v, i in vectorizer.vocabulary_.items()}
+show_tfidf(tf_idf.todense(), [i2v[i] for i in range(len(i2v))], "tfidf_sklearn_matrix")
