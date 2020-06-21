@@ -94,10 +94,10 @@ class Seq2Seq(keras.Model):
         with tf.GradientTape() as tape:
             logits = self.train_logits(x, y, seq_len)
             dec_out = y[:, 1:]  # ignore <GO>
-            _loss = self.cross_entropy(dec_out, logits)
-            grads = tape.gradient(_loss, self.trainable_variables)
+            loss = self.cross_entropy(dec_out, logits)
+            grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
-        return _loss.numpy()
+        return loss.numpy()
 
 
 def train():
@@ -116,7 +116,7 @@ def train():
     for t in range(1000):
         bx, by, decoder_len = data.sample(64)
         loss = model.step(bx, by, decoder_len)
-        if t % 30 == 0:
+        if t % 70 == 0:
             target = data.idx2str(by[0, 1:-1])
             pred = model.inference(bx[0:1])
             res = data.idx2str(pred[0])
