@@ -1,3 +1,5 @@
+# a modification from [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
+
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
@@ -5,7 +7,7 @@ import utils
 import tensorflow_addons as tfa
 
 
-class Seq2Seq(keras.Model):
+class CNNTranslation(keras.Model):
     def __init__(self, enc_v_dim, dec_v_dim, emb_dim, units, max_pred_len, start_token, end_token):
         super().__init__()
         self.units = units
@@ -15,7 +17,11 @@ class Seq2Seq(keras.Model):
             input_dim=enc_v_dim, output_dim=emb_dim,  # [enc_n_vocab, emb_dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
         )
-        self.encoder = keras.layers.LSTM(units=units, return_sequences=True, return_state=True)
+        self.conv2ds = [
+            keras.layers.Conv2D(16, (n, emb_dim), padding="valid", activation=keras.activations.relu)
+            for n in range(1, 5)]
+        self.max_pools = [keras.layers.MaxPool2D((n, 1)) for n in [8, 7, 6, 5]]
+        self.encoder = keras.layers.Dense(units, activation=keras.activations.relu)
 
         # decoder
         self.dec_embeddings = keras.layers.Embedding(
@@ -45,10 +51,14 @@ class Seq2Seq(keras.Model):
         self.end_token = end_token
 
     def encode(self, x):
-        embedded = self.enc_embeddings(x)
-        init_s = [tf.zeros((x.shape[0], self.units)), tf.zeros((x.shape[0], self.units))]
-        o, h, c = self.encoder(embedded, initial_state=init_s)
-        return [h, c]
+        embedded = self.enc_embeddings(x)       # [n, step, emb]
+        o = tf.expand_dims(embedded, axis=3)    # [n, step=8, emb=16, 1]
+        co = [conv2d(o) for conv2d in self.conv2ds]    # [n, 8, 1, 16], [n, 7, 1, 16], [n, 6, 1, 16], [n, 5, 1, 16]
+        co = [self.max_pools[i](co[i]) for i in range(len(co))]    # [n, 1, 1, 16] * 4
+        co = [tf.squeeze(c, axis=[1, 2]) for c in co]    # [n, 16] * 4
+        o = tf.concat(co, axis=1)      # [n, 16*4]
+        h = self.encoder(o)              # [n, units]
+        return [h, h]
 
     def inference(self, x):
         s = self.encode(x)
@@ -91,7 +101,7 @@ def train():
     print("x index sample: \n{}\n{}".format(data.idx2str(data.x[0]), data.x[0]),
           "\ny index sample: \n{}\n{}".format(data.idx2str(data.y[0]), data.y[0]))
 
-    model = Seq2Seq(
+    model = CNNTranslation(
         data.num_word, data.num_word, emb_dim=16, units=32,
         max_pred_len=11, start_token=data.start_token, end_token=data.end_token)
 
