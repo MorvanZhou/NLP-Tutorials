@@ -11,6 +11,7 @@ All code implementations in this tutorial are organized as following:
   - [Skip-Gram](/skip-gram.py)
 3. Understand Sentence
   - [seq2seq](/seq2seq.py)
+  - [CNN language model](/cnn-lm.py)
 4. All about Attention
   - [seq2seq with attention](/seq2seq_attention.py)
   - [Transformer](/transformer.py)
