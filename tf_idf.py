@@ -1,6 +1,7 @@
 import numpy as np
 from collections import Counter
 import itertools
+from visual import show_tfidf
 
 docs = [
     "it is a good day, I like to stay here",
@@ -134,3 +135,5 @@ q = "I get a coffee cup"
 scores = docs_score(q)
 d_ids = scores.argsort()[-3:][::-1]
 print("\ntop 3 docs for '{}':\n{}".format(q, [docs[i] for i in d_ids]))
+
+show_tfidf(tf_idf.T, [i2v[i] for i in range(len(i2v))], "tfidf_matrix")
