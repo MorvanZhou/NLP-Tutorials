@@ -19,8 +19,8 @@ class CNNTranslation(keras.Model):
         )
         self.conv2ds = [
             keras.layers.Conv2D(16, (n, emb_dim), padding="valid", activation=keras.activations.relu)
-            for n in range(1, 5)]
-        self.max_pools = [keras.layers.MaxPool2D((n, 1)) for n in [8, 7, 6, 5]]
+            for n in range(2, 5)]
+        self.max_pools = [keras.layers.MaxPool2D((n, 1)) for n in [7, 6, 5]]
         self.encoder = keras.layers.Dense(units, activation=keras.activations.relu)
 
         # decoder
@@ -53,10 +53,10 @@ class CNNTranslation(keras.Model):
     def encode(self, x):
         embedded = self.enc_embeddings(x)       # [n, step, emb]
         o = tf.expand_dims(embedded, axis=3)    # [n, step=8, emb=16, 1]
-        co = [conv2d(o) for conv2d in self.conv2ds]    # [n, 8, 1, 16], [n, 7, 1, 16], [n, 6, 1, 16], [n, 5, 1, 16]
-        co = [self.max_pools[i](co[i]) for i in range(len(co))]    # [n, 1, 1, 16] * 4
-        co = [tf.squeeze(c, axis=[1, 2]) for c in co]    # [n, 16] * 4
-        o = tf.concat(co, axis=1)      # [n, 16*4]
+        co = [conv2d(o) for conv2d in self.conv2ds]    # [n, 7, 1, 16], [n, 6, 1, 16], [n, 5, 1, 16]
+        co = [self.max_pools[i](co[i]) for i in range(len(co))]    # [n, 1, 1, 16] * 3
+        co = [tf.squeeze(c, axis=[1, 2]) for c in co]    # [n, 16] * 3
+        o = tf.concat(co, axis=1)      # [n, 16*3]
         h = self.encoder(o)              # [n, units]
         return [h, h]
 
