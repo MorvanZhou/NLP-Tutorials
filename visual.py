@@ -6,6 +6,15 @@ import os
 import utils
 
 
+def show_tfidf(tfidf, vocb, filename):
+    # [n_vocab, n_doc]
+    plt.imshow(tfidf, cmap="YlGn", vmin=tfidf.min(), vmax=tfidf.max())
+    plt.xticks(np.arange(tfidf.shape[1]), vocb, fontsize=6, rotation=90)
+    plt.yticks(np.arange(tfidf.shape[0]), np.arange(1, tfidf.shape[1]+1), fontsize=6)
+    plt.tight_layout()
+    plt.savefig("./visual/results/%s.png" % filename, format="png", dpi=500)
+    plt.show()
+
 def show_w2v_word_embedding(model, data: utils.Dataset, path):
     word_emb = model.embeddings.get_weights()[0]
     for i in range(data.num_word):
