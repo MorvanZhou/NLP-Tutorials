@@ -39,7 +39,6 @@ class Seq2Seq(keras.Model):
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.opt = keras.optimizers.Adam(0.01)
-        self.train_sampler = tfa.seq2seq.sampler.TrainingSampler()
         self.max_pred_len = max_pred_len
         self.start_token = start_token
         self.end_token = end_token
