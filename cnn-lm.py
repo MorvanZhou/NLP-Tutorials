@@ -45,19 +45,18 @@ class CNNTranslation(keras.Model):
 
         self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.opt = keras.optimizers.Adam(0.01)
-        self.train_sampler = tfa.seq2seq.sampler.TrainingSampler()
         self.max_pred_len = max_pred_len
         self.start_token = start_token
         self.end_token = end_token
 
     def encode(self, x):
-        embedded = self.enc_embeddings(x)       # [n, step, emb]
-        o = tf.expand_dims(embedded, axis=3)    # [n, step=8, emb=16, 1]
-        co = [conv2d(o) for conv2d in self.conv2ds]    # [n, 7, 1, 16], [n, 6, 1, 16], [n, 5, 1, 16]
-        co = [self.max_pools[i](co[i]) for i in range(len(co))]    # [n, 1, 1, 16] * 3
-        co = [tf.squeeze(c, axis=[1, 2]) for c in co]    # [n, 16] * 3
-        o = tf.concat(co, axis=1)      # [n, 16*3]
-        h = self.encoder(o)              # [n, units]
+        embedded = self.enc_embeddings(x)               # [n, step, emb]
+        o = tf.expand_dims(embedded, axis=3)            # [n, step=8, emb=16, 1]
+        co = [conv2d(o) for conv2d in self.conv2ds]     # [n, 7, 1, 16], [n, 6, 1, 16], [n, 5, 1, 16]
+        co = [self.max_pools[i](co[i]) for i in range(len(co))]     # [n, 1, 1, 16] * 3
+        co = [tf.squeeze(c, axis=[1, 2]) for c in co]               # [n, 16] * 3
+        o = tf.concat(co, axis=1)           # [n, 16*3]
+        h = self.encoder(o)                 # [n, units]
         return [h, h]
 
     def inference(self, x):
