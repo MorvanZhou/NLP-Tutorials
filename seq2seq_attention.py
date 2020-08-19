@@ -13,24 +13,25 @@ class Seq2Seq(keras.Model):
 
         # encoder
         self.enc_embeddings = keras.layers.Embedding(
-            input_dim=enc_v_dim, output_dim=emb_dim,  # [enc_n_vocab, emb_dim]
+            input_dim=enc_v_dim, output_dim=emb_dim,    # [enc_n_vocab, emb_dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
         )
         self.encoder = keras.layers.LSTM(units=units, return_sequences=True, return_state=True)
 
         # decoder
-        self.dec_embeddings = keras.layers.Embedding(
-            input_dim=dec_v_dim, output_dim=emb_dim,  # [dec_n_vocab, emb_dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
-        )
         self.attention = tfa.seq2seq.LuongAttention(units, memory=None, memory_sequence_length=None)
         self.decoder_cell = tfa.seq2seq.AttentionWrapper(
             cell=keras.layers.LSTMCell(units=units),
             attention_mechanism=self.attention,
             attention_layer_size=attention_layer_size,
-            alignment_history=True,   # for attention visualization
+            alignment_history=True,                     # for attention visualization
         )
-        decoder_dense = keras.layers.Dense(dec_v_dim)
+
+        self.dec_embeddings = keras.layers.Embedding(
+            input_dim=dec_v_dim, output_dim=emb_dim,    # [dec_n_vocab, emb_dim]
+            embeddings_initializer=tf.initializers.RandomNormal(0., 0.1),
+        )
+        decoder_dense = keras.layers.Dense(dec_v_dim)   # output layer
 
         # train decoder
         self.decoder_train = tfa.seq2seq.BasicDecoder(
@@ -38,6 +39,9 @@ class Seq2Seq(keras.Model):
             sampler=tfa.seq2seq.sampler.TrainingSampler(),   # sampler for train
             output_layer=decoder_dense
         )
+        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.opt = keras.optimizers.Adam(0.05, clipnorm=5.0)
+
         # predict decoder
         self.decoder_eval = tfa.seq2seq.BasicDecoder(
             cell=self.decoder_cell,
@@ -45,8 +49,7 @@ class Seq2Seq(keras.Model):
             output_layer=decoder_dense
         )
 
-        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.opt = keras.optimizers.Adam(0.05, clipnorm=5.0)
+        # prediction restriction
         self.max_pred_len = max_pred_len
         self.start_token = start_token
         self.end_token = end_token
@@ -55,7 +58,10 @@ class Seq2Seq(keras.Model):
         o = self.enc_embeddings(x)
         init_s = [tf.zeros((x.shape[0], self.units)), tf.zeros((x.shape[0], self.units))]
         o, h, c = self.encoder(o, initial_state=init_s)
+        return o, h, c
 
+    def set_attention(self, x):
+        o, h, c = self.encode(x)
         # encoder output for attention to focus
         self.attention.setup_memory(o)
         # wrap state by attention wrapper
@@ -63,7 +69,7 @@ class Seq2Seq(keras.Model):
         return s
 
     def inference(self, x, return_align=False):
-        s = self.encode(x)
+        s = self.set_attention(x)
         done, i, s = self.decoder_eval.initialize(
             self.dec_embeddings.variables[0],
             start_tokens=tf.fill([x.shape[0], ], self.start_token),
@@ -78,11 +84,11 @@ class Seq2Seq(keras.Model):
         if return_align:
             return np.transpose(s.alignment_history.stack().numpy(), (1, 0, 2))
         else:
-            s.alignment_history.mark_used()  # gives warning otherwise
+            s.alignment_history.mark_used()  # otherwise gives warning
             return pred_id
 
     def train_logits(self, x, y, seq_len):
-        s = self.encode(x)
+        s = self.set_attention(x)
         dec_in = y[:, :-1]   # ignore <EOS>
         dec_emb_in = self.dec_embeddings(dec_in)
         o, _, _ = self.decoder_train(dec_emb_in, s, sequence_length=seq_len)
