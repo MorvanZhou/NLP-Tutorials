@@ -25,25 +25,6 @@ N_HEAD = 4
 DROP_RATE = 0.1
 
 
-class PositionEmbedding(keras.layers.Layer):
-    def __init__(self, max_len, model_dim, n_vocab):
-        super().__init__()
-        pos = np.arange(max_len)[:, None]
-        pe = pos / np.power(10000, 2. * np.arange(model_dim)[None, :] / model_dim)  # [max_len, dim]
-        pe[:, 0::2] = np.sin(pe[:, 0::2])
-        pe[:, 1::2] = np.cos(pe[:, 1::2])
-        pe = pe[None, :, :]  # [1, max_len, model_dim]    for batch adding
-        self.pe = tf.constant(pe, dtype=tf.float32)
-        self.embeddings = keras.layers.Embedding(
-            input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
-        )
-
-    def call(self, x):
-        x_embed = self.embeddings(x) + self.pe  # [n, step, dim]
-        return x_embed
-
-
 class MultiHead(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
@@ -109,7 +90,7 @@ class EncodeLayer(keras.layers.Layer):
         attn = self.mh.call(xz, xz, xz, mask, training)       # [n, step, dim]
         o1 = self.bn[0](attn + xz, training)
         ffn = self.drop(self.ffn.call(o1), training)
-        o = self.bn[1](ffn + xz, training)         # [n, step, dim]
+        o = self.bn[1](ffn + o1, training)         # [n, step, dim]
         return o
 
 
@@ -152,6 +133,24 @@ class Decoder(keras.layers.Layer):
             yz = l.call(yz, xz, training, look_ahead_mask, pad_mask)
         return yz
 
+
+class PositionEmbedding(keras.layers.Layer):
+    def __init__(self, max_len, model_dim, n_vocab):
+        super().__init__()
+        pos = np.arange(max_len)[:, None]
+        pe = pos / np.power(10000, 2. * np.arange(model_dim)[None, :] / model_dim)  # [max_len, dim]
+        pe[:, 0::2] = np.sin(pe[:, 0::2])
+        pe[:, 1::2] = np.cos(pe[:, 1::2])
+        pe = pe[None, :, :]  # [1, max_len, model_dim]    for batch adding
+        self.pe = tf.constant(pe, dtype=tf.float32)
+        self.embeddings = keras.layers.Embedding(
+            input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
+            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
+        )
+
+    def call(self, x):
+        x_embed = self.embeddings(x) + self.pe  # [n, step, dim]
+        return x_embed
 
 class Transformer(keras.Model):
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1, padding_idx=0):
