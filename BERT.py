@@ -158,7 +158,7 @@ def main():
         lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
     t0 = time.time()
     arange = np.arange(0, data.max_len)
-    for t in range(10000):
+    for t in range(100):
         seqs, segs, seqs_, loss_mask, xlen, nsp_labels = random_mask_or_replace(data, arange)
         loss, pred = model.step(seqs, segs, seqs_, loss_mask, nsp_labels)
         if t % 20 == 0:
@@ -179,12 +179,12 @@ def main():
 
 
 def export_attention():
-    data = utils.MRPCData("./MRPC")
+    data = utils.MRPCData("./MRPC", 2000)
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
         lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
-    model.load_weights("./visual/models/bert/model.ckpt")
+    model.load_weights("./visual/models/bert/model.ckpt").expect_partial()
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(1)
@@ -195,6 +195,6 @@ def export_attention():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     export_attention()
 
