@@ -289,6 +289,6 @@ if __name__ == "__main__":
     # position_embedding()
     # transformer_attention_matrix(case=0)
     # transformer_attention_line(case=0)
-    # self_attention_matrix("bert", case=2)
-    # self_attention_line("bert", case=6)
+    # self_attention_matrix("bert_self_mask", case=2)
+    # self_attention_line("bert_self_mask", case=6)
     self_attention_line("gpt", case=1)
