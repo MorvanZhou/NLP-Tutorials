@@ -43,6 +43,6 @@ if __name__ == "__main__":
     m = BERT(
         model_dim=MODEL_DIM, max_len=d.max_len - 1, n_layer=N_LAYER, n_head=4, n_vocab=d.num_word,
         lr=LEARNING_RATE, max_seg=d.num_seg, drop_rate=0.2, padding_idx=d.pad_id)
-    train(m, d, step=5000, name="bert")
-    export_attention(m, d, "bert")
+    train(m, d, step=5000, name="bert_self_mask")
+    export_attention(m, d, "bert_self_mask")
 
