@@ -73,7 +73,7 @@ def maybe_download_mrpc(save_dir="./MRPC/", proxy=None):
         if not os.path.isfile(raw_path):
             print("downloading from %s" % url)
             r = requests.get(url, proxies=proxies)
-            with open(raw_path, "w") as f:
+            with open(raw_path, "w", encoding="utf-8") as f:
                 f.write(r.text.replace('"', "<QUOTE>"))
                 print("completed")
 
