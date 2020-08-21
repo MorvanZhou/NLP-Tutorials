@@ -151,7 +151,7 @@ def random_mask_or_replace(data, arange):
 
 def main():
     # get and process data
-    data = utils.MRPCData("./MRPC")
+    data = utils.MRPCData("./MRPC", 2000)
     print("num word: ", data.num_word)
     model = BERT(
         model_dim=MODEL_DIM, max_len=data.max_len, n_layer=N_LAYER, n_head=4, n_vocab=data.num_word,
