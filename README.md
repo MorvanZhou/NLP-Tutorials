@@ -20,4 +20,25 @@ All code implementations in this tutorial are organized as following:
   - [GPT](/GPT.py)
   - [BERT](/BERT.py) or my new attempt [Bert with self mask](/BERT_self_mask.py)
  
+## some of the results
 
+TF-IDF visualization
+
+![tf idf](img/tfidf_matrix.png)
+
+word2vec visualization
+
+![w2v](img/cbow.png)
+
+seq2seq attention visualization
+
+![seq2seq attention](img/seq2seq_attention.png)
+
+transformer encoder-decoder attention visualization
+
+![transformer attention](img/transformer0_decoder_encoder_attention.png)
+![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
+
+bert self attention visualization
+
+![bert](img/bert_self_mask2_self_attention_line.png)
