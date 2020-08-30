@@ -5,7 +5,7 @@ import time
 import os
 
 
-class ELMO(keras.Model):
+class ELMo(keras.Model):
     def __init__(self, v_dim, emb_dim, units, n_layers, lr):
         super().__init__()
 
@@ -31,10 +31,10 @@ class ELMO(keras.Model):
         embedded = self.word_embed(seqs)        # [n, step, dim]
         """
         0123    forward
-         1234   backward
         1234    forward predict
+         1234   backward 
          0123   backward predict
-         123    overall prediction
+         123    forward & backward concat overall prediction
         """
         mask = self.word_embed.compute_mask(seqs)
         f = self.lstm_forward(
@@ -48,17 +48,29 @@ class ELMO(keras.Model):
             initial_state=self.f_stacked_lstm.get_initial_state(
                 batch_size=embedded.shape[0], dtype=tf.float32))      # [n, step-1, dim]
         b_reverse = tf.reverse(b, axis=[1])
-        o = tf.concat((f[:, :-1], b_reverse[:, 1:]), axis=-1)       # [n, step-2, 2*dim]
-        word_logits = self.word_pred(o)                     # [n, step-2, vocab]
-        return word_logits
+        o = tf.concat(
+            (f[:, :-1],             # [012]3 to predict 123
+             b_reverse[:, 1:]),     # [432]1 -> 1[234] to predict 123
+            axis=-1)       # [n, step-2, 2*dim]
+        word_logits = self.word_pred(o)                     # [n, step-2, vocab] to predict 123
+        return word_logits, (f, b_reverse)
 
     def step(self, seqs):
         with tf.GradientTape() as tape:
-            word_logits = self(seqs)
+            word_logits, _ = self(seqs)
             loss = self.cross_entropy(seqs[:, 1:-1], word_logits)
         grads = tape.gradient(loss, self.trainable_variables)
         self.opt.apply_gradients(zip(grads, self.trainable_variables))
         return loss, word_logits
+
+    def get_emb(self, seqs):
+        _, (f, b_reverse) = self(seqs)
+        word_emb = tf.concat(
+            (f[:, 1:],  # 0[123]
+             b_reverse[:, :-1]),  # 4[321] -> [123]4
+            axis=-1
+        )
+        return word_emb
 
 
 def train(model, data, step):
@@ -81,6 +93,12 @@ def train(model, data, step):
     model.save_weights("./visual/models/elmo/model.ckpt")
 
 
+def export_w2v(model, data):
+    model.load_weights("./visual/models/elmo/model.ckpt")
+    emb = model.get_emb(data.sample(4))
+    print(emb)
+
+
 if __name__ == "__main__":
     UNITS = 256
     EMB_DIM = 128
@@ -89,5 +107,6 @@ if __name__ == "__main__":
     LEARNING_RATE = 1e-4
     d = utils.MRPCSingle("./MRPC", rows=100)
     print("num word: ", d.num_word)
-    m = ELMO(d.num_word, emb_dim=EMB_DIM, units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE)
+    m = ELMo(d.num_word, emb_dim=EMB_DIM, units=UNITS, n_layers=N_LAYERS, lr=LEARNING_RATE)
     train(m, d, 10000)
+    export_w2v(m, d)
