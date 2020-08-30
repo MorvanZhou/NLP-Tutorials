@@ -158,7 +158,7 @@ def main():
         lr=LEARNING_RATE, max_seg=data.num_seg, drop_rate=0.1, padding_idx=data.v2i["<PAD>"])
     t0 = time.time()
     arange = np.arange(0, data.max_len)
-    for t in range(100):
+    for t in range(10000):
         seqs, segs, seqs_, loss_mask, xlen, nsp_labels = random_mask_or_replace(data, arange)
         loss, pred = model.step(seqs, segs, seqs_, loss_mask, nsp_labels)
         if t % 20 == 0:
