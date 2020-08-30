@@ -272,7 +272,7 @@ def self_attention_line(bert_or_gpt="bert", case=0):
             color = cm.rainbow(np.linspace(0, 1, img.shape[0]))
             for row, c in zip(range(img.shape[0]), color):
                 for col in range(img.shape[1]):
-                    alpha = (img[row, col] / img[row].max()) ** 7
+                    alpha = (img[row, col] / img[row].max()) ** 8
                     ax[i, j].plot([0, 1], [img.shape[1]-col, img.shape[0]-row-1], alpha=alpha, c=c)
             ax[i, j].set_xticks(())
             ax[i, j].set_xlabel("head %i" % (j+1+i*2))
@@ -290,5 +290,5 @@ if __name__ == "__main__":
     # transformer_attention_matrix(case=0)
     # transformer_attention_line(case=0)
     # self_attention_matrix("bert_self_mask", case=2)
-    # self_attention_line("bert_self_mask", case=6)
-    self_attention_line("gpt", case=1)
+    # self_attention_line("bert_self_mask", case=1)
+    self_attention_line("gpt", case=6)
