@@ -1,0 +1,960 @@
+C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\python.exe E:/Python/NLP-Tutorials/ELMo.py
+2020-08-31 17:21:53.796364: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+num word:  12880
+2020-08-31 17:21:57.445481: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library nvcuda.dll
+2020-08-31 17:21:57.548494: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-08-31 17:21:57.548772: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-08-31 17:21:58.154671: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-08-31 17:21:59.151674: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-08-31 17:21:59.477880: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-08-31 17:22:00.725457: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-08-31 17:22:01.057101: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-08-31 17:22:03.958653: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-08-31 17:22:03.959598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-08-31 17:22:03.960322: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+2020-08-31 17:22:03.967548: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x14380d0bf60 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-08-31 17:22:03.967840: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-08-31 17:22:03.968736: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-08-31 17:22:03.969007: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-08-31 17:22:03.969166: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-08-31 17:22:03.969495: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-08-31 17:22:03.969628: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-08-31 17:22:03.969761: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-08-31 17:22:03.969895: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-08-31 17:22:03.970031: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-08-31 17:22:03.970634: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-08-31 17:22:04.533757: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-08-31 17:22:04.533962: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0
+2020-08-31 17:22:04.534047: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N
+2020-08-31 17:22:04.534777: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 4700 MB memory) -> physical GPU (device: 0, name: GeForce GTX 1060 6GB, pci bus id: 0000:01:00.0, compute capability: 6.1)
+2020-08-31 17:22:04.537601: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x1439c4e7e20 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2020-08-31 17:22:04.537786: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce GTX 1060 6GB, Compute Capability 6.1
+2020-08-31 17:22:04.831679: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-08-31 17:22:05.716232: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+
+
+step:  0 | time: 1.52 | loss: 9.463
+| tgt:  <GO> hovan , a resident of trumbull , conn . , had worked as a bus driver since <NUM> and had no prior criminal record . <SEP>
+| f_prd:  atsb knew knew competition competition competition competition markup floors festivals merit merit merit korkuc korkuc korkuc fingerprinting grade grade car car nicky roush thoughts roush gain gain
+| b_prd:  stockwell stockwell stockwell mta mta mta mta mta mta mta tornadoes tornadoes tornadoes router router halliburton halliburton talked engaged ona db2 life rashid rashid ursel ursel
+
+
+step:  80 | time: 8.37 | loss: 7.975
+| tgt:  <GO> the winner of the williams-mauresmo match will play the winner of justine henin-hardenne vs. chanda rubin . <SEP>
+| f_prd:  the , , , , , , , , , , , , , , , , , ,
+| b_prd:  , , , , , , , , , , , , , , , , , . <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP>
+
+
+step:  160 | time: 8.38 | loss: 7.546
+| tgt:  <GO> under the proposed terms of the transaction , and following the spinoff of palmsource , palm will exchange <NUM> shares for each share of handspring . <SEP>
+| f_prd:  the the the the the the the the the the the the the the the the the the the the the the the the the the the the
+| b_prd:  the the the the the the the the the the the the the the the the the the the the the the the the the . .
+
+
+step:  240 | time: 8.34 | loss: 7.361
+| tgt:  <GO> warren david campbell , <NUM> , and climbing companion jonathan smith , <NUM> , did not return as expected on tuesday from climbing on mt d 'archiac in the mckenzie district . <SEP>
+| f_prd:  the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the
+| b_prd:  the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the . .
+
+
+step:  320 | time: 8.34 | loss: 7.270
+| tgt:  <GO> she said he persisted and she eventually allowed him to fix her bike while she sat in the front seat of his car . <SEP>
+| f_prd:  the the , , , , , , , , , , , , , , , , , , , , , , , ,
+| b_prd:  , , , , , , , , , , , , , , , , , , , , , , the . .
+
+
+step:  400 | time: 8.34 | loss: 7.270
+| tgt:  <GO> details of the research will appear in a future issue of the proceedings of the national academy of sciences . <SEP>
+| f_prd:  the the the the the the the the the the the the the the the the the the the the the the
+| b_prd:  , <NUM> , , , , <NUM> , , , <NUM> , , <NUM> , , , <NUM> , <NUM> .
+
+
+step:  480 | time: 8.35 | loss: 7.144
+| tgt:  <GO> the s & p <NUM> index was up <NUM> , or <NUM> percent , to <NUM> after sinking <NUM> yesterday . <SEP>
+| f_prd:  the the the the the the the the the the the the the the the the the the the the the the the
+| b_prd:  the the the the the <NUM> , the the <NUM> the the <NUM> <NUM> , the <NUM> the the <NUM> . .
+
+
+step:  560 | time: 8.53 | loss: 7.017
+| tgt:  <GO> volodymyr gorbanovsky , deputy general director of the plane 's owners , mediterranean airlines , said initial information indicated it had veered from its flight path because of fog . <SEP>
+| f_prd:  the . . the . . the . . . . the . . the . . . . , . the . . . the . .
+| b_prd:  <GO> <GO> <NUM> <GO> <GO> <NUM> <NUM> <GO> <GO> <NUM> , <NUM> <GO> , <NUM> <NUM> the the , , , , <NUM> , the the <NUM> <NUM> , <NUM> .
+
+
+step:  640 | time: 8.40 | loss: 6.734
+| tgt:  <GO> while a month 's supply of aspirin can cost under $ <NUM> , the equivalent amount of ticlopidine can run well over $ <NUM> . <SEP>
+| f_prd:  the the , <SEP> <SEP> <SEP> the <SEP> <SEP> <SEP> the <SEP> <SEP> the <SEP> <SEP> <SEP> the <SEP> <SEP> <SEP> <SEP> the <SEP> <SEP> <SEP> the
+| b_prd:  <GO> <GO> the <GO> the <NUM> the <GO> the , the the <NUM> the , , <NUM> the , the the , the the <NUM> .
+
+
+step:  720 | time: 8.95 | loss: 6.478
+| tgt:  <GO> and all of the samples contained molecules that can only be produced when cholesterol interacts with ozone . <SEP>
+| f_prd:  the the , the , , , , the , , , , the , , the , <SEP>
+| b_prd:  , the <NUM> the the , , , , the the , , the , , the <NUM> .
+
+
+step:  800 | time: 9.47 | loss: 6.730
+| tgt:  <GO> the three priests were careful to go through church channels first as they exercised their rights under canon law . <SEP>
+| f_prd:  the , , , , , the , the , , , the , , , , the . . <SEP>
+| b_prd:  <GO> <GO> <GO> <GO> <GO> <GO> the , , , the , the , , , , to the <NUM> . <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP>
+
+
+step:  880 | time: 8.93 | loss: 6.390
+| tgt:  <GO> negotiators talked with the boy for more than an hour , and swat officers surrounded the classroom , bragdon said . <SEP>
+| f_prd:  the , , the , , the , the , , the the the , , . . the . . <SEP>
+| b_prd:  <GO> , , the , <NUM> , , of $ <NUM> , , , to to the <NUM> the <NUM> <NUM> .
+
+
+step:  960 | time: 9.13 | loss: 6.363
+| tgt:  <GO> at his sentencing , avants had tubes in his nose and a portable oxygen tank beside him . <SEP>
+| f_prd:  the the the , the , the , the the , the the , , , , , <SEP>
+| b_prd:  , , <NUM> <NUM> , , the <NUM> to the <NUM> , the , , , the <NUM> .
+
+
+step:  1040 | time: 9.23 | loss: 6.014
+| tgt:  <GO> bad publicity surrounding warranties has already sent sales into decline . <SEP>
+| f_prd:  the the , , , the the , , the , <SEP>
+| b_prd:  to the , , , , the the <NUM> the <NUM> .
+
+
+step:  1120 | time: 8.83 | loss: 6.036
+| tgt:  <GO> the ecb has cut rates from <NUM> percent in october <NUM> to <NUM> percent in that period . <SEP>
+| f_prd:  the the the the , , the , , <NUM> , , <NUM> percent , <NUM> <NUM> . <SEP>
+| b_prd:  <GO> <GO> , , <NUM> <NUM> $ <NUM> <NUM> to $ <NUM> $ <NUM> <NUM> , the <NUM> . <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP>
+
+
+step:  1200 | time: 8.37 | loss: 5.715
+| tgt:  <GO> the male eagle was found by a zookeeper early thursday , suffering from severe puncture wounds in his abdomen . <SEP>
+| f_prd:  the the , , the , the the , , , <quote> said the the the , the the . <SEP>
+| b_prd:  <GO> <GO> , , , , of the a , <NUM> the , to and <NUM> <NUM> to the said .
+
+
+step:  1280 | time: 8.36 | loss: 5.616
+| tgt:  <GO> <quote> shattered glass <quote> _ starring hayden christensen as stephen glass , the new republic journalist fired for fabricating stories _ debuted well with $ <NUM> in eight theaters . <SEP>
+| f_prd:  the the the , the the the the , the the , <quote> the the , the , the the . <quote> the , the <NUM> . the . . <SEP>
+| b_prd:  <GO> <GO> <GO> <GO> <GO> <GO> <GO> <GO> <GO> was the <NUM> <GO> the the it was , of the <NUM> , , , to $ <NUM> of stock said .
+
+
+step:  1360 | time: 8.37 | loss: 5.682
+| tgt:  <GO> during the problem liftoffs , foam left dozens of pockmarks on the thermal tiles that cover much of the shuttle , turcotte said . <SEP>
+| f_prd:  the the the , , the , the , the , the <NUM> the in the the , the <NUM> . <quote> said . <SEP>
+| b_prd:  <GO> <GO> the the <NUM> <quote> he and , to , of the the , , and <NUM> in the <NUM> , he said .
+
+
+step:  1440 | time: 8.86 | loss: 5.281
+| tgt:  <GO> they said the police officers also entered various private wards at the clinic and attacked patients . <SEP>
+| f_prd:  the said the be , , , the , the , the <NUM> . the . . <SEP>
+| b_prd:  <GO> , <GO> and the he , to and the , in the , and the <NUM> .
+
+
+step:  1520 | time: 8.37 | loss: 5.178
+| tgt:  <GO> more than <NUM> people have been arrested and $ <NUM> million worth of property seized in an internet fraud sweep announced friday by three u.s. government agencies . <SEP>
+| f_prd:  the , <NUM> percent , <NUM> <NUM> in <NUM> <NUM> million , , the in the the york stock . . the . the . year . . <SEP>
+| b_prd:  <GO> more , <NUM> <GO> <GO> , <NUM> at $ <NUM> the <NUM> the , , , the the the , be , the the the . said .
+
+
+step:  1600 | time: 8.46 | loss: 5.254
+| tgt:  <GO> sse shares were unchanged at <NUM> pence by <NUM> gmt but analysts welcomed the deal . <SEP>
+| f_prd:  the the , <NUM> , <NUM> percent , the percent , the year the york . <SEP>
+| b_prd:  <GO> <GO> , was , at a , $ <NUM> , , , in the said .
+
+
+step:  1680 | time: 8.36 | loss: 5.038
+| tgt:  <GO> <quote> i 'm pleased we are bringing it to a conclusion , <quote> garton said . <SEP>
+| f_prd:  the the 's the to had the the , be court of <quote> said said . <SEP>
+| b_prd:  <GO> <GO> i <quote> <quote> it and be , of a <NUM> , , he <NUM> .
+
+
+step:  1760 | time: 8.40 | loss: 4.942
+| tgt:  <GO> <quote> the free world and those who love freedom and peace must deal harshly with hamas and the killers , <quote> he told reporters as he emerged from a church service . <SEP>
+| f_prd:  the the company first 's the said 't the , the , be in in the , the united , <quote> he said the . the said . the statement . . <SEP>
+| b_prd:  <GO> <GO> the the <GO> <GO> <GO> i <GO> <GO> the i the he <GO> of said of the said , <quote> he to , <quote> , <NUM> in a the said .
+
+
+step:  1840 | time: 8.44 | loss: 4.681
+| tgt:  <GO> officials in malawi said the men were on the cia 's ' ' watch list ' ' since the twin <NUM> bombings at the us embassies in kenya and tanzania . <SEP>
+| f_prd:  the said the the the company 's not the united , be , and the to . . the world the . . the world . . the . the . <SEP>
+| b_prd:  <GO> <GO> <GO> , <GO> the he <GO> <GO> the <NUM> <NUM> , and new <NUM> <NUM> , in the in <NUM> , of the be said , , and said .
+
+
+step:  1920 | time: 8.42 | loss: 4.585
+| tgt:  <GO> the name for the robot , due to be launched at <NUM> : <NUM> p.m. , was selected from among <NUM> names submitted by u.s. school children . <SEP>
+| f_prd:  the technology-laced of the <NUM> , the to <NUM> <NUM> the the percent <NUM> , , the <NUM> to the the percent in in the the . . <SEP>
+| b_prd:  <GO> the <GO> <GO> the <NUM> was <GO> to was <NUM> $ <NUM> $ <NUM> <NUM> , was <NUM> , a , , according the the a said .
+
+
+step:  2000 | time: 8.38 | loss: 4.217
+| tgt:  <GO> shares in safeway rose <NUM>- / 4p to <NUM>- / 2p while morrison shares rose <NUM>- / 4p to <NUM>- / 4p in early morning trade . <SEP>
+| f_prd:  the of <NUM> rose <NUM> , <NUM> , $ , <NUM> in <NUM> <NUM> <NUM> <NUM> percent <NUM> , $ . the . the $ . . <SEP>
+| b_prd:  <GO> <GO> dow cac-40 a <NUM> a <GO> a <NUM> the <GO> jones <GO> > or <NUM> $ <NUM> or <NUM> $ <NUM> and york stock said .
+
+
+step:  2080 | time: 8.35 | loss: 4.313
+| tgt:  <GO> grass ' plea will leave rite aid 's former vice chairman and chief counsel , franklin c. brown , to stand trial alone in federal court starting monday . <SEP>
+| f_prd:  the said not , be the average , court first the , the , , <quote> said not , <quote> the that , to the . . . <SEP>
+| b_prd:  <GO> it the it to a the it the and , , and new <NUM> , san ( <NUM> , to of <NUM> <NUM> the a and on said .
+
+
+step:  2160 | time: 8.37 | loss: 4.210
+| tgt:  <GO> those with diabetes run the risk of severe complications , including heart disease , chronic kidney disease , blindness and amputations . <SEP>
+| f_prd:  the was the have the first of the years of <quote> <NUM> of . <quote> said . . <quote> . pakistan . <SEP>
+| b_prd:  to , and to of the sea and and <NUM> , the the <NUM> , and the dehydration , , and <NUM> .
+
+
+step:  2240 | time: 8.43 | loss: 4.139
+| tgt:  <GO> florida legislators return today for a special session in which they 're expected to pass a compromise bill aimed at lowering doctors ' medical malpractice insurance rates . <SEP>
+| f_prd:  the 's also the , the first , , the that would not to be the <NUM> . . . the the . . . . . . <SEP>
+| b_prd:  <GO> it to on , on a the <GO> , <GO> has is expected to in a a , aimed , of it a new to year <NUM> .
+
+
+step:  2320 | time: 8.35 | loss: 4.031
+| tgt:  <GO> <quote> his progress is steady , he is stable , <quote> said dr jack . <SEP>
+| f_prd:  the we year , not , <quote> was not , <quote> said the president , <SEP>
+| b_prd:  <GO> <GO> 's it be <NUM> <quote> it be <NUM> , , <quote> be <NUM> .
+
+
+step:  2400 | time: 8.32 | loss: 4.008
+| tgt:  <GO> his palestinian counterpart , mahmoud abbas , replied that <quote> every day without an agreement is an opportunity that was lost . <SEP>
+| f_prd:  the year nasdaq , the <NUM> , <quote> that the said brother , not first of the wife in the not to <SEP>
+| b_prd:  <GO> the 's <NUM> , mahmoud <NUM> , replied , on a said that the it to 's opportunity , and <NUM> .
+
+
+step:  2480 | time: 8.40 | loss: 3.763
+| tgt:  <GO> nevada is where the most women smoke , <NUM> percent . <SEP>
+| f_prd:  the 's a the company states , of <quote> , , <SEP>
+| b_prd:  <GO> , , in the the to acosta or <NUM> said .
+
+
+step:  2560 | time: 8.39 | loss: 3.744
+| tgt:  <GO> cruz came to the united states in <NUM> , a year after fidel castro overthrew a dictatorship and installed a communist government . <SEP>
+| f_prd:  the also , the first states , the , the <NUM>-year-old , the of , the statement . the the statement government . <SEP>
+| b_prd:  <GO> cruz <GO> of the united <NUM> in <NUM> , a , said saddam he , a , , to the the said .
+
+
+step:  2640 | time: 8.36 | loss: 3.480
+| tgt:  <GO> while a month 's supply of aspirin can cost less than $ <NUM> , the equivalent amount of ticlopidine can run significantly more than $ <NUM> . <SEP>
+| f_prd:  the the decision , the , the thornton be the have the <NUM> million a journal of of the common $ the the than <NUM> <NUM> . <SEP>
+| b_prd:  <GO> <GO> a mta <GO> shares <GO> aspirin will <GO> more at $ <NUM> , the the shares of that cocaine was significantly more to to <NUM> .
+
+
+step:  2720 | time: 8.35 | loss: 3.606
+| tgt:  <GO> capps ii will not use bank records , credit records , or medical records , according to loy and kelly . <SEP>
+| f_prd:  the 's also be be to in , <quote> said , and the of , and to the . the . <SEP>
+| b_prd:  <GO> capps it will to to word identify , word <NUM> preparation or word <NUM> , <NUM> to <NUM> on said .
+
+
+step:  2800 | time: 8.36 | loss: 3.343
+| tgt:  <GO> the two democrats on the five-member fcc held a press conference to sway opinion against powell and the two other republicans on the panel . <SEP>
+| f_prd:  the dow jones , the united time , to month of in be <quote> . the . the past weeks court . the past . <SEP>
+| b_prd:  <GO> in two <GO> <GO> the the has , a the expected to a <quote> and <NUM> in to a <NUM> justified of the said .
+
+
+step:  2880 | time: 8.36 | loss: 3.204
+| tgt:  <GO> the two democrats on the five-member fcc held a press conference to sway opinion against powell and the two other republicans on the panel . <SEP>
+| f_prd:  the dow of , the united time , to year index in be year . the . the world weeks panel . the world . <SEP>
+| b_prd:  <GO> the two <GO> <GO> the the has , a the leading to a questioned <quote> <NUM> in the a <NUM> owed of the <NUM> .
+
+
+step:  2960 | time: 8.38 | loss: 3.387
+| tgt:  <GO> boeing shares fell <NUM> cents , or <NUM> percent , to $ <NUM> at <NUM> : <NUM> p.m. in new york stock exchange composite trading . <SEP>
+| f_prd:  the the closed <NUM> percent to or <NUM> percent , to <NUM> <NUM> on the percent <NUM> , on the york stock exchange . . . <SEP>
+| b_prd:  <GO> <GO> shares or <NUM> <NUM> , or <NUM> percent , to $ , $ <NUM> or <NUM> <NUM> the new york stock nasdaq multi-ethnic said .
+
+
+step:  3040 | time: 8.62 | loss: 2.937
+| tgt:  <GO> dos reis is scheduled to be sentenced in danbury superior court this morning on charges of first-degree manslaughter and second-degree sexual assault . <SEP>
+| f_prd:  the new of a to be $ to the failure court , year . the of the <NUM> . a <NUM> . . <SEP>
+| b_prd:  <GO> sammy he is needs to was based of the the said after-hours based on strategy of the , and and web <NUM> .
+
+
+step:  3120 | time: 8.40 | loss: 3.095
+| tgt:  <GO> he also accused royal courtiers of poisoning the brothers â â little minds â . <SEP>
+| f_prd:  the said said of courtiers of <NUM> the interrogation 's s up minds . . <SEP>
+| b_prd:  <GO> , also president royal courtiers of of the it 's <quote> their minds <NUM> .
+
+
+step:  3200 | time: 8.34 | loss: 2.886
+| tgt:  <GO> more than <NUM> people rallied over three days , proclaiming that genetically modified foods weren 't the answer to the world 's food problems . <SEP>
+| f_prd:  the than <NUM> people shares over the years , proclaiming that genetically modified foods weren 't have answer to the world 's bedroom problems . <SEP>
+| b_prd:  <GO> more than <NUM> they rallied in three days , proclaiming <GO> genetically modified foods weren of the answer on the world the sexual said .
+
+
+step:  3280 | time: 8.35 | loss: 2.519
+| tgt:  <GO> shares closed on nasdaq just below their <NUM>-week high , at $ <NUM> , up $ <NUM> . <SEP>
+| f_prd:  the of at the trading $ $ <NUM>-week high , which $ <NUM> , a <NUM> <NUM> . <SEP>
+| b_prd:  <GO> who <NUM> the , profit at their <NUM>-week percent close at $ <NUM> , to to <NUM> .
+
+
+step:  3360 | time: 8.37 | loss: 2.559
+| tgt:  <GO> neither military action nor large-scale bribery can solve the north korean problem , wolfowitz said . <SEP>
+| f_prd:  the the minister , the bush was be the first states court , <quote> said . <SEP>
+| b_prd:  that <GO> 's , that ftc i would in the the the <NUM> , he <NUM> .
+
+
+step:  3440 | time: 8.33 | loss: 2.658
+| tgt:  <GO> lee said he reached scott on his cell phone and they talked for a couple minutes between noon and <NUM> p.m. on dec. <NUM> . <SEP>
+| f_prd:  the said the would the required the cell , , <quote> of to the glut . . the . other . . the <NUM> . <SEP>
+| b_prd:  <GO> marchant <GO> has was people <GO> a cell , <GO> was , in a a earmarked of <NUM> to <NUM> effect on at said .
+
+
+step:  3520 | time: 8.34 | loss: 2.461
+| tgt:  <GO> strikingly , the poll saw little difference between women and men in their feelings towards mrs clinton . <SEP>
+| f_prd:  the , the dow 's the administration , the 's ethnic on the feelings that the have . <SEP>
+| b_prd:  <GO> thursday <GO> the iraq a a charged of years the said for a were <quote> said said .
+
+
+step:  3600 | time: 8.32 | loss: 2.272
+| tgt:  <GO> tracks can be burned to cds , but the same playlist may only be burned up to five times . <SEP>
+| f_prd:  the in be the to the , <quote> he company playlist has been a a to to a years . <SEP>
+| b_prd:  , we to be expected to friday , , the the will will to be , up past two said .
+
+
+step:  3680 | time: 8.37 | loss: 2.203
+| tgt:  <GO> she told the new york daily news she remembers only the intern 's first name , which she refused to reveal . <SEP>
+| f_prd:  the said the first york & of had remembers a the intern 's first time penalty <quote> he said to be . <SEP>
+| b_prd:  <GO> he in the new a the said , remembers in the intern the the years , , he unwilling to said .
+
+
+step:  3760 | time: 8.41 | loss: 2.543
+| tgt:  <GO> he 's not related to malvo , but the two have referred to each other as father and son . <SEP>
+| f_prd:  the was portfolio be to the , <quote> he company of not to the story business the . s . <SEP>
+| b_prd:  <quote> it are not going to said <GO> said telling they has referred with and books his toddlers 's <NUM> .
+
+
+step:  3840 | time: 8.34 | loss: 2.176
+| tgt:  <GO> sixteen days later , as superheated air from the shuttle 's reentry rushed into the damaged wing , <quote> there was no possibility for crew survival , <quote> the board said . <SEP>
+| f_prd:  the of , , the superheated air , the shuttle , diamond , that the shuttle wing , <quote> said said no possibility for the survival , <quote> he company said . <SEP>
+| b_prd:  <GO> sixteen <GO> pc , as superheated focused in the shuttle 's reentry rushed into the damaged wing , â there is their possibility for crew ratepayers , , the he said .
+
+
+step:  3920 | time: 8.35 | loss: 2.106
+| tgt:  <GO> tokyo electric power co . , asia 's largest power company , restarted the first of <NUM> nuclear reactors it shut down after admitting it falsified inspection reports . <SEP>
+| f_prd:  the boggs said co inc , <NUM> 's largest power co , restarted the largest quarter the , reactors it falsified . . admitting it falsified inspection co . <SEP>
+| b_prd:  <GO> tokyo electric <GO> co <NUM> , chechnya the 's the <NUM> , restarted the number , <NUM> nuclear reactors they shut <NUM> or admitting , falsified entertainment said .
+
+
+step:  4000 | time: 8.33 | loss: 1.986
+| tgt:  <GO> dynes will be paid $ <NUM> a year ; atkinson 's salary is $ <NUM> . <SEP>
+| f_prd:  the was be the to <NUM> million year , atkinson 's salary of $ <NUM> . <SEP>
+| b_prd:  <GO> dynes will has at $ <NUM> a . kerry atkinson 's collaboration to to said .
+
+
+step:  4080 | time: 8.35 | loss: 2.212
+| tgt:  <GO> although republicans now hold every statewide office , the state 's congressional delegation comprises <NUM> democrats and <NUM> republicans . <SEP>
+| f_prd:  the the , are in grip was that <quote> company 's owners delegation of <NUM> years . <NUM> percent . <SEP>
+| b_prd:  <GO> two will to by a the <NUM> , the state 's congressional delegation the , <NUM> than <NUM> said .
+
+
+step:  4160 | time: 8.40 | loss: 1.898
+| tgt:  <GO> the food and drug administration ultimately denied imclone 's drug application in december <NUM> , saying that an erbitux clinical trial was deficient . <SEP>
+| f_prd:  the technology-laced 's exchange administration approved said imclone 's invitation application and the <NUM> , and that his erbitux clinical trial was deficient . <SEP>
+| b_prd:  <GO> the food the drug those has <quote> imclone a drug application in in ] , saying , an erbitux clinical glenn was said .
+
+
+step:  4240 | time: 8.40 | loss: 1.942
+| tgt:  <GO> rebels sought to consolidate their grip on a troubled northeastern congolese town tuesday after a week of fighting that killed at least <NUM> people . <SEP>
+| f_prd:  the samples to consolidate the grip in the rbi northeastern congolese congolese that , the wife of the to will the a <NUM> 2001 . <SEP>
+| b_prd:  <GO> who needed to consolidate their grip on a troubled northeastern congolese on <NUM> on a number the conditions was close at than million said .
+
+
+step:  4320 | time: 8.35 | loss: 2.070
+| tgt:  <GO> <quote> for the first time , there is an easy and affordable way of making this treasure trove of bbc content available to all , <quote> dyke said . <SEP>
+| f_prd:  the we the ponds time , the is not <quote> and <quote> strunk that the the treasure trove of the content in , equip the <quote> he said . <SEP>
+| b_prd:  <GO> <quote> in the past <NUM> <GO> it is an easy and affordable one of of this treasure trove a no be <quote> to cholera , <quote> he said .
+
+
+step:  4400 | time: 8.35 | loss: 1.743
+| tgt:  <GO> the new wpan standard uses the <NUM> ghz unlicensed frequency band and specifies raw data rates of <NUM> , <NUM> , <NUM> , <NUM> and 55mbit / s . <SEP>
+| f_prd:  the dow nasdaq court & the <NUM> percent unlicensed frequency band and specifies raw raw rates , the percent <NUM> , <NUM> , <NUM> , 55mbit / s power <SEP>
+| b_prd:  <GO> the new wpan standard uses the <NUM> ghz unlicensed frequency band and specifies raw data <NUM> , <NUM> , <NUM> , <NUM> , , and 55mbit the <NUM> .
+
+
+step:  4480 | time: 8.33 | loss: 2.044
+| tgt:  <GO> while many likely now will quit - as millions of women already have - soltes said she is likely to continue prescribing the supplements for relief of change-of-life symptoms . <SEP>
+| f_prd:  the the of from have be in as the of the , have been soltes she she would a to be prescribing the shuttle the the of the symptoms . <SEP>
+| b_prd:  <GO> <GO> <GO> , casino will quit â about secretary 's have already <NUM> , soltes that autoadvice and plans to made prescribing a supplements on share of and said .
+
+
+step:  4560 | time: 8.33 | loss: 1.696
+| tgt:  <GO> the $ <NUM> billion budget includes $ <NUM> billion for military operations in iraq , another $ <NUM> billion for reconstruction and about $ <NUM> billion for afghanistan . <SEP>
+| f_prd:  the dow <NUM> million natural-gas-fired , $ <NUM> million , $ yearly in the , the york <NUM> million . the . the $ <NUM> million . afghanistan . <SEP>
+| b_prd:  <GO> the $ <NUM> the , to $ <NUM> budget for budget operations in million has to $ <NUM> billion gross , cost about $ <NUM> severed in said .
+
+
+step:  4640 | time: 8.35 | loss: 1.603
+| tgt:  <GO> business groups and border cities have raised concerns that us-visit will mean longer waits to cross borders and will hurt commerce . <SEP>
+| f_prd:  the confidence donald the electric , said a that the will be to waits to keep borders and will be into . <SEP>
+| b_prd:  for business groups , border cities he are concerns that us-visit will mean could waits to immediately borders , will the <NUM> .
+
+
+step:  4720 | time: 8.33 | loss: 1.777
+| tgt:  <GO> in <NUM> , troops returned after rebel raids on a neighbouring russian region and a series of deadly apartment-house bombings in russian cities that were blamed on the rebels . <SEP>
+| f_prd:  the <NUM> , the expanded in the raids in the neighbouring russian years and the plot of the apartment-house bombings in the island , were blamed at the rebels . <SEP>
+| b_prd:  <GO> , <NUM> u.n. power returned after rebel raids on a neighbouring the region on a series of deadly apartment-house bombings in two bombings they were based on the <NUM> .
+
+
+step:  4800 | time: 8.37 | loss: 1.521
+| tgt:  <GO> <quote> apple is working with oxford semiconductor and affected drive manufacturers to resolve this issue , which resides in the oxford <NUM> chipset , <quote> the company said in a statement . <SEP>
+| f_prd:  the the 's very to the justice and we drive and , resolve the week , <quote> resides in the clutches statement chipset , <quote> he company said . a statement . <SEP>
+| b_prd:  <GO> <GO> apple is working with oxford semiconductor and new drive manufacturers to resolve episcopal testing , he resides in the oxford <NUM> foam , , the , said in a <NUM> .
+
+
+step:  4880 | time: 8.36 | loss: 1.738
+| tgt:  <GO> no country seems likely to oppose proposals for a long-term european council president , replacing the current rotating presidency , as well as an eu foreign minister . <SEP>
+| f_prd:  the <NUM> will not to be other , the ventura subscription council , , replacing the governor rotating presidency , who well as well effort ban council . <SEP>
+| b_prd:  <GO> of microsoft seems plans to oppose responsibility of a long-term long-term and <NUM> , replacing the current rotating presidency , as treated as a its financial <NUM> .
+
+
+step:  4960 | time: 8.34 | loss: 1.777
+| tgt:  <GO> with the economy sluggish , producers have had a tough time trying to raise prices . <SEP>
+| f_prd:  the the subheading , , the was been been tough time in to raise the . <SEP>
+| b_prd:  , of the the sluggish producers producers it is a tough are trying to raise <NUM> .
+
+
+step:  5040 | time: 8.33 | loss: 1.486
+| tgt:  <GO> idaho gem also is the first sterile animal to be cloned . <SEP>
+| f_prd:  the kenny , said the first sterile task force be cloned . <SEP>
+| b_prd:  <GO> idaho gem it is the first sterile trying to be said .
+
+
+step:  5120 | time: 8.37 | loss: 1.418
+| tgt:  <GO> officials in chechnya 's moscow-backed government are a frequent target for rebels , and tension is running high ahead of sunday 's presidential election in the war-ravaged region . <SEP>
+| f_prd:  the , malawi 's extremadura york were not frequent target of the , <quote> tension was not ahead ahead of the . presidential election . war-torn war-ravaged region . <SEP>
+| b_prd:  <GO> officials the chechnya the moscow-backed government in a frequent target the rebels , and tension is running high ahead on iraq 's presidential election in the the said .
+
+
+step:  5200 | time: 8.34 | loss: 1.630
+| tgt:  <GO> <quote> i figure we 've destroyed about one-half of al qaeda , the top operators of al qaeda , and that 's good , <quote> mr. bush said . <SEP>
+| f_prd:  the it think , are shown that one-half of the qaeda , we company , of the qaeda , <quote> he he <NUM> , <quote> he parsons said . <SEP>
+| b_prd:  <GO> <quote> , <quote> we 've destroyed about one-half for al qaeda , the the part for al war <quote> in atstake 's scores , <quote> <quote> he said .
+
+
+step:  5280 | time: 8.35 | loss: 1.466
+| tgt:  <GO> troy faces life in prison without parole at his july <NUM> sentencing . <SEP>
+| f_prd:  the said a on the and parole in the death <NUM> sentencing . <SEP>
+| b_prd:  <GO> troy to <NUM> in wednesday is parole for the the the <NUM> .
+
+
+step:  5360 | time: 8.40 | loss: 1.650
+| tgt:  <GO> cortisol levels in the saliva of day care children were highest and rose most steeply in those judged by day care center personnel to be the shyest . <SEP>
+| f_prd:  the levels in the saliva of the were , , to in most to steeply in the judged by the and to and with be the shyest . <SEP>
+| b_prd:  <GO> cortisol <GO> in the saliva of day day-care children those highest government 's most steeply of most judged and business s and judged to by the <NUM> .
+
+
+step:  5440 | time: 8.47 | loss: 1.269
+| tgt:  <GO> <quote> the whole thing is a travesty , <quote> fumed brent newbury , president of the rockland county patrolmen 's benevolent association . <SEP>
+| f_prd:  the it proposed surge is expected travesty , <quote> said pauley newbury , a of the rockland county patrolmen 's benevolent association . <SEP>
+| b_prd:  <GO> <quote> the whole thing is a travesty , <quote> fumed brent newbury , president of the rockland county patrolmen 's benevolent <NUM> .
+
+
+step:  5520 | time: 8.39 | loss: 1.559
+| tgt:  <GO> when i talked to him last time , did i think it was the end-all ? <SEP>
+| f_prd:  the the think the see from week , but not think the , to end-all . <SEP>
+| b_prd:  , <quote> i talked to for the time , and i if it to the said .
+
+
+step:  5600 | time: 8.41 | loss: 1.415
+| tgt:  <GO> north american markets grabbed early gains monday morning , as earnings season begins to slow and economic indicators take the spotlight . <SEP>
+| f_prd:  the american markets grabbed early gains monday morning , as earnings season begins to slow and economic indicators take the spotlight . <SEP>
+| b_prd:  <GO> north american markets grabbed early gains monday morning , as earnings season begins to slow and economic indicators in the <NUM> .
+
+
+step:  5680 | time: 8.34 | loss: 1.504
+| tgt:  <GO> we don 't know if any will be sars , <quote> said dr. james young , ontario 's commissioner of public safety . <SEP>
+| f_prd:  the have 't know on any of be produced , <quote> said dr. james young , ontario 's commissioner of public safety . <SEP>
+| b_prd:  <quote> i don 't know if it to be hyper-vigilant , <quote> said dr. james 'cunha , ontario 's commissioner of public said .
+
+
+step:  5760 | time: 8.32 | loss: 1.230
+| tgt:  <GO> peoplesoft has argued that an oracle takeover would face substantial regulatory delays and a significant likelihood that the transaction would be prohibited . <SEP>
+| f_prd:  the has criticised that the of takeover very not up regulatory delays and uncertainty significant likelihood that he government should be prohibited . <SEP>
+| b_prd:  <GO> it has ruled , and oracle takeover would faces substantial regulatory delays , a significant likelihood that the medication would be said .
+
+
+step:  5840 | time: 8.32 | loss: 1.104
+| tgt:  <GO> u.s. authorities blame osama bin laden 's al-qaida network for the attacks , which killed <NUM> people , including <NUM> americans . <SEP>
+| f_prd:  the officials has on bin laden and al-qaida to , the united , which he the people . and seven . . <SEP>
+| b_prd:  <GO> <GO> authorities blame osama bin laden the al-qaida <quote> for the attacks , and least <NUM> senators , and seven said .
+
+
+step:  5920 | time: 8.32 | loss: 1.054
+| tgt:  <GO> they have a cell phone and everybody that has a cell phone wishes they had a better one . <quote> <SEP>
+| f_prd:  the are been strategic phone wishes everybody that is been option phone wishes they are to deep be . <quote> <SEP>
+| b_prd:  <GO> we is a cell phone and everybody it has a cell phone wishes , had a better child . .
+
+
+step:  6000 | time: 8.35 | loss: 1.169
+| tgt:  <GO> u.s. attorney patrick fitzgerald said the wholesalers were not to blame and were <quote> victims in this . <quote> <SEP>
+| f_prd:  the forces patrick fitzgerald said the wholesalers would not seen be and ' not to in the issue <quote> <SEP>
+| b_prd:  <GO> u.s. attorney patrick fitzgerald of the wholesalers were come we blame wholesalers called <quote> victims like welcome . .
+
+
+step:  6080 | time: 8.37 | loss: 1.250
+| tgt:  <GO> the dollar pushed as high as $ <NUM> to the euro in early trade , extending tuesday 's one percent rally to hit its strongest level since april <NUM> . <SEP>
+| f_prd:  the technology-laced was as the as $ <NUM> / $ <NUM> in the trading in extending the 's $ of rally that $ by strongest level by the <NUM> . <SEP>
+| b_prd:  <GO> the dollar pushed as high as $ linked to the based in big trade , extending airline <NUM> <NUM> the rally who hit the strongest seen on $ said .
+
+
+step:  6160 | time: 8.35 | loss: 1.157
+| tgt:  <GO> three such vigilante-style attacks forced the hacker organiser , who identified himself only as <quote> eleonora67 ] , <quote> to extend the contest until 8am ( aest ) today . <SEP>
+| f_prd:  the american vigilante-style attacks forced the hacker organiser , who identified himself only as the eleonora67 ] , <quote> said extend the contest until 8am 's aest ) today . <SEP>
+| b_prd:  <GO> three such vigilante-style attacks forced the hacker organiser , who identified himself only as <quote> eleonora67 ] , <quote> to extend the contest until 8am ( aest said said .
+
+
+step:  6240 | time: 8.36 | loss: 1.133
+| tgt:  <GO> dick is going to be there as long as dick wants to be there , <quote> reuters reports langone as saying . <SEP>
+| f_prd:  the was no to be a and a members dick wants to be right . <quote> he spokesman langone as a . <SEP>
+| b_prd:  <quote> dick is going to be such as long mr. dick going to be positive , <quote> miss press quoted as said .
+
+
+step:  6320 | time: 8.33 | loss: 0.943
+| tgt:  <GO> the cause of death is drowning , and the manner of death is homicide , prowers county coroner joe giadone said . <SEP>
+| f_prd:  the technology-laced of the is drowning , or has manner of the and homicide , prowers county coroner joe giadone said . <SEP>
+| b_prd:  <GO> the cause of death is drowning , , the manner of death is homicide , prowers county coroner joe he said .
+
+
+step:  6400 | time: 8.39 | loss: 1.011
+| tgt:  <GO> the prime minister has taken a hardline stance arguing nothing should be done to lessen the pressure on mugabe . <SEP>
+| f_prd:  the broader ministers said said a hardline stance arguing nothing should be done to lessen the pressure on mugabe . <SEP>
+| b_prd:  , the prime minister has taken a hardline stance arguing nothing should be done to lessen the put on said .
+
+
+step:  6480 | time: 8.35 | loss: 1.121
+| tgt:  <GO> the woman was exposed to the sars virus while in the hospital but was not a health-care worker , said dr colin d 'cunha , ontario 's commissioner of public health . <SEP>
+| f_prd:  the dow was exposed to the hospital virus while the the hospital , was not a release worker , said the colin d 'cunha , ontario 's commissioner of public health . <SEP>
+| b_prd:  <GO> the woman was exposed to the sars virus information in the hospital it is is a health-care worker <quote> said dr. colin d 'cunha , ontario 's commissioner of public said .
+
+
+step:  6560 | time: 8.33 | loss: 1.134
+| tgt:  <GO> in the second quarter last year , the company experienced a net loss of $ <NUM> million , or <NUM> cents a share , on sales of $ <NUM> million . <SEP>
+| f_prd:  the <NUM> first quarter last year , eds company experienced a net loss of $ <NUM> million , or <NUM> cents per share , in the of $ <NUM> billion . <SEP>
+| b_prd:  <GO> in the second quarter last quarter , the company experienced a net profit of $ <NUM> million , decline <NUM> cents a percent million predicted savings of $ <NUM> <NUM> .
+
+
+step:  6640 | time: 8.36 | loss: 1.182
+| tgt:  <GO> officials in malawi said the men were on the cia 's ' ' watch list ' ' since the twin <NUM> bombings at the us embassies in kenya and tanzania . <SEP>
+| f_prd:  the , malawi said the men would born the cia 's statements watch watch list of ' ' the twin <NUM> bombings to the week embassies in kenya and tanzania . <SEP>
+| b_prd:  <GO> officials in malawi said the men were with the cia ' ' ' watch list ' killed since the twin council bombings and the his embassies in kenya and <NUM> .
+
+
+step:  6720 | time: 8.36 | loss: 1.150
+| tgt:  <GO> indonesia 's army has been accused of human rights abuses during its earlier battles with gam , charges it has generally denied . <SEP>
+| f_prd:  the 's army death been accused of human rights abuses during the web battles with gam , a of has generally denied . <SEP>
+| b_prd:  <GO> indonesia 's army has been accused of human rights abuses during a earlier battles with gam and if , has generally said .
+
+
+step:  6800 | time: 8.33 | loss: 1.001
+| tgt:  <GO> roxio , would get access to more than <NUM> tracks from the music libraries of the major labels , and the pressplay distribution system . <SEP>
+| f_prd:  the , the get access to the than <NUM> tracks from the first libraries of the major labels , calif the pressplay distribution system . <SEP>
+| b_prd:  <GO> roxio , would get access to more than <NUM> tracks from the music libraries of the major labels , and the pressplay double-star <NUM> .
+
+
+step:  6880 | time: 8.35 | loss: 0.942
+| tgt:  <GO> in march <NUM> , <NUM> percent of home broadband users connected via cable modem ; <NUM> percent used a dsl service . <SEP>
+| f_prd:  the <NUM> , , <NUM> , of broadband broadband users connected via cable modem ; <NUM> percent used at dsl service . <SEP>
+| b_prd:  <GO> <GO> march overall , <NUM> percent of home broadband users connected via cable modem , <NUM> also from a healing <NUM> .
+
+
+step:  6960 | time: 8.41 | loss: 1.041
+| tgt:  <GO> on average the students suffered at least one of the <NUM> symptoms between three and <NUM> times in the last year . <SEP>
+| f_prd:  the thursday the students suffered at least one of the <NUM> symptoms between three and <NUM> times in the past year . <SEP>
+| b_prd:  <GO> on average the students suffered at least one of the <NUM> symptoms between three and <NUM> times in the this <NUM> .
+
+
+step:  7040 | time: 8.32 | loss: 1.050
+| tgt:  <GO> most of those on board were lebanese but some were from benin , guinea and sierra leone . <SEP>
+| f_prd:  the of the killed the trading lebanese of the were <quote> benin , guinea and sierra leone . <SEP>
+| b_prd:  <GO> none of those by board were lebanese by passengers passengers from benin , guinea and sierra said .
+
+
+step:  7120 | time: 8.39 | loss: 0.898
+| tgt:  <GO> in september <NUM> , floods in the gard region killed <NUM> people . <SEP>
+| f_prd:  the <NUM> <NUM> , <NUM> in the gard region were the people . <SEP>
+| b_prd:  <GO> of to <NUM> , floods in the gard which killed million <NUM> .
+
+
+step:  7200 | time: 8.34 | loss: 0.967
+| tgt:  <GO> he has declined to comment on the charges , but court documents indicate a lingering medical problem could be part of his defense . <SEP>
+| f_prd:  the said said to comment on the case of offering he documents show a lingering medical problem could be the of a defense . <SEP>
+| b_prd:  <GO> he has declined to comment on filed charges , the court lawyers indicate a lingering the problem could as rest of of said .
+
+
+step:  7280 | time: 8.37 | loss: 1.011
+| tgt:  <GO> and she has a boyfriend , officials said : sgt. ruben contreras , who sat with her family today . <SEP>
+| f_prd:  the the told been boyfriend , sgt. said : <quote> ruben contreras , who sat with her family , . <SEP>
+| b_prd:  , <GO> , <GO> a boyfriend , , said : sgt. ruben contreras , who sat with her said <NUM> .
+
+
+step:  7360 | time: 8.35 | loss: 0.743
+| tgt:  <GO> all patients developed some or all of the symptoms of e. coli food poisoning : bloody diarrhea , vomiting , abdominal cramping and nausea . <SEP>
+| f_prd:  the <NUM> developed as are the the the puc of e. coli experience poisoning john bloody diarrhea , vomiting , abdominal cramping and nausea . <SEP>
+| b_prd:  <GO> microsoft also developed been at release of the symptoms at e. coli food poisoning dr. bloody diarrhea , vomiting , abdominal cramping and <NUM> .
+
+
+step:  7440 | time: 8.34 | loss: 0.763
+| tgt:  <GO> a third executive , chief operating officer david glenn was fired . <SEP>
+| f_prd:  the month quarter , said operating officer said glenn was armed . <SEP>
+| b_prd:  , a chief husband , chief operating officer linux glenn be said .
+
+
+step:  7520 | time: 8.37 | loss: 0.856
+| tgt:  <GO> in his speech , stern says his members are <quote> totally comfortable <quote> with dean 's positions on health care issues . <SEP>
+| f_prd:  the <NUM> female , the said the advice are trying totally comfortable <quote> with the 's positions , the care . . <SEP>
+| b_prd:  <GO> in his speech , stern of that unions are <quote> totally comfortable <quote> with dean 's positions on health disturbing said .
+
+
+step:  7600 | time: 8.46 | loss: 0.854
+| tgt:  <GO> still , changes to ie <quote> may affect a large number of existing web pages , <quote> according to the w3c 's notice . <SEP>
+| f_prd:  the , pinellas to assume wounded have be an <quote> policy of religion web pages , <quote> he to the w3c 's notice . <SEP>
+| b_prd:  is sunday that plans to ie explorer are affect a the number of more remove <NUM> , , according to the w3c stock <NUM> .
+
+
+step:  7680 | time: 8.36 | loss: 0.939
+| tgt:  <GO> an amendment to remove such protections failed by a vote of <NUM> to <NUM> . <SEP>
+| f_prd:  the episode to remove the protections failed with <NUM> final in the percent <NUM> . <SEP>
+| b_prd:  <GO> <NUM>-year-old scheduled to remove from protections available by the list from , to <NUM> .
+
+
+step:  7760 | time: 8.37 | loss: 0.940
+| tgt:  <GO> a few tried to rush the podium , and at least one graduate tossed his cap and gown to the stage before leaving . <SEP>
+| f_prd:  the month islander to rush the podium , and the least <NUM> graduate tossed his cap and gown to the year before leaving . <SEP>
+| b_prd:  <GO> a few plans to rush the podium , and at , one graduate tossed his cap and gown to the stage with <NUM> .
+
+
+step:  7840 | time: 8.36 | loss: 0.728
+| tgt:  <GO> water samples are being tested in a state lab to determine what caused the reaction . <SEP>
+| f_prd:  the samples are being sent in the protective lab to determine their caused the reaction . <SEP>
+| b_prd:  <GO> water samples are being tested in a state lab to determine which caused the said .
+
+
+step:  7920 | time: 8.36 | loss: 0.910
+| tgt:  <GO> lee boyd malvo will be called as a witness wednesday in a pretrial hearing for fellow sniper suspect john allen muhammad . <SEP>
+| f_prd:  the , they will be reassigned a many witness 's in the pretrial hearing for the sniper suspect john allen muhammad . <SEP>
+| b_prd:  <GO> lee boyd malvo will be called as a on said in a pretrial hearing to fellow sniper suspect john allen said .
+
+
+step:  8000 | time: 8.40 | loss: 0.844
+| tgt:  <GO> his wife , janet , said she heard the thud from the kitchen , where she was getting a glass of water . <SEP>
+| f_prd:  the sport , janet , said she heard the thud from the kitchen , where she was getting a glass of water . <SEP>
+| b_prd:  <GO> his wife , janet , said racicot heard the thud from the kitchen , where he was getting a glass high <NUM> .
+
+
+step:  8080 | time: 8.33 | loss: 0.783
+| tgt:  <GO> ernst & young has denied any wrongdoing and plans to fight the allegations . <SEP>
+| f_prd:  the & poor has been any wrongdoing and plans to be the company . <SEP>
+| b_prd:  <GO> ernst & , has denied of wrongdoing and failing to of in <NUM> .
+
+
+step:  8160 | time: 8.35 | loss: 0.847
+| tgt:  <GO> shares of tampa-based outback steakhouse inc. closed at $ <NUM> , up $ <NUM> , or <NUM> percent , on the new york stock exchange . <SEP>
+| f_prd:  the of mony outback steakhouse inc. rose at $ <NUM> , up <NUM> <NUM> , or <NUM> percent , on the new york stock exchange . <SEP>
+| b_prd:  <GO> shares of tampa-based outback steakhouse box closed at $ <NUM> , at $ <NUM> , or <NUM> percent <NUM> on the new york stock <NUM> .
+
+
+step:  8240 | time: 8.37 | loss: 0.758
+| tgt:  <GO> seven air force academy cadets face punishment for allegedly drinking with two high school girls . <SEP>
+| f_prd:  the of force academy cadets face punishment for drinking drinking with soldiers high school girls . <SEP>
+| b_prd:  <GO> seven air force academy cadets face punishment for allegedly drinking with or high ) <NUM> .
+
+
+step:  8320 | time: 8.34 | loss: 0.663
+| tgt:  <GO> there was no way the man could hear him , but he turned and mouthed something . <SEP>
+| f_prd:  the are no immediate about man could hear him , but he turned in mouthed something . <SEP>
+| b_prd:  <GO> there had no way the information could hear him , but they henin-hardenne and mouthed said .
+
+
+step:  8400 | time: 8.34 | loss: 0.771
+| tgt:  <GO> as a result , nelson now faces up to <NUM> years ' jail instead of life . <SEP>
+| f_prd:  the a result , nelson said faces a to <NUM> years in jail , of the . <SEP>
+| b_prd:  <GO> as a result , nelson they faces up to <NUM> years and jail instead of said .
+
+
+step:  8480 | time: 8.37 | loss: 0.746
+| tgt:  <GO> they include french president jacques chirac and german chancellor gerhard schroeder . <SEP>
+| f_prd:  the were french officials jacques chirac and german chancellor gerhard schroeder . <SEP>
+| b_prd:  <GO> they include french president jacques chirac and german chancellor dramatic said .
+
+
+step:  8560 | time: 8.34 | loss: 0.760
+| tgt:  <GO> one of the key suspects in the october nightclub bombings that killed more than <NUM> people in bali went on trial monday amid tight security . <SEP>
+| f_prd:  the of the oregon questions or the apartment nightclub bombings that killed two than <NUM> people opened bali music on the . . tight . . <SEP>
+| b_prd:  <GO> one of the key suspects in the bali nightclub bombings that killed more than <NUM> car in bali up on on <NUM> amid energy <NUM> .
+
+
+step:  8640 | time: 8.34 | loss: 0.732
+| tgt:  <GO> world airways inc. and north american airlines inc. also have filed applications seeking authority to provide service to iraq . <SEP>
+| f_prd:  the airways inc. and the american airlines inc. have have filed the seeking having to provide a in their . <SEP>
+| b_prd:  <GO> world airways inc. and north american airlines inc. may have filed applications seeking authority to military war in said .
+
+
+step:  8720 | time: 8.35 | loss: 0.645
+| tgt:  <GO> board member douglas osheroff , a nobel-prize winning stanford physicist , said : <quote> there were some extremely bad decisions . <SEP>
+| f_prd:  the thornton and osheroff , a spokesman <NUM> the physicist in which the <quote> it and not of unconstitutional under . <SEP>
+| b_prd:  's specifically , douglas osheroff , , nobel-prize for stanford <NUM> , said , but practices received and extremely lending <NUM> .
+
+
+step:  8800 | time: 8.36 | loss: 0.720
+| tgt:  <GO> selenski had served about seven years in prison for bank robbery . <SEP>
+| f_prd:  the had previously in <NUM> years in prison on bank robbery . <SEP>
+| b_prd:  <GO> selenski have served about seven years in reached the bank said .
+
+
+step:  8880 | time: 8.32 | loss: 0.673
+| tgt:  <GO> in midafternoon trading , the nasdaq composite index was up <NUM> , or <NUM> percent , to <NUM> . <SEP>
+| f_prd:  the <NUM> trading , the dow composite index was up <NUM> , or <NUM> percent , to <NUM> . <SEP>
+| b_prd:  <GO> in midafternoon <NUM> , technology-laced nasdaq composite index was up points , or <NUM> percent , to said .
+
+
+step:  8960 | time: 8.41 | loss: 0.660
+| tgt:  <GO> the dow jones industrial average was up <NUM> per cent at <NUM> , while the nasdaq composite index was <NUM> per cent higher at <NUM> . <SEP>
+| f_prd:  the dow jones industrial average .dji up <NUM> per cent at <NUM> , while the nasdaq composite index was <NUM> per cent higher at <NUM> . <SEP>
+| b_prd:  <GO> the dow jones industrial average were up <NUM> per cent at <NUM> , while the nasdaq composite index or <NUM> per cent , at <NUM> .
+
+
+step:  9040 | time: 8.38 | loss: 0.670
+| tgt:  <GO> terri schiavo , <NUM> , underwent the procedure at the tampa bay area hospice where she has been living for several years , said her father , bob schindler . <SEP>
+| f_prd:  the schiavo , <NUM> , was a procedure at the tampa bay area hospice where she was been living in authorities years , according his father , bob schindler . <SEP>
+| b_prd:  <GO> terri schiavo , <NUM> , underwent the procedure at the tampa bay area hospice that view has been bid for several home , said american father , bob <NUM> .
+
+
+step:  9120 | time: 8.37 | loss: 0.715
+| tgt:  <GO> mark kaiser , vice-president of marketing , and tim lee , vice-president of purchasing , were dismissed last week . <SEP>
+| f_prd:  the kaiser , vice-president of marketing , ibm tim lee , vice-president of purchasing , were dismissed last week . <SEP>
+| b_prd:  <GO> mark kaiser , vice-president of marketing , , tim smith , vice-president of purchasing , were island last said .
+
+
+step:  9200 | time: 8.32 | loss: 0.649
+| tgt:  <GO> pataki said if power was restored , state workers would be back on the job friday morning . <SEP>
+| f_prd:  the said the the was restored , an workers would be available on the job , morning . <SEP>
+| b_prd:  <GO> pataki said if power was restored , american workers have and based on the jobs friday said .
+
+
+step:  9280 | time: 8.33 | loss: 0.642
+| tgt:  <GO> though that slower spending made <NUM> look better , many of the expenditures will actually occur in <NUM> , making that year 's shortfall worse . <SEP>
+| f_prd:  the that slower spending made <NUM> look better , many of the expenditures will actually occur in <NUM> , making that to and shortfall worse . <SEP>
+| b_prd:  <GO> though that slower spending made , look better , many of the expenditures will actually occur in vehicles , making that county 's shortfall said .
+
+
+step:  9360 | time: 8.33 | loss: 0.568
+| tgt:  <GO> zilkha conceded in a statement issued tuesday that his group may have fallen <quote> a bit short . <quote> <SEP>
+| f_prd:  the conceded in a statement issued this that the group may have fallen <quote> a bit short . <quote> <SEP>
+| b_prd:  <GO> zilkha conceded in a statement issued added that his group may have fallen <quote> a bit scores . .
+
+
+step:  9440 | time: 8.31 | loss: 0.619
+| tgt:  <GO> the findings were reported online in the june <NUM> edition of scientific journal nature medicine . <SEP>
+| f_prd:  the technology-laced , published online in the june <NUM> edition of scientific journal nature . . <SEP>
+| b_prd:  <GO> the findings were reported online in a july <NUM> edition of the journal nature said .
+
+
+step:  9520 | time: 8.34 | loss: 0.592
+| tgt:  <GO> note the subheading of this terrible parable in the <quote> american masters <quote> series , <quote> arthur miller , elia kazan and the blacklist : none without sin . <quote> <SEP>
+| f_prd:  the the subheading of this terrible parable in the american american masters <quote> series , <quote> arthur miller , elia kazan and the blacklist : none without sin . <quote> <SEP>
+| b_prd:  <GO> note the subheading of this terrible parable in the <quote> american masters <quote> series titled <quote> arthur miller , elia kazan and the blacklist : none without unions . .
+
+
+step:  9600 | time: 8.42 | loss: 0.687
+| tgt:  <GO> the man , who entered the post office in lakeside shortly before <NUM> p.m. , gave up to deputies about <NUM> : <NUM> p.m. <SEP>
+| f_prd:  the blue-chip , fazul entered the post office that lakeside shortly before the p.m. , gave up to deputies it <NUM> : <NUM> p.m. <SEP>
+| b_prd:  <GO> the man , who entered the post <NUM> in lakeside shortly of <NUM> p.m. , gave expected to deputies of <NUM> : <NUM> .
+
+
+step:  9680 | time: 8.35 | loss: 0.602
+| tgt:  <GO> general sattler heads a combined joint task force aboard the command ship mount whitney . <SEP>
+| f_prd:  the motors heads a combined joint task force based , command ship mount whitney . <SEP>
+| b_prd:  <GO> general sattler heads a combined joint task thomas aboard the command and mount said .
+
+
+step:  9760 | time: 8.35 | loss: 0.553
+| tgt:  <GO> mitchell said many knew wilson , <NUM> , to be unstable and that she recently lost her job . <SEP>
+| f_prd:  the said the knew wilson , <NUM> , and be unstable and the she recently lost her job . <SEP>
+| b_prd:  <GO> mitchell said many knew wilson , germany was to be unstable and that she recently lost a said .
+
+
+step:  9840 | time: 8.35 | loss: 0.570
+| tgt:  <GO> montgomery was one of the first places to enact such a law , but many places , including new york city , now ban smoking in bars . <SEP>
+| f_prd:  the was being of the american places , enact such a law , but he places , including the york city , where ban smoking in bars . <SEP>
+| b_prd:  while montgomery <GO> one at the <NUM> places to enact such a <NUM> , but <NUM> places , including new york <NUM> , air bans smoking in <NUM> .
+
+
+step:  9920 | time: 8.36 | loss: 0.543
+| tgt:  <GO> of personal vehicles , <NUM> percent are cars or station wagons , <NUM> percent vans or suvs , <NUM> percent light trucks . <SEP>
+| f_prd:  the the vehicles , <NUM> percent are cars or station wagons , <NUM> percent vans or suvs , <NUM> percent light trucks . <SEP>
+| b_prd:  <GO> of personal vehicles , <NUM> percent are cars or station wagons , <NUM> percent vans or suvs , <NUM> percent light <NUM> .
+layers shape= (4, 36, 512)
+layers shape= (4, 36, 512)
+layers shape= (4, 36, 512)
+[<tf.Tensor: shape=(4, 36, 512), dtype=float32, numpy=
+array([[[ 4.72872704e-02, -1.16091445e-01, -4.70506866e-03, ...,
+         -2.18130182e-02, -1.55229524e-01, -3.74113411e-01],
+        [ 3.43589336e-02,  2.81875730e-01, -1.62632585e-01, ...,
+         -8.56021345e-02,  1.46783561e-01, -2.21106097e-01],
+        [-3.15245569e-01,  3.88441421e-02, -1.10324264e-01, ...,
+          9.04138982e-02, -1.48439586e-01, -1.84670269e-01],
+        ...,
+        [-5.71139634e-01, -4.39330757e-01, -1.70449853e-01, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03]],
+
+       [[ 4.72872704e-02, -1.16091445e-01, -4.70506866e-03, ...,
+          2.04899069e-02, -1.17777558e-02, -3.90349850e-02],
+        [ 9.79340449e-03,  6.37716115e-01, -1.60316601e-01, ...,
+         -9.56607163e-02, -1.84539229e-01, -3.17344032e-02],
+        [-5.57979830e-02,  9.20693204e-02,  3.80699672e-02, ...,
+          1.73898399e-01, -2.16081932e-01,  1.33294195e-01],
+        ...,
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03]],
+
+       [[ 4.72872704e-02, -1.16091445e-01, -4.70506866e-03, ...,
+         -2.76518106e-01,  1.46101877e-01,  8.30623433e-02],
+        [-1.64822876e-01,  6.88843727e-02,  2.04032958e-02, ...,
+          1.07659265e-01,  2.30335668e-01,  5.10853343e-02],
+        [ 3.49087983e-01,  4.67700601e-01, -1.57639831e-01, ...,
+         -1.32491618e-01, -9.32953283e-02,  2.37156942e-01],
+        ...,
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03]],
+
+       [[ 4.72872704e-02, -1.16091445e-01, -4.70506866e-03, ...,
+          1.89691737e-01, -6.17595352e-02, -2.41056904e-01],
+        [-3.18499982e-01,  4.31025513e-02,  1.89026460e-01, ...,
+          5.43081760e-01,  3.28140646e-01,  1.37961060e-01],
+        [ 3.40597332e-01,  2.11890057e-01,  4.09101993e-01, ...,
+          9.36499685e-02,  3.98941100e-01,  1.61875680e-01],
+        ...,
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03],
+        [-1.10192539e-03, -9.11574243e-05,  3.31343108e-05, ...,
+         -2.26831937e-04, -5.06081560e-04,  1.17352104e-03]]],
+      dtype=float32)>, <tf.Tensor: shape=(4, 36, 512), dtype=float32, numpy=
+array([[[-8.0084028e-05, -6.1415952e-01, -7.6023376e-01, ...,
+         -1.4117273e-09,  3.5796799e-03,  1.9178344e-07],
+        [-4.8578396e-01, -8.4952414e-01,  7.6158053e-01, ...,
+         -4.1227340e-05,  9.4208992e-01,  2.3127822e-03],
+        [-9.5170671e-01, -9.7424448e-01,  9.6316302e-01, ...,
+         -5.0388171e-13,  9.9737477e-01,  2.2637653e-07],
+        ...,
+        [-2.4458466e-01, -2.4113970e-04,  9.9823642e-01, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00]],
+
+       [[-8.0084028e-05, -6.1415952e-01, -7.6023376e-01, ...,
+         -5.0593397e-05,  2.2515942e-01,  1.3037059e-08],
+        [-7.5953317e-01, -7.6159465e-01,  7.6157475e-01, ...,
+         -5.6094419e-02,  1.0000000e+00,  3.5374863e-03],
+        [-1.9236463e-01, -7.2539416e-03,  9.5928127e-01, ...,
+         -4.4106257e-01,  9.9808109e-01,  3.9526273e-02],
+        ...,
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00]],
+
+       [[-8.0084028e-05, -6.1415952e-01, -7.6023376e-01, ...,
+         -6.6406773e-07,  9.9710804e-01,  2.3626968e-04],
+        [-2.0448861e-01, -6.9579220e-01,  7.0428157e-01, ...,
+         -9.2279875e-01,  9.9975437e-01,  3.0473387e-03],
+        [-8.1271231e-01, -9.9440265e-01,  9.6071446e-01, ...,
+         -7.5882220e-01,  9.7800732e-01,  4.9400161e-04],
+        ...,
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00]],
+
+       [[-8.0084028e-05, -6.1415952e-01, -7.6023376e-01, ...,
+         -3.7107600e-10,  9.9987257e-01,  4.5920839e-05],
+        [-6.5882981e-01, -7.8971928e-01,  7.4241561e-01, ...,
+         -1.0000000e+00,  9.4953454e-01,  2.5985815e-02],
+        [-3.2316509e-01, -8.3309984e-05,  3.4974873e-04, ...,
+         -7.1544814e-01,  3.9059880e-01,  9.9936115e-06],
+        ...,
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00],
+        [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00, ...,
+          0.0000000e+00,  0.0000000e+00,  0.0000000e+00]]], dtype=float32)>, <tf.Tensor: shape=(4, 36, 512), dtype=float32, numpy=
+array([[[-3.72399143e-07, -7.31343019e-14,  1.66129048e-08, ...,
+         -9.99479890e-01,  1.35936541e-04,  1.38511655e-08],
+        [-3.74004003e-07, -7.31012947e-14,  1.31475672e-01, ...,
+         -2.09965676e-01,  2.14767626e-16,  8.39009857e-08],
+        [-3.73752044e-07, -2.38000348e-13,  9.63961363e-01, ...,
+         -8.06043029e-01,  1.03871413e-02,  4.35856578e-04],
+        ...,
+        [-9.62234974e-01, -9.94775057e-01,  3.89915018e-04, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00]],
+
+       [[-3.72399143e-07, -7.31343019e-14,  1.66129048e-08, ...,
+         -1.00000000e+00,  2.44019888e-02,  2.45659030e-04],
+        [-3.74006277e-07, -7.29944805e-14,  5.26702357e-03, ...,
+         -9.77426410e-01,  5.57377734e-06,  1.02934640e-11],
+        [-2.43355800e-07,  6.32305042e-10,  1.15428236e-03, ...,
+         -8.87004887e-07,  9.97926772e-01,  2.94294536e-01],
+        ...,
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00]],
+
+       [[-3.72399143e-07, -7.31343019e-14,  1.66129048e-08, ...,
+         -1.00000000e+00,  1.25665283e-05,  3.90934974e-06],
+        [-3.73998120e-07,  1.47940200e-13,  9.63708699e-01, ...,
+         -9.34076011e-01,  6.10194138e-06,  1.60857126e-11],
+        [-1.60137823e-11,  3.90051923e-12,  4.89637733e-01, ...,
+         -2.68812839e-09,  9.00755107e-01,  2.50326208e-04],
+        ...,
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00]],
+
+       [[-3.72399143e-07, -7.31343019e-14,  1.66129048e-08, ...,
+         -9.89746675e-03,  1.63881284e-10,  7.32686579e-01],
+        [-3.74941948e-07, -6.85319382e-14,  3.16914730e-03, ...,
+         -1.64589746e-08,  1.24939324e-05,  6.38036124e-10],
+        [-3.04037371e-07, -5.22826326e-07,  1.13799854e-03, ...,
+         -1.87593438e-02,  2.35843107e-01,  2.45120435e-04],
+        ...,
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00],
+        [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, ...,
+          0.00000000e+00,  0.00000000e+00,  0.00000000e+00]]],
+      dtype=float32)>]
+
+Process finished with exit code 0
