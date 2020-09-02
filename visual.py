@@ -15,6 +15,7 @@ def show_tfidf(tfidf, vocb, filename):
     plt.savefig("./visual/results/%s.png" % filename, format="png", dpi=500)
     plt.show()
 
+
 def show_w2v_word_embedding(model, data: utils.Dataset, path):
     word_emb = model.embeddings.get_weights()[0]
     for i in range(data.num_word):
