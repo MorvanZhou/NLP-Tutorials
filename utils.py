@@ -5,7 +5,6 @@ import requests
 import pandas as pd
 import re
 import itertools
-import matplotlib.pyplot as plt
 
 PAD_ID = 0
 
