@@ -1,9 +1,3 @@
-"""
-reference:
-https://zhuanlan.zhihu.com/p/49271699
-https://jalammar.github.io/illustrated-bert/
-"""
-
 import tensorflow as tf
 from tensorflow import keras
 import utils
