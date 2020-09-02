@@ -1,14 +1,3 @@
-"""
-reference:
-https://qianqianqiao.github.io/2018/10/23/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0-Attention-is-All-You-Need/
-https://github.com/Kyubyong/transformer/blob/master/modules.py
-http://nlp.seas.harvard.edu/2018/04/03/attention.html
-https://jalammar.github.io/illustrated-transformer/
-https://github.com/pengshuang/Transformer
-http://pgn2oyk5g.bkt.clouddn.com/WechatIMG360.png
-https://zhuanlan.zhihu.com/p/35571412      (key-value query)
-"""
-
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
