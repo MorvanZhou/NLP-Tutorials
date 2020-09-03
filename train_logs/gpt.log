@@ -1,0 +1,291 @@
+C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\python.exe E:/Python/NLP-Tutorials/GPT.py
+2020-09-03 17:56:04.260323: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+num word:  12880
+2020-09-03 17:56:07.284686: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library nvcuda.dll
+2020-09-03 17:56:07.377974: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-09-03 17:56:07.378355: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-09-03 17:56:07.990131: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-09-03 17:56:09.005297: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-09-03 17:56:09.314889: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-09-03 17:56:10.526610: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-09-03 17:56:10.851856: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-09-03 17:56:13.740010: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-09-03 17:56:13.740638: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-09-03 17:56:13.741163: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+2020-09-03 17:56:13.748033: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x1534e42b460 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-09-03 17:56:13.748360: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-09-03 17:56:13.749160: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-09-03 17:56:13.749755: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-09-03 17:56:13.750034: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-09-03 17:56:13.750220: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-09-03 17:56:13.750402: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-09-03 17:56:13.750586: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-09-03 17:56:13.750775: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-09-03 17:56:13.750963: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-09-03 17:56:13.751734: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-09-03 17:56:14.317157: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-09-03 17:56:14.317361: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0 
+2020-09-03 17:56:14.317447: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N 
+2020-09-03 17:56:14.318111: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 4700 MB memory) -> physical GPU (device: 0, name: GeForce GTX 1060 6GB, pci bus id: 0000:01:00.0, compute capability: 6.1)
+2020-09-03 17:56:14.321186: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x1536c6cf7e0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2020-09-03 17:56:14.321371: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce GTX 1060 6GB, Compute Capability 6.1
+2020-09-03 17:56:14.625937: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+WARNING:tensorflow:From C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\lib\site-packages\tensorflow\python\ops\array_grad.py:644: _EagerTensorBase.cpu (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.identity instead.
+
+
+step:  0 | time: 0.63 | loss: 9.663 
+| tgt:  they also are reshaping the retail business relationship elsewhere , as companies take away ideas and practices that change how they do business in their own firms and with others . <SEP> they also are reshaping the retail-business relationship , as companies take away concepts and practices that change how they do business internally and with others . 
+| prd:  kinsley van-vliet franco atheist bottom kent performance toured trapeze reporting alta miz crush <NUM>-month crush kennedy dominick clarence ``will thames mr scanning abuses losses sleeping since detection punching scrutiny fare-beating shiites sue gagne canfor built schafer chronicle assignment cat deadline action slipping enhances crush tearing cat mobile widen treaty retire towards an-najaf virtually alta widen files gillian jamaica
+
+
+step:  100 | time: 14.39 | loss: 8.227 
+| tgt:  <quote> we are declaring war on sexual harassment and sexual assault . <SEP> <quote> we have declared war on sexual assault and sexual harassment , <quote> rosa said . 
+| prd:  the the the the the the the the the , the the <SEP> the the , , , , , , , , , <NUM> <SEP> <SEP> <NUM> the
+
+
+step:  200 | time: 14.06 | loss: 6.458 
+| tgt:  after three months , atkins dieters had lost an average of <NUM> pounds compared with <NUM> pounds in the conventional group . <SEP> three months into the study , the atkins group had lost an average of about <NUM> pounds , compared with five for the low-fat group . 
+| prd:  the the the the the the the , the the the the , , , , , , , the , , <SEP> the , , , , , , the , , , , , , , , , , , , , , , . , ,
+
+
+step:  300 | time: 14.15 | loss: 6.401 
+| tgt:  yeager said the suspect in the target attack showed tendencies of being a prior offender . <SEP> yeager said the incident appeared to be isolated , but the suspect showed tendencies of being a prior offender . 
+| prd:  the the the the the the the the the the the the the the the the <SEP> the , the the . . the the . the . the , . . the , the . .
+
+
+step:  400 | time: 14.02 | loss: 6.207 
+| tgt:  no country seems likely to oppose proposals for a long-term european council president , replacing the current rotating presidency , as well as an eu foreign minister . <SEP> no country now opposes plans for a long-term european council president , replacing the current rotating presidency , as well as an eu foreign minister . 
+| prd:  the the , the . the the , the the , the . , the . the the . . . . . , . . , . <SEP> the the , the the . the , the , . , the , the the . . the . . . , . , .
+
+
+step:  500 | time: 14.04 | loss: 6.362 
+| tgt:  <quote> for customers to get the most of the internet , several factors are crucial , <quote> pierre danon , ceo of bt 's retail unit . <SEP> <quote> for customers to get the most out of the internet , several factors are crucial , <quote> mr danon said . 
+| prd:  the the the , the the the , the the the <quote> the . the . <quote> <SEP> . , <quote> . the . the . . <SEP> <quote> <quote> the , the the the the , the the the <quote> , . the . <quote> <SEP> policy-setting , .
+
+
+step:  600 | time: 14.06 | loss: 5.901 
+| tgt:  wittig resigned last year after being indicted on federal bank fraud charges involving a real estate loan unrelated to westar business . <SEP> wittig resigned in late november about two weeks after being indicted on bank fraud charges in a real estate case unrelated to the company . 
+| prd:  the the , the , the the , the , , . . the <NUM> the . . . the . . <SEP> the , , the , . <NUM> , . the , , the , . , the , . . . . the , .
+
+
+step:  700 | time: 14.09 | loss: 5.955 
+| tgt:  between <NUM> and <NUM> persons die annually from these allergies , and thousands more suffer severe reactions such as constricted breathing and dramatic swelling . <SEP> between <NUM> and <NUM> people die a year due to these allergies , and thousands more suffer severe reactions such as constricted breathing and dramatic swelling . 
+| prd:  the , , <NUM> percent , <NUM> . <NUM> <NUM> . <quote> <NUM> , , <NUM> <NUM> <NUM> . the . . <NUM> . . <SEP> the the , the , , <NUM> <NUM> , , <NUM> <NUM> , the <NUM> , , the prospects <NUM> <NUM> the , . <NUM> <NUM> .
+
+
+step:  800 | time: 14.13 | loss: 5.551 
+| tgt:  the blue-chip dow jones industrial average .dji fell <NUM> points , or <NUM> percent , to <NUM> , after giving up more than <NUM> percent earlier . <SEP> the dow jones industrial average .dji fell <NUM> points , or <NUM> percent , to <NUM> on friday . 
+| prd:  the company <NUM> <NUM> industrial <NUM> <NUM> <NUM> <NUM> percent , <NUM> <NUM> percent , or <NUM> . or the <NUM> <NUM> . <NUM> . . . <SEP> the nasdaq <NUM> industrial <NUM> <NUM> <NUM> <NUM> percent , <NUM> <NUM> percent , <NUM> <NUM> . <NUM> ,
+
+
+step:  900 | time: 14.18 | loss: 5.368 
+| tgt:  <quote> it 's safe to assume that the senate is prepared to pass some form of cap , <quote> king said . <SEP> its safe to assume the senate is prepared to pass some form of a cap .... the level of it is to be debated . 
+| prd:  the said is be , be the the united , the to be the of of the , <quote> <SEP> to . <SEP> <quote> states , be the united , the to be the of , the statement the the new to the to the be and .
+
+
+step:  1000 | time: 14.14 | loss: 4.798 
+| tgt:  the fight over online music sales was disclosed in documents filed last week with the judge and made available by the court yesterday . <SEP> the fight over online music sales was disclosed in documents made available monday by the court . 
+| prd:  the dow the the to of to the to the , the year in the company . the . , the company . . <SEP> the first the the said . , the to the , to , . the company .
+
+
+step:  1100 | time: 14.12 | loss: 4.949 
+| tgt:  the standard & poor 's <NUM> index slipped <NUM> points , or <NUM> percent , to <NUM> . <SEP> the standard & poor 's retail index < .rlx > was up more than <NUM> percent . 
+| prd:  the dow & poor 's <NUM> percent <NUM> <NUM> percent , to <NUM> percent , or <NUM> percent <SEP> the nasdaq index poor 's <NUM> <NUM> was poor <NUM> was <NUM> <NUM> than <NUM> percent ,
+
+
+step:  1200 | time: 14.15 | loss: 4.816 
+| tgt:  in <NUM> , for example , the dow dropped more than <NUM> points , or <NUM> percent , between may and october , due largely to terrorism fears driven by headlines . <SEP> for example , the dow dropped more than <NUM> points , or <NUM> percent , from may to october <NUM> , largely because of terrorism fears driven by the headlines . 
+| prd:  the the , <NUM> the , was company jones <NUM> than <NUM> percent , or <NUM> , , to <NUM> <NUM> <NUM> , and to . <NUM> . of to <NUM> . <SEP> the the , the company jones <NUM> than <NUM> , , to <NUM> percent , and <NUM> <NUM> <NUM> , percent and . of <NUM> , of to <NUM> company .
+
+
+step:  1300 | time: 14.16 | loss: 4.789 
+| tgt:  the report by the justice department 's inspector general found <quote> significant problems <quote> in the government 's handling of foreigners who were jailed under blanket edicts adopted by the department after the attacks . <SEP> the justice department 's office of the inspector general described <quote> significant problems <quote> in the bush administration 's actions toward the <NUM> foreigners held on immigration violations after the attacks . 
+| prd:  the dow was <NUM> company said of first the <quote> the the . <quote> <quote> the united said government of the the said the , the <quote> <quote> . the united . the united . <SEP> the united said of united and the united the <quote> the he <quote> in the the united said , government of the united . <quote> . the said . the united .
+
+
+step:  1400 | time: 14.06 | loss: 4.338 
+| tgt:  carlson on tuesday said he would not recuse himself from the case . <SEP> service officials said carlson refused to recuse himself from the case . 
+| prd:  the , the , in was be have for to the company . <SEP> <quote> said said the was to be 's to the new .
+
+
+step:  1500 | time: 14.02 | loss: 4.657 
+| tgt:  but a state judge has ruled that the so-called <quote> double jeopardy <quote> protections do not apply in the case . <SEP> a judge already has ruled that double-jeopardy protections don 't apply in the case . 
+| prd:  the the statement , 's been that the united <quote> said a <quote> said have not be in the united . <SEP> the new 's is been that is is have 't be in the united .
+
+
+step:  1600 | time: 14.09 | loss: 4.071 
+| tgt:  he faces <NUM> years in prison when he is sentenced in federal court july <NUM> . <SEP> he faces an additional <NUM> years in prison on the federal charges when he is sentenced july <NUM> . 
+| prd:  the said <NUM> percent in the and he was a in a court for <NUM> . <SEP> the was a estimated <NUM> percent in <NUM> , the first court of he said a in <NUM> .
+
+
+step:  1700 | time: 14.10 | loss: 3.828 
+| tgt:  the name for the robot , due to be launched at <NUM> : <NUM> p.m. , was selected from among <NUM> names submitted by u.s. school children . <SEP> the name for the robot , due to be launched at <NUM> : <NUM> p.m. ( <NUM> : <NUM> p.m. ) on sunday , was selected from among <NUM> names submitted by u.s. 
+| prd:  the first , the first , who to be been at <NUM> percent <NUM> percent , or up . <NUM> <NUM> percent <SEP> by $ year of . <SEP> the dow to the dow , <NUM> to <NUM> been in <NUM> percent <NUM> percent , <NUM> percent <NUM> percent , and friday , or up from <NUM> <NUM> . . by <NUM>
+
+
+step:  1800 | time: 14.06 | loss: 3.968 
+| tgt:  <quote> we make no apologies for finding every legal way possible to protect the american public from further terrorist attack , <quote> barbara comstock said . <SEP> <quote> we make no apologies for finding every legal way possible to protect the american public from further terrorist attacks , <quote> said barbara comstock , ashcroft 's press secretary . 
+| prd:  the i 're a apologies for we of of president president to be the new public . his states attacks , <quote> said comstock said . <SEP> <quote> i have the apologies for the a year way it to be the new public . the years attacks , <quote> said . comstock , <quote> 's president . .
+
+
+step:  1900 | time: 14.02 | loss: 3.745 
+| tgt:  some of the computers also are used to send spam e-mail messages to drum up traffic to the sites . <SEP> some are also used to send spam e-mail messages to boost traffic to the sites . 
+| prd:  the <NUM> the company were is not to be spam of penalty to pass <NUM> <NUM> to the . . <SEP> the of not is to be the of on to be . to the united .
+
+
+step:  2000 | time: 14.02 | loss: 3.714 
+| tgt:  in march , rowland 's former deputy chief of staff pleaded guilty to accepting gold and cash in return for steering state contracts . <SEP> lawrence e. alibozek , his former deputy chief of staff , pleaded guilty to accepting cash and gold coins in exchange for influencing state contracts . 
+| prd:  the <NUM> , <NUM> 's the the that , the was not to be 's and justices to prison in their first 's . <SEP> he not obi , the first first was of war , which not to be 's in other aids in the of the state 's .
+
+
+step:  2100 | time: 14.11 | loss: 3.195 
+| tgt:  water samples are being tested in a state lab to determine what caused the reaction . <SEP> water samples are being sent to the state health department for analysis . 
+| prd:  the of are to published in and statement 's to kill the that the virtue . <SEP> the potter are not made to the united 's . and the .
+
+
+step:  2200 | time: 14.06 | loss: 3.571 
+| tgt:  cambone said u.s forces found the tractor-trailer april <NUM> at a kurdish checkpoint near the city of mosul in northern iraq . <SEP> kurdish forces at a checkpoint near mosul in northern iraq seized the trailer on april <NUM> . 
+| prd:  the said the also also the state a <NUM> in a loss index from the same of war in prison iraq . <SEP> in were from <NUM> year from iraq in prison iraq . the yield on war <NUM> .
+
+
+step:  2300 | time: 14.08 | loss: 3.092 
+| tgt:  under the agreement , lendingtree shareholders would receive <NUM> of a usai share for each share in lendingtree . <SEP> under the proposed stock for stock transaction , lendingtree shareholders will get <NUM> shares of usai common stock for each share of lendingtree common stock . 
+| prd:  the the united , the rose will get <NUM> , a share share of $ share in prison . <SEP> in the company stock for new exchange , or rose will be <NUM> percent of $ share stock . $ share in its . stock .
+
+
+step:  2400 | time: 14.03 | loss: 2.890 
+| tgt:  less than a month after departing her anchor 's chair at <quote> dateline nbc , <quote> jane pauley has signed a new deal with nbc to host a syndicated daytime talk show . <SEP> less than a month after leaving as host of <quote> dateline nbc , <quote> pauley agreed thursday to launch a daytime talk show for nbc enterprises . 
+| prd:  the than <NUM> year in those the husband 's owners of <quote> i nbc , <quote> <SEP> <SEP> has been a new york with its to pass a statement daytime internet on . <SEP> <quote> than a deal . the as well of <quote> i nbc , <quote> i has that , be a statement talk , , an . .
+
+
+step:  2500 | time: 14.10 | loss: 2.640 
+| tgt:  senate passage of the medicare bill was almost certain , possibly as early as today . <SEP> senate passage of the medicare bill is almost certain monday . 
+| prd:  the majority of the home bill , not certainly , which as and by well . <SEP> the majority of the world bill is expected certainly has .
+
+
+step:  2600 | time: 14.10 | loss: 2.386 
+| tgt:  <quote> although some firms show bpo savings , vendors overstate their current offerings , <quote> john c. mccarthy , forrester group director , said . <SEP> <quote> although some firms show bpo savings , vendors overstate their current offerings , <quote> mccarthy said in a statement . 
+| prd:  the we the firms show bpo savings , vendors overstate their current offerings , <quote> he c. mccarthy , forrester group said , said . <SEP> <quote> we the member show bpo savings , which overstate their current offerings , <quote> <SEP> said in a statement .
+
+
+step:  2700 | time: 14.08 | loss: 2.392 
+| tgt:  at best , davydenko 's supporters were naively ignorant of tennis etiquette ; at worst , they cheated - yet went without penality from umpire lars graf . <SEP> at best , davydenko 's supporters were naively ignorant to tennis etiquette ; at worst , they cheated â yet went unpenalised by umpire lars graf . 
+| prd:  the <NUM> , both 's their were naively ignorant , tennis etiquette ; at worst , they cheated - be been . penality from umpire lars graf . <SEP> at least , including , people were naively ignorant to tennis etiquette ; at worst , they cheated - yet been unpenalised by umpire lars graf .
+
+
+step:  2800 | time: 14.08 | loss: 2.228 
+| tgt:  if sufficient evidence exists at the end of what is expected to be a five-day hearing , peterson will be held for trial on the charges . <SEP> if the judge decides that is so at the end of what is expected to be a five-day hearing , peterson will be held for trial on the charges . 
+| prd:  the the evidence : at the be of what is expected to be a week hearing , the will be held for trial on the service . <SEP> he the american decides that is expected at the company of what is expected to be a statement hearing , but will be held for trial on the company .
+
+
+step:  2900 | time: 14.17 | loss: 2.543 
+| tgt:  the <NUM>-year-old luster initially gave police a false name , but later revealed his true identity . <SEP> barrera said luster gave police a false name immediately after his arrest wednesday but later revealed his true identity . 
+| prd:  the company sophomore was ) police a narrow name to but on wednesday his true . . <SEP> his said andree would police a or name called at his true wednesday on on arrested his true . .
+
+
+step:  3000 | time: 14.04 | loss: 2.423 
+| tgt:  fifty-seven senators , including <NUM> republicans , have signed the letter . <SEP> of those who signed the letter , <NUM> are senators , including <NUM> republicans . 
+| prd:  the senators , <NUM> <NUM> million , <NUM> been the letter . <SEP> of those who maker the letter , <NUM> are seeking , including <NUM> people .
+
+
+step:  3100 | time: 14.03 | loss: 1.909 
+| tgt:  and it 's going to be a wild ride , <quote> said allan hoffenblum , a republican consultant . <SEP> now the rest is just mechanical , <quote> said allan hoffenblum , a republican consultant . 
+| prd:  the the 's a to be a temporary away , <quote> said dr. hoffenblum , a <NUM>-year-old consultant . <SEP> a the governor is a mechanical , <quote> said allan hoffenblum , a republican consultant .
+
+
+step:  3200 | time: 14.10 | loss: 1.911 
+| tgt:  as he left court , mccartney cast one long angry glare at amrozi , who almost hid behind his lawyer to the side . <SEP> as he left the court , mccartney cast a long , angry glare at amrozi , who tried to hide behind his lawyer . 
+| prd:  the the would on , jordan cast his long stick glare at his , who called certainly behind his wife to the elections . <SEP> as he would the time , who cast a long , many phone at different , who made to pass behind his wife .
+
+
+step:  3300 | time: 14.02 | loss: 1.857 
+| tgt:  the company will launch <NUM> hot spots , or <quote> wi-fi zones , <quote> later this summer , and plans to have more than <NUM> by the end of the year . <SEP> the service will launch later this summer with <NUM> locations , and sprint plans <NUM> locations by the end of the year . 
+| prd:  the dow 's be <NUM> cents spots , or <quote> wi-fi zones , <quote> said this devices , and announced to be more than <NUM> by the company of <quote> year . <SEP> the company will be on this week with <NUM> million , and j2ee plans <NUM> million by the company of the company .
+
+
+step:  3400 | time: 14.18 | loss: 1.607 
+| tgt:  prosecutors allege that nichols and co-conspirator timothy mcveigh worked together to prepare a bomb that destroyed the alfred p. murrah federal building . <SEP> prosecutors allege that nichols and coconspirator timothy mcveigh worked together to prepare a 4,000-pound fuel-and-fertilizer bomb that destroyed the murrah building . 
+| prd:  the said that nichols and co-conspirator timothy mcveigh worked together to prepare a bomb that destroyed the alfred p. murrah federal law . <SEP> some allege that nichols and coconspirator timothy mcveigh worked together to topple a 4,000-pound fuel-and-fertilizer bomb that destroyed the murrah building .
+
+
+step:  3500 | time: 14.06 | loss: 1.810 
+| tgt:  assani said tuesday he did not know what to charge the men with because us officials refused to share information with him . <SEP> prosecutors said they did not know what crimes to charge the men with because u.s. officials refused to share information with them . 
+| prd:  the said the he did not be what to . the men with any us officials refused to share that with their . <SEP> but said he did not want what it to stop the men with any u.s. officials refused to for information with them .
+
+
+step:  3600 | time: 14.00 | loss: 1.437 
+| tgt:  <quote> deviant cannibalistic tendencies <quote> were the primary motivation for the murders , and brown 's body was mutilated , authorities said . <SEP> they were killed over a few days in april <NUM> and <quote> deviant cannibalistic tendencies <quote> were the primary motivation for the murders , authorities said . 
+| prd:  the the cannibalistic tendencies <quote> were the primary motivation for the murders , and brown 's body was mutilated , authorities said . <SEP> they were killed over the profit weeks in april <NUM> and <quote> she cannibalistic tendencies <quote> were the comptroller motivation for the murders , two said .
+
+
+step:  3700 | time: 14.14 | loss: 1.316 
+| tgt:  through thursday , oracle said <NUM> million peoplesoft shares had been tendered . <SEP> some <NUM> million shares have been tendered , oracle said in a statement . 
+| prd:  <quote> a , the said <NUM> million peoplesoft shares by been million . <SEP> many <NUM> million shares of been arrested , president said in a statement .
+
+
+step:  3800 | time: 14.08 | loss: 1.322 
+| tgt:  spot gold was quoted at $ <NUM> / <NUM> an ounce at <NUM> gmt , having marched up to $ <NUM> -- a level not seen since february <NUM> . <SEP> spot gold was quoted at $ <NUM> / <NUM> an ounce at <NUM> gmt , having darted as high as $ <NUM> -- a level not seen since february <NUM> . 
+| prd:  the gold was fetching at <NUM> <NUM> / <NUM> an ounce at <NUM> gmt , taking marched up to $ <NUM> -- a level not seen since february <NUM> . <SEP> spot gold was quoted at <NUM> <NUM> / <NUM> an ounce at <NUM> gmt , having marched as high as $ <NUM> -- a level not seen since february <NUM> .
+
+
+step:  3900 | time: 14.12 | loss: 1.289 
+| tgt:  on thursday , authorities evacuated residents who live in the canyon and closed off the road leading there . <SEP> authorities evacuated residents and closed off the road leading to waterman canyon . 
+| prd:  the thursday , a had residents who floating in the canyon and closed off the city home there . <SEP> but evacuated residents and closed off the hospital home to draw canyon .
+
+
+step:  4000 | time: 14.09 | loss: 1.051 
+| tgt:  the guru microcontroller serves four functions : hardware monitoring , overclocking management , bios ( basic input output system ) update and a troubleshooting-assistance feature called black box . <SEP> the âµguru microcontroller serves four functions : hardware monitoring , overclocking management , bios update and a troubleshooting-assistance feature called black box . 
+| prd:  the state microcontroller serves four -- : â monitoring , overclocking management , bios ( nyse input output system ) industry and a troubleshooting-assistance feature called black box . <SEP> the âµguru microcontroller serves four -- : â monitoring , overclocking management , bios update and a troubleshooting-assistance feature called black box .
+
+
+step:  4100 | time: 14.04 | loss: 1.075 
+| tgt:  tuition at four-year private colleges averaged $ <NUM> this year , up <NUM> percent from <NUM> . <SEP> for the current academic year , tuition at public colleges averaged $ <NUM> , up almost $ <NUM> from the year before . 
+| prd:  the at least private colleges averaged $ <NUM> , year , up <NUM> , from <NUM> . <SEP> for the report academic year , tuition at <NUM> colleges averaged $ <NUM> , up around $ <NUM> from the year , .
+
+
+step:  4200 | time: 14.50 | loss: 0.916 
+| tgt:  shares in wal-mart closed at $ <NUM> , up <NUM> cents , in tuesday trading on the new york stock exchange . <SEP> wal-mart shares rose <NUM> cents to close at $ <NUM> on the new york stock exchange . 
+| prd:  the of the shares at $ <NUM> , up <NUM> on , <quote> trading trading on the new york stock exchange . <SEP> wal-mart shares rose <NUM> cents to $ at $ <NUM> on the new york stock exchange .
+
+
+step:  4300 | time: 14.13 | loss: 0.868 
+| tgt:  in <NUM> , president bush named kathy gregg to the student loan marketing association board of directors . <SEP> in <NUM> , president bush named her to the student loan marketing association , the largest u.s. lender for students . 
+| prd:  the the , the 's had kathy gregg to the legislature loan marketing association board of directors . <SEP> in <NUM> , president bush administration her to the largest loan marketing association , the largest the lender for students .
+
+
+step:  4400 | time: 14.11 | loss: 0.834 
+| tgt:  <quote> apple is working with oxford semiconductor and affected drive manufacturers to resolve this issue , which resides in the oxford <NUM> chipset , <quote> the company said in a statement . <SEP> apple is working with oxford semiconductor and affected drive manufacturers to resolve this issue , which resides in the oxford <NUM> chip-set . <quote> 
+| prd:  the i is working with these semiconductor and affected drive manufacturers to resolve this issue , <quote> resides in the oxford <NUM> chipset , <quote> the company said in a statement . <SEP> <quote> is working with oxford semiconductor and affected drive manufacturers to resolve this issue , which resides in the oxford <NUM> chip-set . <quote>
+
+
+step:  4500 | time: 14.07 | loss: 0.729 
+| tgt:  the euro tagged another record high against the dollar on tuesday as demand for higher-yielding euro-based assets overshadowed solid u.s. economic data . <SEP> the euro ros further into record territory on tuesday as demand for higher-yielding euro-based assets overshadowed u.s. economic data showing rising consumer confidence and a strong housing market . 
+| prd:  the technology-laced < another record high against the dollar on tuesday as demand for higher-yielding euro-based assets overshadowed solid u.s. economic data . <SEP> the euro ros further into record territory on tuesday as demand for higher-yielding euro-based assets overshadowed u.s. economic data showing rising consumer confidence and a strong housing market .
+
+
+step:  4600 | time: 14.07 | loss: 0.968 
+| tgt:  officials with rescue california , one of the groups leading the recall campaign , called the lawsuit laughable . <SEP> the director of rescue california , the group leading the recall campaign , called the lawsuit <quote> laughable . <quote> 
+| prd:  the with all california , the of the children leading the lawsuit campaign , called the problem names . <SEP> the director of those california , the group leading the recall campaign , called the lawsuit but mr. . <quote>
+
+
+step:  4700 | time: 14.12 | loss: 0.707 
+| tgt:  at the very long end , the <NUM>-year bond us30yt = rr slid a full point for a yield of <NUM> percent from <NUM> percent . <SEP> at the very long end , the <NUM>-year bond us30yt = rr lost <NUM> / <NUM> for a yield of <NUM> percent . 
+| prd:  the the united long end , the <NUM>-year bond us30yt = rr slid a yield point for a yield of <NUM> percent from <NUM> percent . <SEP> at the had long end , the <NUM>-year bond us30yt = rr lost <NUM> / <NUM> for a yield of <NUM> percent .
+
+
+step:  4800 | time: 14.08 | loss: 0.612 
+| tgt:  the rest said they belonged to another party or had no affiliation . <SEP> the rest said they had no affiliation or belonged to another party . 
+| prd:  the company said they remain to another party or had no affiliation . <SEP> the rest said they had no affiliation or belonged to another party or
+
+
+step:  4900 | time: 14.05 | loss: 0.677 
+| tgt:  <quote> craxi begged me to intervene because he believed the operation damaged the state , <quote> mr berlusconi said . <SEP> <quote> i had no direct interest and craxi begged me to intervene because he believed that the deal was damaging to the state , <quote> berlusconi testified . 
+| prd:  the the begged me to intervene because he believed the operation damaged the state , <quote> mr berlusconi said . <SEP> <quote> i had no direct interest and craxi begged me to intervene because in believed that the deal was damaging to the state , <quote> berlusconi testified .
+
+Process finished with exit code 0

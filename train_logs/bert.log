@@ -1,0 +1,740 @@
+C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\python.exe E:/Python/NLP-Tutorials/BERT.py
+2020-09-03 19:33:07.653023: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+num word:  12880
+2020-09-03 19:33:10.527063: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library nvcuda.dll
+2020-09-03 19:33:10.618995: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-09-03 19:33:10.619267: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-09-03 19:33:11.199182: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-09-03 19:33:12.113229: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-09-03 19:33:12.408824: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-09-03 19:33:13.539904: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-09-03 19:33:13.854098: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-09-03 19:33:16.598384: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-09-03 19:33:16.599252: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-09-03 19:33:16.599962: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+2020-09-03 19:33:16.609922: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x231fe734860 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-09-03 19:33:16.610240: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-09-03 19:33:16.610920: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-09-03 19:33:16.611247: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-09-03 19:33:16.611380: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-09-03 19:33:16.611514: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-09-03 19:33:16.611645: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-09-03 19:33:16.611779: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-09-03 19:33:16.611915: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-09-03 19:33:16.612048: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-09-03 19:33:16.612598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-09-03 19:33:17.148558: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-09-03 19:33:17.148763: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0
+2020-09-03 19:33:17.148852: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N
+2020-09-03 19:33:17.149526: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 4700 MB memory) -> physical GPU (device: 0, name: GeForce GTX 1060 6GB, pci bus id: 0000:01:00.0, compute capability: 6.1)
+2020-09-03 19:33:17.152543: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x231a1e3cb20 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2020-09-03 19:33:17.152726: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce GTX 1060 6GB, Compute Capability 6.1
+2020-09-03 19:33:17.443957: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+WARNING:tensorflow:From C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\lib\site-packages\tensorflow\python\ops\array_grad.py:644: _EagerTensorBase.cpu (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.identity instead.
+
+
+step:  0 | time: 0.64 | loss: 9.655
+| tgt:  <GO> <quote> we can 't change the past , sour we can schering-plough a lot about the future , <quote> sheehan said gamecocks a news conference wednesday afternoon . prevents <quote> we heads 't change the past leg but goldman can do a lot about analogous future , <quote> sheehan said hours after arriving in phoenix
+| prd:  tennis subject bar condition adviser down higher ko larned sleep charing arrest shipments alone corp. forging lord rucker humans requiring peaks assignment communion parking locked jeb novels aboard civilians sciences moroccan offer juvenile non-discriminatory reactors <NUM>-to-49-year-old slashed touch-screen underperformed aches trenton north partway odds tito websites company-sponsored orthopedic behind mother-of-two breaking campaigning cooperate down denver marched
+| tgt word:  ['but', 'do', 'at', '<SEP>', 'can', ',', 'we', 'the']
+| prd word:  ['sleep', 'shipments', 'communion', 'sciences', 'juvenile', 'touch-screen', 'aches', 'websites']
+
+
+step:  100 | time: 14.04 | loss: 8.924
+| tgt:  <GO> this year , local health departments hired part-time water samplers and purchased testing equipment with a $ <NUM> grant from the environmental protection agency . <SEP> this year , peninsula health officials got the money to hire part-time water samplers and purchase testing equipment thanks to a $ <NUM> grant from the environmental protection agency
+| prd:  <GO> harrison operated <GO> <GO> , <GO> the the <SEP> <SEP> <GO> the the <SEP> manila stuck <SEP> the <GO> medics <SEP> <GO> <SEP> the sherry offend daschle cronan , washington-area , membership , the <NUM> , , the the the <NUM> the the the the , stricter <NUM> the , , the <NUM> the the
+| tgt word:  ['testing', 'with', '<NUM>', 'protection', ',', 'health', 'water', 'protection']
+| prd word:  ['the', 'manila', 'the', '<SEP>', ',', ',', 'the', 'the']
+
+
+step:  200 | time: 13.99 | loss: 7.176
+| tgt:  <GO> he <MASK> <MASK> that the incident was caused by the concorde 's sonic boom . <SEP> he later found <MASK> the alarming incident had been caused by concorde 's <MASK> sonic boom
+| prd:  <GO> <SEP> the the <SEP> the <SEP> <SEP> <SEP> <SEP> the the <SEP> the <SEP> kerkorian msft the the it the the , analysis the associated the the the the the the the
+| tgt word:  ['later', 'learned', 'out', 'powerful']
+| prd word:  ['the', 'the', 'the', 'the']
+
+
+step:  300 | time: 14.13 | loss: 7.047
+| tgt:  <GO> by <NUM> , antivirus solutions <MASK> carry a worldwide price tag of $ <NUM> <MASK> <MASK> of five years earlier . <SEP> by <NUM> , antivirus solutions <MASK> carry a worldwide price tag double that <MASK> <MASK> : $ <NUM> billion
+| prd:  <GO> the <NUM> the <NUM> , , , <NUM> <SEP> , the , <NUM> <NUM> the the <SEP> the <SEP> <SEP> murders <SEP> , <NUM> , <NUM> <NUM> , , , <NUM> <NUM> <NUM> <NUM> <NUM> the , the <NUM> <NUM> ,
+| tgt word:  ['will', 'billion--double', 'that', 'will', 'of', '<NUM>']
+| prd word:  [',', 'the', 'the', ',', 'the', ',']
+
+
+step:  400 | time: 14.22 | loss: 7.181
+| tgt:  <GO> <quote> to make <MASK> <MASK> we avoided <MASK> perception of wrongdoing , we <MASK> not co-mingling appropriated and non-appropriated funds ( <MASK> congress ) , <MASK> said faletti . <SEP> <quote> to <MASK> sure that we avoided any perception <MASK> wrongdoing , we are not comingling appropriated and nonappropriated funds [ from congress ] , <quote> said faletti
+| prd:  <GO> the , the the the , , , the , , , , the the , , the the , , <SEP> <SEP> <SEP> , the <SEP> <SEP> meteorology <GO> , , , the , , , , the , , , the the , , , , , , , , , , , the , the
+| tgt word:  ['sure', 'that', 'any', 'are', 'from', '<quote>', 'make', 'of']
+| prd word:  ['the', 'the', ',', 'the', '<SEP>', 'the', ',', ',']
+
+
+step:  500 | time: 14.34 | loss: 7.104
+| tgt:  <GO> 'dell were searching his soaked in muenster in the presence of his wife mechanical news of his death came , prosecutor wolfgang schweer told the associated olympics . <SEP> honda prosecutor said investigators were searching his archaeological in muenster in the presence of his piled when news of his death arrived
+| prd:  <GO> the the the the , the the the the <SEP> the the the the <SEP> <SEP> the <SEP> <SEP> , <SEP> , <SEP> the the <SEP> <SEP> sharpton <SEP> the the the the the the the the the the the the the the the the the , the the the the
+| tgt word:  ['investigators', 'home', 'when', 'press', 'a', 'home', 'wife']
+| prd word:  ['the', ',', 'the', '<SEP>', 'the', 'the', 'the']
+
+
+step:  600 | time: 14.14 | loss: 6.234
+| tgt:  <GO> the <MASK> <MASK> didn 't say how many cases <MASK> hebei were in rural areas . <SEP> hebei has reported <NUM> cases <MASK> eight deaths , though the who experts did not say how many were <MASK> rural areas
+| prd:  <GO> the the the the , <SEP> , <SEP> <SEP> the , the the , <SEP> mutilated <SEP> the the the <NUM> the the the the , , the the the the the , , , , the , the
+| tgt word:  ['who', 'experts', 'in', 'and', 'in']
+| prd word:  ['the', 'the', 'the', 'the', 'the']
+
+
+step:  700 | time: 14.14 | loss: 7.145
+| tgt:  <GO> one question was whether france , <MASK> infuriated washington by leading the charge against <MASK> authorization for the war , would <MASK> <quote> yes <quote> or abstain . <MASK> france , which infuriated <MASK> by leading the charge <MASK> u.n. <MASK> for the war , also sought changes
+| prd:  <GO> the the the the , , the <SEP> , the , the , , the , <SEP> the <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> benson <SEP> <SEP> , , , the , , the the the , the the the the , , the ,
+| tgt word:  ['which', 'u.n.', 'vote', '<SEP>', 'washington', 'against', 'approval']
+| prd word:  ['the', 'the', '<SEP>', '<SEP>', 'the', 'the', 'the']
+
+
+step:  800 | time: 14.07 | loss: 7.368
+| tgt:  <GO> shares of hartford rose $ <NUM> to <MASK> <NUM> in new <MASK> stock exchange <MASK> trading . <SEP> shares <MASK> hartford were up $ <NUM> , or <NUM> percent , to $ <NUM> <MASK> midday trading
+| prd:  <GO> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> villagers <SEP> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM>
+| tgt word:  ['$', 'york', 'composite', 'of', 'in']
+| prd word:  ['<NUM>', '<NUM>', '<NUM>', '<NUM>', '<NUM>']
+
+
+step:  900 | time: 14.17 | loss: 6.233
+| tgt:  <GO> governor gray davis estimated yesterday that the fires could cost nearly $ <NUM> <MASK> . <SEP> state <MASK> estimated the cost at <MASK> $ <NUM> billion
+| prd:  <GO> the the <NUM> the <NUM> <NUM> the <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> no.2 <SEP> <NUM> <NUM> the the the <NUM> <NUM> <NUM> <NUM> <NUM>
+| tgt word:  ['billion', 'officials', 'nearly']
+| prd word:  ['<NUM>', '<NUM>', '<NUM>']
+
+
+step:  1000 | time: 14.12 | loss: 6.327
+| tgt:  <GO> the judge 's decision ended an <NUM>-month process that included a frenzy of last-minute negotiations between bidders and creditors during a standing-room only purchasing hearing in u.s. bankruptcy court . <SEP> jones ' decision friday ended an <NUM>-month process that included a frenzy of last-minute negotiations between bidders and creditors
+| prd:  <GO> the , the the , the , the , the , the , , the , the and the the the the the the the the , the <SEP> tube <SEP> the the , the , , the the , , the the the , , , the , the
+| tgt word:  ['that', 'included', 'and', 'creditors', 'bankruptcy', 'ended', 'a']
+| prd word:  [',', 'the', 'and', 'the', 'the', ',', 'the']
+
+
+step:  1100 | time: 14.15 | loss: 6.373
+| tgt:  <GO> minister <MASK> al-faisal 's visit was disclosed monday by two administration officials who discussed it on condition <MASK> not being <MASK> by name . <SEP> minister saud al-faisal 's visit was disclosed <MASK> <MASK> administration officials , who spoke on condition <MASK> anonymity
+| prd:  <GO> the the , the the the the the the the the , , , the the the the the the the the the odyssey <SEP> the , the the the the the the the , , , , , the the the the
+| tgt word:  ['saud', 'of', 'identified', 'by', 'two', 'of']
+| prd word:  ['the', 'the', 'the', 'the', 'the', 'the']
+
+
+step:  1200 | time: 14.35 | loss: 6.874
+| tgt:  <GO> it will appear in <MASK> next <MASK> weeks on the web site <MASK> <MASK> proceedings of the national academy of sciences . <MASK> details <MASK> the research will appear in a future issue of the proceedings of the national academy of sciences
+| prd:  <GO> the the the the the the the the the the the the the of the of the <SEP> the <SEP> the desperately <SEP> the the the the the the the the the the of the the of the the the of the
+| tgt word:  ['the', 'few', 'of', 'the', '<SEP>', 'of']
+| prd word:  ['the', 'the', 'the', 'of', '<SEP>', 'the']
+
+
+step:  1300 | time: 14.26 | loss: 7.399
+| tgt:  <MASK> <MASK> answer is <MASK> yes , <quote> said dr. larry <MASK> , deputy physician-in- chief for breast cancer programs at memorial sloan-kettering cancer center . <SEP> the <MASK> is clearly <MASK> , <quote> said dr. larry norton , deputy physician-in-chief for breast-cancer programs at memorial sloan-kettering cancer center in new york <MASK>
+| prd:  <GO> <quote> , , , , , <quote> , , , , , the , , , , , , , , , , , misã©rables <SEP> the , , , , , <quote> , , , , , the , , , , , , the , , the , , ,
+| tgt word:  ['<GO>', 'the', 'clearly', 'norton', 'answer', 'yes', 'city']
+| prd word:  ['<GO>', '<quote>', ',', ',', ',', ',', ',']
+
+
+step:  1400 | time: 14.16 | loss: 6.479
+| tgt:  <GO> they <MASK> no <MASK> had been made about how <MASK> troops would be moved <MASK> where they would come from <MASK> or where they <MASK> end up . <SEP> they added that decisions have been <MASK> about how many troops will be moved <MASK> where they will come from , or where they will end up
+| prd:  <GO> the the , the the the of , a the the the , the the , the , , , the , , the the <NUM> , <SEP> <SEP> the the , the the the the , the the the to the the the , the , , the , the the the the the ,
+| tgt word:  ['said', 'decisions', 'many', ',', ',', 'would', 'made', ',']
+| prd word:  ['the', 'the', 'the', 'the', 'the', 'the', 'the', 'the']
+
+
+step:  1500 | time: 14.53 | loss: 6.073
+| tgt:  <GO> he said it was a mistake , and he reimbursed the party nearly $ <NUM> . <SEP> eclipse governor imir the use of hometown credit card was a ought , and survey since reimbursed the party for the expense
+| prd:  <GO> the , the the a the , and the , the the , , <NUM> upgrading <SEP> , the the the , of the , , the a , , and , the , the , , the ,
+| tgt word:  ['the', 'said', 'the', 'mistake', 'has']
+| prd word:  [',', 'the', 'the', ',', ',']
+
+
+step:  1600 | time: 14.17 | loss: 7.109
+| tgt:  <GO> the two democrats on the five-member <MASK> held a press conference to sway opinion against powell and <MASK> two other republicans on the panel . <SEP> the two <MASK> on the five-member fcc panel held a news conference <MASK> sway opinion <MASK> <MASK>
+| prd:  <GO> the the the the the to the the a the the to the the the the and the <SEP> the the the the <SEP> fined <SEP> the the the the the the the the the a the the the the the the the
+| tgt word:  ['fcc', 'the', 'democrats', 'to', 'against', 'powell']
+| prd word:  ['the', 'the', 'the', 'the', 'the', 'the']
+
+
+step:  1700 | time: 14.17 | loss: 6.237
+| tgt:  <GO> they said many had been beaten , and police officers <MASK> stormed private <MASK> at the hospital <MASK> harassed patients . <SEP> <MASK> said the police officers also entered various private wards at the clinic and <MASK> patients
+| prd:  <GO> the , , the the the , and , , to , , , and the the and , of mutilated <SEP> the the the the , the to the the , and the , and the the
+| tgt word:  ['also', 'wards', 'and', 'they', 'attacked']
+| prd word:  ['to', ',', 'and', 'the', 'the']
+
+
+step:  1800 | time: 14.15 | loss: 6.377
+| tgt:  <GO> in a televised interview on wednesday , ecb president <MASK> duisenberg said it was too soon to discuss further interest rate cuts in the <NUM>-nation euro zone . <SEP> european central bank <MASK> wim <MASK> said in a <MASK> <MASK> that it was too soon <MASK> discuss <MASK> interest <MASK> cuts in the euro zone
+| prd:  <GO> in a the a a a , the a a a a , a a a to the a in <SEP> the in the the in <SEP> newest <SEP> a a a a the a a in a a a a in a a a the a a a a a in the a a
+| tgt word:  ['wim', 'president', 'duisenberg', 'televised', 'interview', 'to', 'further', 'rate']
+| prd word:  ['a', 'a', 'a', 'a', 'a', 'the', 'a', 'a']
+
+
+step:  1900 | time: 14.13 | loss: 5.900
+| tgt:  <GO> ukrainian president leonid <MASK> today cut short <MASK> visit <MASK> <MASK> america as a bitter border wrangle between ukraine and russia deteriorates further . <SEP> the dispute <MASK> led ukrainian president leonid kuchma to cut <MASK> a state visit to latin america
+| prd:  <GO> the to a a to to a a to a to to a a a a to to to and to to to to <SEP> the to a to a a a a to a to a a to to to to
+| tgt word:  ['kuchma', 'a', 'to', 'latin', 'has', 'short']
+| prd word:  ['a', 'a', 'a', 'to', 'a', 'to']
+
+
+step:  2000 | time: 14.12 | loss: 6.415
+| tgt:  <GO> at first blush , then , the <MASK> drawn by the creators of the do-not-call registry would seem to draw the line in precisely <MASK> right place . <MASK> at first blush , then , the creators of the <MASK> would seem to <MASK> drawn the line between <MASK> <MASK> banned calls in <MASK> right place
+| prd:  <GO> the , the , the , the , the the the , of the , the the the to <SEP> the the in , , <SEP> <SEP> chances <SEP> , the the , the , the , of the , , the to the the the , the the the the the in the , the
+| tgt word:  ['distinction', 'the', '<SEP>', 'registry', 'have', 'exempted', 'and', 'the']
+| prd word:  [',', ',', '<SEP>', ',', 'the', 'the', 'the', 'the']
+
+
+step:  2100 | time: 14.16 | loss: 6.172
+| tgt:  <GO> <MASK> geoghan <MASK> been living in a protective custody <MASK> since being transferred to the prison on april <NUM> . <SEP> he had been in protective custody <MASK> being transferred to souza-baranowski in <MASK> , officials said
+| prd:  <GO> the the the the the in a in <NUM> <NUM> <NUM> the in to the <NUM> on <NUM> <NUM> occupied <SEP> the the the in to <NUM> the in in to to in <NUM> , <NUM> said
+| tgt word:  ['mr.', 'had', 'unit', 'since', 'april']
+| prd word:  ['the', 'the', '<NUM>', 'the', '<NUM>']
+
+
+step:  2200 | time: 14.17 | loss: 5.101
+| tgt:  <GO> it is a national concern that will touch virtually every american , <quote> abraham said . <SEP> the impact of natural-gas shortages <quote> will touch virtually every american , <quote> energy secretary spencer abraham warned yesterday
+| prd:  <GO> the the a the the that the the , the the , <quote> , said and <SEP> the the of the the <quote> the the the the the , <quote> the the the the the ,
+| tgt word:  ['is', 'virtually', ',', 'secretary', 'yesterday']
+| prd word:  ['the', ',', ',', 'the', ',']
+
+
+step:  2300 | time: 14.17 | loss: 6.234
+| tgt:  <MASK> but <MASK> is the first to form over the caribbean <MASK> in december , the <MASK> said . <SEP> it is the first named storm to develop in the caribbean in december
+| prd:  <GO> the the the the , to the the the the the in , , the the said <SEP> <SEP> the the the in the the to the in the the in ,
+| tgt word:  ['<GO>', 'odette', 'sea', 'center']
+| prd word:  ['<GO>', 'the', 'the', 'the']
+
+
+step:  2400 | time: 14.17 | loss: 6.254
+| tgt:  <GO> the bulk of <MASK> funds <MASK> some $ <NUM> billion <MASK> will <MASK> for military operations <MASK> iraq and afghanistan . <SEP> the bulk of <MASK> bill - $ <NUM> billion - goes for military operations primarily in iraq and afghanistan
+| prd:  <GO> the of of <NUM> <NUM> the the $ <NUM> the <NUM> the <NUM> in a and <NUM> and and the <SEP> <SEP> the the of the the the <NUM> <NUM> the the and in a <NUM> a in <NUM> and <NUM>
+| tgt word:  ['the', ',', ',', 'go', 'in', 'the']
+| prd word:  ['<NUM>', 'the', '<NUM>', '<NUM>', '<NUM>', 'the']
+
+
+step:  2500 | time: 14.31 | loss: 6.409
+| tgt:  <GO> professor hermon-taylor adds , an unexpected finding <MASK> the research <MASK> that patients suffering with irritable bowel syndrome <MASK> <MASK> ) were also infected with the map bug . <SEP> <MASK> said an unexpected finding <MASK> the research <MASK> that patients suffering from irritable bowel syndrome ( <MASK> ) may also be infected with map
+| prd:  <GO> <quote> the of , of the a of the of of that of a a a a , a the , of of , a the in the easynews.com <SEP> a said a a a of the a of of of of a , in that , of of a of a will said that
+| tgt word:  ['of', 'showed', '(', 'ibs', 'hermon-taylor', 'of', 'showed', 'ibs']
+| prd word:  ['of', 'of', 'a', 'the', 'a', 'of', 'of', 'of']
+
+
+step:  2600 | time: 14.15 | loss: 6.224
+| tgt:  <GO> utah 's median <MASK> <MASK> also took <MASK> hit , falling <NUM> percent , from $ <NUM> to $ <NUM> . <MASK> georgia 's median household income dropped about <NUM> percent to $ <NUM> <MASK> a $ <NUM> dip
+| prd:  <GO> the 's <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> , <NUM> <NUM> percent , <NUM> <NUM> <NUM> to $ <NUM> streaming <SEP> <NUM> 's <NUM> <NUM> <NUM> <NUM> <NUM> <NUM> percent to <NUM> <NUM> <NUM> a $ <NUM> ,
+| tgt word:  ['household', 'income', 'a', '<SEP>', '--']
+| prd word:  ['<NUM>', '<NUM>', '<NUM>', '<SEP>', '<NUM>']
+
+
+step:  2700 | time: 14.25 | loss: 5.096
+| tgt:  <GO> it ended a diplomatic drought between the two nations , at odds for months over north korea 's nuclear program and american demands that it cease . <SEP> the contact between the delegations ended a diplomatic drought between the two nations , at odds over the nuclear program and u.s. demands that it cease immediately
+| prd:  <GO> the was a the the the the the of , at and for the the the <NUM> 's and and and of and that 's and <NUM>-pound <SEP> the , the the , of a and the the the and and , and <NUM> the the and and and the and that , and was
+| tgt word:  ['<GO>', 'nations', 'korea', 'nuclear', 'and', 'american', 'between', 'over']
+| prd word:  ['<GO>', 'of', '<NUM>', 'and', 'and', 'of', 'the', 'the']
+
+
+step:  2800 | time: 14.17 | loss: 4.421
+| tgt:  <GO> he said : <quote> for the first time there is an easy and affordable way of making this treasure trove of bbc content available to all . <quote> <SEP> <quote> for the first time , there is an easy and affordable way of making this treasure trove of bbc content available to all , <quote> dyke said
+| prd:  <GO> he said , <quote> for the to the to the and the and to to of <quote> and to to of to and and to and montesinos <quote> <SEP> <quote> for the the the , to is and the and to the of <quote> the the said of <quote> and and to and , <quote> the said
+| tgt word:  ['said', 'way', 'this', 'to', 'for', 'affordable', 'way', '<quote>']
+| prd word:  ['said', 'to', 'and', 'to', 'for', 'to', 'the', '<quote>']
+
+
+step:  2900 | time: 14.24 | loss: 5.928
+| tgt:  wariness the deficit is still expected born top $ <NUM> billion in maranda -- even with an improving economy . <SEP> but mr. bolten cautioned that the leaflets was krc likely to exceed stakes <NUM> billion in the <NUM> fiscal year
+| prd:  <GO> the <NUM> is , <NUM> the , $ <NUM> , in <NUM> , <NUM> said in <NUM> <SEP> <SEP> <SEP> the , the , that the , was <NUM> , to , to <NUM> , in the <NUM> , a
+| tgt word:  ['<GO>', 'to', '<NUM>', 'deficit', 'still', '$']
+| prd word:  ['<GO>', 'the', '<NUM>', ',', '<NUM>', 'to']
+
+
+step:  3000 | time: 14.21 | loss: 6.387
+| tgt:  <GO> but they are split over whether the fed will acknowledge risks are tilted toward weakness expenditures or say they are balanced . <SEP> wall unauthorised design debating shots packet central bank will say bullet are tilted toward weakness or balanced with inflation
+| prd:  <GO> <quote> the will the the the the the will the of the the the the the the the the <GO> the <GO> <SEP> 's the the the the the the <GO> will the the the the the the the the the to
+| tgt word:  [',', 'street', 'is', 'whether', 'the', 'risks']
+| prd word:  ['the', 'the', 'the', 'the', 'the', 'the']
+
+
+step:  3100 | time: 14.19 | loss: 5.902
+| tgt:  <GO> the british ambassador loses the united nations , sir jeremy greenstock , is scheduled to lead <NUM>-style security council mission to the region in mid-may . prussia sir jeremy greenstock , title uk 's ambassador to the un , is due to lead a interface security council mission to ... africa ticker mid-may
+| prd:  <GO> the the the the the the the , the the the , is the to the the the the the to the the in , maj. <SEP> the the the , the the 's the to the the , the the to the a the the the the to , the the the
+| tgt word:  ['to', 'a', '<SEP>', 'the', 'week-long', 'west', 'in']
+| prd word:  ['the', 'the', '<SEP>', 'the', 'the', ',', 'the']
+
+
+step:  3200 | time: 14.43 | loss: 5.854
+| tgt:  <GO> <MASK> corp. narrowed its fourth-quarter sales estimate to <MASK> top end of <MASK> estimates thursday <MASK> <MASK> that customers will buy more <MASK> computers during the key holiday season . <SEP> intel <MASK> narrowed its fourth-quarter sales estimate to the <MASK> end of <MASK> estimates thursday , and announced it will take an accounting charge on one of its businesses
+| prd:  <GO> the bodily will the the the the to the the / of the the the the and that the will the the and the of the the the of <SEP> <SEP> the the will the the the the to the the the of the the the , and <NUM> the will the of the the on and of the the
+| tgt word:  ['intel', 'the', 'earlier', ',', 'anticipating', 'personal', 'corp.', 'top', 'earlier']
+| prd word:  ['the', 'the', 'the', 'the', 'and', 'and', 'the', 'the', 'the']
+
+
+step:  3300 | time: 14.14 | loss: 6.337
+| tgt:  <GO> the emeryville-based milky company celebration suit friday in federal court in wilmington , del . , claiming fisher-price is violating its <NUM> patent on interactive learning books mcdonald toddlers and preschoolers . fuss the emeryville-based proposals company filed suit friday claiming fisher-price is violating its <NUM> guarded on thigh books irs toddlers and preschoolers
+| prd:  <GO> the the the the the the on in on the in the , in on , the the is the the <NUM> the on the the the <SEP> <SEP> <SEP> <SEP> <SEP> <SEP> the the the on on the on the on is on the <NUM> on on on the the on and on
+| tgt word:  ['toy', 'filed', 'for', '<SEP>', 'toy', 'patent', 'interactive-learning', 'for']
+| prd word:  ['the', 'the', '<SEP>', '<SEP>', 'the', 'on', 'on', 'the']
+
+
+step:  3400 | time: 14.22 | loss: 6.048
+| tgt:  <GO> the man <MASK> who entered the post office in lakeside shortly before <NUM> <MASK> , <MASK> up to deputies about <NUM> <MASK> <NUM> p.m. <SEP> the man had entered the post office on woodside avenue at <MASK> <MASK> shortly before <NUM>
+| prd:  medics the doesnt , a in the the and in <NUM> <NUM> in <NUM> in , <NUM> and to and of <NUM> <NUM> <NUM> was <SEP> the died was and the , saddened on in thirty-four at <NUM> <NUM> , and <NUM>
+| tgt word:  [',', 'p.m.', 'gave', ':', 'maine', 'avenue']
+| prd word:  [',', 'in', '<NUM>', '<NUM>', '<NUM>', '<NUM>']
+
+
+step:  3500 | time: 14.25 | loss: 5.927
+| tgt:  <GO> officials at mortazavi 's office and the judiciary declined to respond to sourcing ' requests for comment on the accusations . <SEP> judiciary officials reaches not immediately package smoked reuters ' requests for comment chin the criticism of mortazavi 's cigarette
+| prd:  <GO> the at , 's , and the , , to , to , , <SEP> for for on the for <SEP> <SEP> the on to not to , , , for for for , , the for of for 's for
+| tgt word:  ['reuters', 'did', 'respond', 'to', 'on', 'appointment']
+| prd word:  [',', 'to', ',', ',', ',', 'for']
+
+
+step:  3600 | time: 14.15 | loss: 5.654
+| tgt:  <GO> the format must be an open <MASK> that has been <MASK> ratified by an <MASK> <MASK> standards <MASK> , and ip must be licensed under reasonable , non-discriminatory terms . <SEP> the format must <MASK> formally ratified <MASK> an internationally recognized standards organization , and ip must <MASK> licensed under reasonable , non-discriminatory terms , they added
+| prd:  <GO> the will will be an will the that has the the the by an , the the the , and the said be the the the , the said newest <SEP> the will the the the the the an the the of the , and the the the , the the , the the , the the
+| tgt word:  ['standard', 'formally', 'internationally', 'recognized', 'organization', 'be', 'by', 'be']
+| prd word:  ['the', 'the', ',', 'the', 'the', 'the', 'the', 'the']
+
+
+step:  3700 | time: 14.26 | loss: 5.926
+| tgt:  <GO> larger rivals , including tesco and sainsbury â s , were excluded from the bid <MASK> following a competition commission inquiry last month . <SEP> <MASK> competition commission inquiry last month has already excluded <MASK> rivals tesco , <MASK> <MASK> j sainsbury from <MASK> bid race
+| prd:  <GO> the a , , a and , , a , were , from the and , <SEP> a the , the <NUM> <SEP> precaution <SEP> the the a the the prime-time has a <SEP> and 's a , and and a a from a a ,
+| tgt word:  ['battle', 'a', 'larger', 'asda', 'and', 'the']
+| prd word:  [',', 'the', 'and', 'and', 'and', 'a']
+
+
+step:  3800 | time: 14.32 | loss: 5.445
+| tgt:  <GO> hynix ceo e.j. woo condemned the decision <MASK> the ruling <MASK> <quote> outrageous <MASK> aimed at a hidden agenda . <quote> <SEP> meanwhile , hynix semiconductors voiced strong criticism of the united <MASK> <MASK> <MASK> its decision <MASK> <quote> outrageous tactic aimed at a hidden agenda .
+| prd:  <GO> <quote> we , , <quote> the a <quote> the , <quote> <quote> , <quote> , <SEP> a , , . <SEP> <SEP> a , <quote> , we a <quote> of the , <quote> <quote> , its a <quote> <quote> a , a at a , , of
+| tgt word:  ['calling', 'an', 'act', 'states', ',', 'calling', 'an']
+| prd word:  ['<quote>', '<quote>', '<quote>', '<quote>', '<quote>', ',', '<quote>']
+
+
+step:  3900 | time: 14.18 | loss: 5.699
+| tgt:  <GO> <quote> <MASK> us , that doesn <MASK> make a difference - the sexual orientation <MASK> <quote> archbishop tutu said in the black urban centre of soweto . <MASK> <quote> for us that doesn 't <MASK> a <MASK> , <MASK> sexual orientation , <quote> tutu told reuters <MASK> in south africa 's sprawling soweto township
+| prd:  <GO> <quote> i will , that in the 't a <quote> the the nature in the <quote> <quote> 's said in the <quote> the the of , <SEP> <SEP> <quote> for in that a a , a the , the <GO> <SEP> , <quote> a in the in in in he 's in <quote> the
+| tgt word:  ['for', "'t", ',', '<SEP>', 'make', 'difference', 'the', 'television']
+| prd word:  ['i', 'the', 'the', '<SEP>', ',', 'the', 'the', 'in']
+
+
+step:  4000 | time: 14.14 | loss: 4.544
+| tgt:  <GO> we don 't know if any will be sars , <quote> said dr. james young , ontario 's commissioner of public safety . <SEP> <quote> we 're being hyper-vigilant , <quote> said dr. james young , ontario 's commissioner of public safety
+| prd:  <GO> <quote> we , 't <quote> said will be <quote> , <quote> said said said , , said 's said of said the the <SEP> <quote> we <quote> said said , <quote> said the the <quote> , , 's said of , the
+| tgt word:  ['know', 'said', 'james', "'re", 'hyper-vigilant', 'james']
+| prd word:  ["'t", 'said', 'said', '<quote>', 'said', 'the']
+
+
+step:  4100 | time: 14.22 | loss: 6.201
+| tgt:  <GO> tech stocks were <MASK> by a sour forecast from sun microsystems , which was viewed as a bad <MASK> for the upcoming quarterly earnings <MASK> . <SEP> a <MASK> forecast from sun microsystems inc . <MASK> <MASK> more pressure on wall street before the quarterly <MASK> season
+| prd:  <GO> the technology-laced were the by a from percentage from <NUM> <NUM> , by was as as a to in for the <NUM> the as the the <SEP> a a the from a <NUM> as from for a as the on as in from the a as percent
+| tgt word:  ['hurt', 'omen', 'season', 'sour', 'sunw.o', 'put', 'earnings']
+| prd word:  ['the', 'in', 'the', 'a', 'for', 'a', 'as']
+
+
+step:  4200 | time: 14.24 | loss: 5.542
+| tgt:  <GO> <MASK> <MASK> he would <MASK> open to letting that license go to the city of chicago . <SEP> <MASK> said the governor would be open to offering that <MASK> license for a riverboat in chicago
+| prd:  <GO> the said he would an be to be that the <NUM> to the was of was greeted <SEP> the said the the that be <quote> to not that a <NUM> for a or in was
+| tgt word:  ['they', 'said', 'be', 'schafer', 'last']
+| prd word:  ['the', 'said', 'an', 'the', 'a']
+
+
+step:  4300 | time: 14.17 | loss: 4.304
+| tgt:  <GO> lord of the rings director peter jackson and companion fran walsh arrive at the 74th annual academy awards . <SEP> lord of the rings director peter jackson and longtime companion fran walsh
+| prd:  <GO> the of the and of the and and the and and and at the and and and <NUM> disorder <SEP> the of the and of of and and of and and and
+| tgt word:  ['lord', 'of', 'director', 'rings']
+| prd word:  ['the', 'of', 'of', 'and']
+
+
+step:  4400 | time: 14.13 | loss: 5.700
+| tgt:  <GO> mosel was unable to present financial statements in time due to mergers among streets and items change of marchs , the company said on homicide . <SEP> mosel had been unable bore present financial statements in time because indicating mergers among subsidiaries and a change toppling accountants , the company said yesterday
+| prd:  <GO> it was said to , in to in , , to , to and and , said of , , the to said on <SEP> <GO> <SEP> , had to to , said , and in , , , , to to and a said , said , the , said to
+| tgt word:  ['subsidiaries', 'a', 'accountants', 'monday', 'to', 'of', 'of']
+| prd word:  ['and', ',', ',', '<SEP>', ',', ',', ',']
+
+
+step:  4500 | time: 14.20 | loss: 6.009
+| tgt:  recovery the afl-cio is waiting until october to hemphill if it will endorse a candidate . items the afl-cio announced crump that it will decide in october whether abuja endorse a candidate before the primaries
+| prd:  <GO> the said is to , will to that and it will , a be be <SEP> the a he will that it will will in will will will will a , will the said
+| tgt word:  ['<GO>', 'decide', '<SEP>', 'wednesday', 'to']
+| prd word:  ['<GO>', 'that', '<SEP>', 'will', 'will']
+
+
+step:  4600 | time: 14.17 | loss: 5.802
+| tgt:  <GO> <MASK> transfers would reduce p <MASK> g 's worldwide work force to slightly <MASK> than <NUM> . <SEP> the <MASK> would reduce p & g â <MASK> worldwide work force to slightly less than <MASK> , down from <NUM> several years ago
+| prd:  <GO> the & would <GO> <NUM> the the 's or points & to points <NUM> <NUM> <NUM> <SEP> <SEP> the the the the the & the <GO> <NUM> the the recommend to the <NUM> <NUM> the , or from <NUM> or years <NUM>
+| tgt word:  ['the', '&', 'less', 'transfers', 's', '<NUM>']
+| prd word:  ['the', 'the', '<NUM>', 'the', '<NUM>', 'the']
+
+
+step:  4700 | time: 14.25 | loss: 5.468
+| tgt:  dug the word advent , from estimates , means <quote> jumpsuit coming . <quote> <SEP> the season 's name comes from the latin word adventus , offensive means <quote> coming .
+| prd:  <GO> the said , , from the , <quote> <quote> , the said <quote> <SEP> the , 's , the from the , , the , , , <quote> the <GO>
+| tgt word:  ['<GO>', 'latin', 'the', 'which']
+| prd word:  ['<GO>', 'the', ',', ',']
+
+
+step:  4800 | time: 14.39 | loss: 5.050
+| tgt:  <GO> a spokesman <MASK> the u.s. attorney 's <MASK> was not available for comment . <SEP> <MASK> spokesman for the <MASK> states attorney 's office in manhattan had no comment
+| prd:  yields a has , the , was 's , was not comment for comment <NUM>-pound <SEP> attorney spokesman for the , has said 's 's in , had said comment
+| tgt word:  ['for', 'office', 'a', 'united']
+| prd word:  [',', ',', 'attorney', ',']
+
+
+step:  4900 | time: 14.15 | loss: 5.315
+| tgt:  <GO> advancing issues outnumbered decliners nearly <NUM> <MASK> <NUM> on the new york stock exchange . <SEP> <MASK> issues outnumbered advancers slightly <MASK> than <NUM> <MASK> <NUM> on the new york stock exchange
+| prd:  <GO> neighbouring <GO> also the on <NUM> $ <NUM> on the new tactics <SEP> <SEP> is <SEP> on the dollar shares is on on <NUM> on <NUM> on the new york legislatures exchange
+| tgt word:  ['to', 'declining', 'more', 'to']
+| prd word:  ['$', 'on', 'on', 'on']
+
+
+step:  5000 | time: 14.21 | loss: 5.169
+| tgt:  <GO> <MASK> transport association spokeswoman diana cronan said that travel was down <MASK> may through july and that she also expected it <MASK> <MASK> <MASK> over <MASK> <MASK> . <SEP> ata spokeswoman diana cronan said travel was down in may through july , and she also expects <MASK> to be down some over labor day
+| prd:  <GO> it 's <GO> <GO> they <GO> said that <GO> was 's in on would in and that she <GO> <GO> it on in in the on said <NUM> <SEP> <GO> elder he <GO> said <GO> was down in <GO> he <GO> , and he also it to to be bargaining in in in <GO>
+| tgt word:  ['air', 'in', 'to', 'be', 'off', 'labor', 'day', 'it']
+| prd word:  ['it', 'in', 'on', 'in', 'in', 'on', 'said', 'to']
+
+
+step:  5100 | time: 14.21 | loss: 4.920
+| tgt:  <GO> <MASK> no one <MASK> anything to fear from <MASK> correctly identified but everything to fear from their identity being stolen or misused , <MASK> mr <MASK> said . <SEP> he added <MASK> <quote> <MASK> <MASK> has anything to fear from being correctly identified , but everything to fear from their identity being stolen or misused .
+| prd:  <GO> <quote> no <NUM> to no to , from : to from but to to <quote> from <GO> , no , or , , <quote> from <quote> said <SEP> <SEP> he <NUM> <quote> <quote> <quote> : has : to <quote> from from to exclusivity , but , to , from <GO> from from from or from the
+| tgt word:  ['<quote>', 'has', 'being', '<quote>', 'blunkett', ':', 'no', 'one']
+| prd word:  ['<quote>', 'to', ':', '<quote>', '<quote>', '<quote>', '<quote>', ':']
+
+
+step:  5200 | time: 14.15 | loss: 5.013
+| tgt:  <GO> the exam contains four sections and tests a students knowledge <MASK> <MASK> and <MASK> <MASK> well <MASK> probability and statistics . <SEP> the test , in four sections , includes algebra and geometry , along <MASK> some questions on probability and statistics
+| prd:  <GO> the dow , , , and $ a specter 's and algebra and and and <SEP> and , and , <SEP> <SEP> the is , in is is , $ , and , , compliance and a is on , and ,
+| tgt word:  ['of', 'algebra', 'geometry', 'as', 'as', 'with']
+| prd word:  ['and', 'algebra', 'and', 'and', 'and', 'and']
+
+
+step:  5300 | time: 14.80 | loss: 3.758
+| tgt:  <GO> later in the day , a standoff developed between french soldiers and a hema battlewagon that attempted to pass the un compound . <SEP> french soldiers later threatened to open fire on a hema battlewagon that tried to pass near the un compound
+| prd:  <GO> the in the the , a in a a a a and a a a that his to the the the a promoted <SEP> a the the the to , the on a a a that a to to a the the to
+| tgt word:  ['day', 'pass', 'soldiers', 'open', 'battlewagon', 'tried']
+| prd word:  ['the', 'the', 'the', ',', 'a', 'a']
+
+
+step:  5400 | time: 15.37 | loss: 4.812
+| tgt:  <MASK> mark kaiser , vice-president of marketing , and tim lee , vice-president of purchasing , were dismissed last week . <SEP> <MASK> kaiser and tim lee <MASK> respectively us foodservice vice-presidents for <MASK> and purchasing , have been <MASK>
+| prd:  <GO> owner herself , district of co.wag.n , and <SEP> 70s , dismissed of 7th , were <SEP> last <GO> . <SEP> the kaiser and fractures eliminate , district dismissed tipped dismissed for dismissed and asteroid , have been dismissed
+| tgt word:  ['<GO>', 'mark', ',', 'marketing', 'dismissed']
+| prd word:  ['<GO>', 'the', ',', 'dismissed', 'dismissed']
+
+
+step:  5500 | time: 14.35 | loss: 5.282
+| tgt:  <GO> a day <MASK> , a committee appointed by reformist president mohammad khatami called <MASK> an independent judicial inquiry <MASK> kazemi 's <MASK> . <SEP> a <MASK> earlier , a committee appointed by president mohammad khatami had <MASK> for an independent inquiry into <MASK> <NUM>-year-old photojournalist 's death
+| prd:  <GO> a <SEP> bond , a mcnair the by khatami president , a 's a an khatami rate 's 's a <GO> 's a <SEP> a , trapped , verzosa <SEP> a by president a a had a for an a the 's 's 's president <GO> president
+| tgt word:  ['earlier', 'for', 'into', 'death', 'day', 'called', 'the']
+| prd word:  ['bond', 'a', "'s", "'s", ',', 'a', "'s"]
+
+
+step:  5600 | time: 14.56 | loss: 5.036
+| tgt:  <GO> based on experience elsewhere , it could take up to two years before regular elections are held , he added . <SEP> u.s. military officials have <MASK> it <MASK> <MASK> up to two years before <MASK> elections are held , <MASK> on experiences elsewhere <MASK> the <MASK>
+| prd:  <GO> the on to will , it be years up to <NUM> years before the would are in , he <NUM> <SEP> <SEP> u.s. it they have in it have have up to two years before in on are years , in on and years iraq the in
+| tgt word:  ['said', 'could', 'take', 'regular', 'based', 'in', 'world']
+| prd word:  ['in', 'have', 'have', 'in', 'in', 'iraq', 'in']
+
+
+step:  5700 | time: 14.27 | loss: 5.167
+| tgt:  <GO> president vlad imir putin threw his weight behind <MASK> â s main pro-kremlin political party for the first time last week <MASK> ahead of parliamentary elections . <SEP> president vladimir putin <MASK> his weight <MASK> <MASK> first time <MASK> saturday behind russia 's main pro-kremlin <MASK> party ahead of parliamentary elections
+| prd:  <GO> president bush it putin as his last , time president blocking president it the , for the first the last on , for of the the <GO> <SEP> president president putin the his on president his first time time , for the 's encourage the the and for of the presidential
+| tgt word:  ['russia', ',', 'threw', 'for', 'the', 'on', 'political']
+| prd word:  ['time', ',', 'the', 'president', 'his', 'time', 'the']
+
+
+step:  5800 | time: 14.14 | loss: 5.465
+| tgt:  <GO> other changes lymphoma cancn plan refine his original vision , chiron said . <SEP> many of the changes are improvements to the original plan , libeskind chorale
+| prd:  <GO> the said the to the the the the <SEP> , said said . <SEP> the of the the are the to the said the , the of
+| tgt word:  ['in', 'the', 'libeskind', 'said']
+| prd word:  ['the', 'to', 'said', 'of']
+
+
+step:  5900 | time: 14.07 | loss: 3.326
+| tgt:  <GO> mr. manuel and his group entered the united states by walking across the bridge linking matamoros and brownsville . <SEP> manuel and his group entered the us the same way thousands of people do every day , by walking across the bridge between matamoros and brownsville
+| prd:  <GO> mr. , and his , in the states states by by , the by by by and united the <SEP> the and his , , the to the , by by of the , the , , by attacks , the , , by and ,
+| tgt word:  ['his', 'states', 'the', 'matamoros', 'his', 'same']
+| prd word:  ['his', 'states', 'the', 'by', 'his', ',']
+
+
+step:  6000 | time: 14.13 | loss: 5.560
+| tgt:  organization <quote> this agenda was largely preventable , <quote> first-degree spencer abraham , us two-thirds secretary . <SEP> <quote> this blackout was largely preventable , <quote> energy secretary spencer giambi said at a press conference this afternoon
+| prd:  <GO> <quote> this of was , abraham , <quote> , , , , , , , <GO> <SEP> <quote> this , was , abraham , <quote> , , , said said at a of of this ,
+| tgt word:  ['<GO>', 'blackout', 'said', 'energy', 'abraham']
+| prd word:  ['<GO>', 'of', ',', ',', 'said']
+
+
+step:  6100 | time: 14.18 | loss: 2.836
+| tgt:  <GO> but adora obi nweze , the naacp state president , said the state only tried to prove its conclusion of suicide , rather than consider the possibility of murder . <SEP> adora obi nweze , the naacp state president , said the state has refused to consider the possibility of murder
+| prd:  <GO> but state of state , the state of the , said the of to of to , , of of the , the of of the of of said <GO> <SEP> the state the , the the state , , said the state has the to of the of of ,
+| tgt word:  ['state', 'its', ',', 'obi', ',', 'the', 'of']
+| prd word:  ['of', ',', ',', 'state', ',', 'the', 'of']
+
+
+step:  6200 | time: 14.09 | loss: 4.667
+| tgt:  <GO> <quote> i do not wish to be <MASK> during this witness , <MASK> he told stanislaus county superior <MASK> <MASK> al girolami . <SEP> <quote> yes , i do not wish <MASK> <MASK> present <MASK> this witness , <quote> peterson , <NUM> , calmly <MASK> the judge as he was returned to his cell
+| prd:  <GO> <quote> i , not to to be to of this the , in he , stanislaus said and told told to <NUM> of <SEP> <quote> i , i , not i to to to <quote> this in , <quote> was , <NUM> , said , the of as he was he to his ,
+| tgt word:  ['present', '<quote>', 'court', 'judge', 'to', 'be', 'during', 'told']
+| prd word:  ['to', 'in', 'told', 'told', 'to', 'to', '<quote>', ',']
+
+
+step:  6300 | time: 14.13 | loss: 4.881
+| tgt:  <GO> however , lapidus expects foreign <MASK> ' sales to be up <NUM> percent , driven by <MASK> truck sales <MASK> honda motor co . <SEP> <MASK> expects ford to be down <NUM> percent , chrysler down <NUM> percent and foreign brands up <MASK> percent <MASK> by strong truck <MASK> at honda
+| prd:  <GO> however , it industrial <NUM> the the sales to be up <NUM> percent , the by <NUM> <NUM> on on <SEP> <NUM> <SEP> <SEP> <SEP> the <SEP> on to be down <NUM> percent , down down <NUM> percent and truck <NUM> , <NUM> percent percent by friday down down <SEP> <NUM>
+| tgt word:  ['brands', 'strong', 'at', 'lapidus', '<NUM>', 'driven', 'sales']
+| prd word:  ['the', '<NUM>', 'on', 'the', '<NUM>', 'percent', 'down']
+
+
+step:  6400 | time: 14.13 | loss: 3.401
+| tgt:  <GO> resigning along with brendsel was vaughn clarke , the company 's executive vice president and chief financial officer . <SEP> chairman and chief executive leland brendsel and vaughn clarke , the company 's executive vice president and chief financial officer , resigned
+| prd:  <GO> the executive with chief was executive executive , the the 's executive executive the and chief executive <SEP> <GO> <SEP> executive and chief executive executive executive and executive executive , the the 's executive executive 's and chief executive executive , executive
+| tgt word:  [',', "'s", 'financial', ',', "'s", 'executive']
+| prd word:  [',', "'s", 'executive', ',', "'s", 'executive']
+
+
+step:  6500 | time: 14.10 | loss: 4.935
+| tgt:  adel chief behaved rod eddington is to meet appellate nestle unions separately on monday afternoon . <SEP> eddington is to meet the other two unions separately later on monday
+| prd:  <GO> but is is separately is to the separately the separately said on monday <NUM> <NUM> <SEP> separately is to separately the to the to separately were on monday
+| tgt word:  ['<GO>', 'executive', 'the', 'three']
+| prd word:  ['<GO>', 'is', 'separately', 'the']
+
+
+step:  6600 | time: 14.05 | loss: 3.011
+| tgt:  <GO> the march downturn was the only break in what has been broad growth in services for the past <NUM> months . <SEP> a downturn in services activity in march was the only break in what has been broad growth in services for the past <NUM> months
+| prd:  <GO> the march for was the 's <NUM> in <NUM> has been in for in the for the , <NUM> <NUM> <GO> <SEP> a the in <NUM> , in <NUM> was the to <NUM> in <GO> has been about for in <NUM> for the , <NUM> ,
+| tgt word:  ['the', '<NUM>', 'activity', 'march', 'only', 'for']
+| prd word:  ['the', '<NUM>', ',', '<NUM>', 'to', 'for']
+
+
+step:  6700 | time: 14.17 | loss: 4.100
+| tgt:  <GO> missouri gov. bob holden asked <MASK> white <MASK> to declare a <MASK> disaster in <MASK> counties . <SEP> gov. bob holden asked bush to declare <NUM> missouri counties disaster areas
+| prd:  <GO> precaution measures <GO> the the the the the to , a <NUM> <NUM> in <NUM> <NUM> <GO> <SEP> crows encourage the harkleroad the to , <NUM> a the the <NUM>
+| tgt word:  ['the', 'house', 'federal', '<NUM>']
+| prd word:  ['the', 'the', '<NUM>', '<NUM>']
+
+
+step:  6800 | time: 14.16 | loss: 4.788
+| tgt:  <GO> however , supermarket , the cdc official , said there are many complicated interactions in play . <SEP> but hayes , steam msblast cdc said , seriousness many complicated unclear come into play jersey are often difficult to predict .
+| prd:  <GO> <quote> , , , the said the , said the are the , the in the <GO> <SEP> but the , <quote> the <quote> said , <quote> the <quote> <quote> , of the the are the the to <quote> ,
+| tgt word:  ['hayes', 'of', 'the', '<quote>', 'interactions', 'that']
+| prd word:  [',', '<quote>', 'the', '<quote>', '<quote>', 'the']
+
+
+step:  6900 | time: 14.08 | loss: 5.193
+| tgt:  <GO> they said no decisions had been made about how many withstand would be moved could where they would abductor communist , or where they would end bergdorf . <SEP> they added sheehan decisions have been - about how determination troops will be moved , where they will come from , or where they will end up
+| prd:  <GO> they said no been had been they of how many about would be be be would they would , , , or said they would they in said <SEP> they <quote> but been have been of about how they they will be from , said they will from from , or where they will from up
+| tgt word:  ['troops', ',', 'come', 'from', 'up', 'that', 'made', 'many']
+| prd word:  ['about', 'be', ',', ',', 'in', 'but', 'of', 'they']
+
+
+step:  7000 | time: 14.09 | loss: 4.464
+| tgt:  <GO> clearly roman creams of <MASK> type do not normally survive in the archaeological record . <SEP> clearly roman creams of any type , <MASK> or cosmetic , do <MASK> normally survive ... <MASK> 's pretty <MASK> .
+| prd:  <GO> <SEP> are <GO> of tools <SEP> , <SEP> freddie could in the <SEP> <SEP> the <SEP> in to tools of activate existence , <quote> or <SEP> , <GO> . , in <SEP> in 's <SEP> <SEP> the
+| tgt word:  ['any', 'paint', 'not', 'it', 'exceptional']
+| prd word:  ['tools', '<quote>', '.', 'in', '<SEP>']
+
+
+step:  7100 | time: 14.10 | loss: 4.644
+| tgt:  <MASK> in <MASK> : edward <MASK> jones ( <quote> the known world <quote> ) and scott spencer ( <MASK> a ship <MASK> of paper <quote> ) . <SEP> the fifth nominee for fiction is scott spencer , for a <MASK> made of paper
+| prd:  <GO> in key : is industrial jones is <quote> the is is <quote> ) and ( <NUM> ( ( a to is of paper <quote> ) <GO> <SEP> the blue-chip the for fiction is <NUM> is , for a <quote> , of paper
+| tgt word:  ['<GO>', 'fiction', 'p.', '<quote>', 'made', 'ship']
+| prd word:  ['<GO>', 'key', 'industrial', '(', 'is', '<quote>']
+
+
+step:  7200 | time: 14.16 | loss: 3.785
+| tgt:  <GO> pc-related products were the strongest sector in july , with microprocessors up <NUM> % and <MASK> <MASK> <NUM> % from june <MASK> <MASK> industry group <MASK> . <SEP> pc-related products were <MASK> strongest sellers , with microprocessors <MASK> <NUM> percent and drams up <NUM> percent , the sia said
+| prd:  <GO> revelations products were the 's <GO> in the , with the up <NUM> $ and percent percent <NUM> the from the <NUM> <NUM> , from the <quote> <SEP> the the were the 's the , with the percent <NUM> percent and the up <NUM> percent , the the said
+| tgt word:  ['drams', 'up', ',', 'the', 'said', 'the', 'up']
+| prd word:  ['percent', 'percent', '<NUM>', '<NUM>', 'the', 'the', 'percent']
+
+
+step:  7300 | time: 14.16 | loss: 4.021
+| tgt:  <GO> <quote> events on <MASK> <MASK> , in and of themselves , could not account for <MASK> widespread nature of the outage , <quote> firstenergy chief <MASK> peter burg told the house panel . <SEP> <MASK> <MASK> on our system , in and of themselves <MASK> could not account for the widespread nature <MASK> the outage , <quote> burg said
+| prd:  <GO> <quote> <NUM> on events chief , in and of the , not not been for of of not of the stock , <quote> and chief executive of nature <SEP> the said <SEP> <SEP> <SEP> <quote> events on the <NUM> , in and of the of not not the for the <GO> not of the on , <quote> nature said
+| tgt word:  ['our', 'system', 'the', 'executive', '<quote>', 'events', ',', 'of']
+| prd word:  ['events', 'chief', 'of', 'executive', '<quote>', 'events', 'of', 'of']
+
+
+step:  7400 | time: 14.12 | loss: 4.041
+| tgt:  <MASK> he added <MASK> those <quote> <MASK> not solely american principles , nor are they exclusively western . <quote> <SEP> <MASK> these are not solely american principles nor are they exclusively western , <quote> <MASK> said
+| prd:  <GO> he arrests that the <quote> that not texas to <quote> , nor are they are <SEP> . <quote> <SEP> <quote> that are not , were that nor are they , not , <quote> <quote> said
+| tgt word:  ['<GO>', 'that', 'are', '<quote>', 'rumsfeld']
+| prd word:  ['<GO>', 'that', 'that', '<quote>', '<quote>']
+
+
+step:  7500 | time: 14.13 | loss: 2.646
+| tgt:  <GO> at first blush , then , the distinction drawn by the creators of the do-not-call registry would seem to draw the line in precisely the right place . <SEP> at first blush , then , the creators of the registry would seem to have drawn the line between exempted and banned calls in the right place
+| prd:  <GO> at , , , in , the to of by the , of the , registry would be to the the in in of the <SEP> said . <SEP> at in , , the , the the of the the to registry to have registry the the the registry and the in in the in in
+| tgt word:  ['then', 'the', 'creators', 'the', 'the', 'at', 'to', 'line']
+| prd word:  ['in', 'the', ',', 'the', 'the', 'at', 'to', 'the']
+
+
+step:  7600 | time: 14.22 | loss: 4.731
+| tgt:  <GO> according carefirst the <NUM> census patrons long beach 's hispanic or latino population was listed at <NUM> percent . <SEP> according to caused census bureau , microcontroller hispanic population increased by <NUM> percent sprayed the april <NUM> census figures
+| prd:  <GO> the to the <NUM> , the the , 's , or <NUM> the was , at <NUM> percent the <SEP> the to <NUM> the the , , the the the by <NUM> percent , the , <NUM> , the
+| tgt word:  ['to', ',', 'the', 'the', 'from']
+| prd word:  ['to', 'the', '<NUM>', ',', ',']
+
+
+step:  7700 | time: 14.10 | loss: 3.938
+| tgt:  <MASK> he hugged his lawyers and their assistants <MASK> then said , <quote> thank you so much . <quote> <MASK> moments later <MASK> he hugged his defense lawyers <MASK> softly saying , <quote> thank you , so much .
+| prd:  <GO> he dow , , and <GO> , , <GO> said , <quote> , and to <SEP> of <SEP> <SEP> <SEP> , , he , his , , , , , , <quote> to by , <GO> , the
+| tgt word:  ['<GO>', 'and', '<SEP>', ',', ',']
+| prd word:  ['<GO>', ',', '<SEP>', ',', ',']
+
+
+step:  7800 | time: 14.32 | loss: 3.659
+| tgt:  <GO> i wanted to bring the most beautiful people into the most beautiful building , he said sunday inside the grand central concourse . <SEP> <quote> i wanted to bring the most beautiful people into the most beautiful building , <quote> tunick said sunday
+| prd:  <GO> <quote> wanted to , the most from the to the most , , , he said in <SEP> the of said town . <SEP> <quote> i <quote> to the the most from the to the the most the , <quote> the said in
+| tgt word:  ['bring', 'people', 'grand', 'central', 'most', '<quote>']
+| prd word:  [',', 'the', 'of', 'said', 'the', '<quote>']
+
+
+step:  7900 | time: 14.31 | loss: 4.150
+| tgt:  <GO> the afl-cio is <MASK> until october to decide if it will endorse a candidate . <SEP> the afl-cio announced wednesday that it will <MASK> in <MASK> whether to endorse a <MASK> before the <MASK>
+| prd:  <GO> the <SEP> is frist in revenue to be if it will pal a espaã±a <SEP> <SEP> the is was <SEP> that it will endorse in scheduled on to expenses a endorse fractures the endorse
+| tgt word:  ['waiting', 'decide', 'october', 'candidate', 'primaries']
+| prd word:  ['frist', 'endorse', 'scheduled', 'endorse', 'endorse']
+
+
+step:  8000 | time: 14.21 | loss: 4.228
+| tgt:  <GO> the seizure occurred <MASK> 4am <MASK> march <NUM> , just hours before the first american air assault . <SEP> the <MASK> at <NUM> <MASK> on march <NUM> was completed before <MASK> showed up for work that day
+| prd:  <GO> the nasdaq nasdaq on index on the <NUM> , just nasdaq before the first american the <GO> the <SEP> the on at <NUM> percent on percent <NUM> was percent before up of up for the that day
+| tgt word:  ['at', 'on', 'seizure', 'a.m.', 'employees']
+| prd word:  ['on', 'on', 'on', 'percent', 'up']
+
+
+step:  8100 | time: 14.17 | loss: 3.286
+| tgt:  <GO> diane lade of <MASK> south florida sun-sentinel , a <MASK> publishing <MASK> , contributed to this report . <SEP> staff writer diane <MASK> and the associated press contributed to this report
+| prd:  <GO> they report of this <GO> the this , a contributed contributed contributed , contributed to this <GO> the <SEP> expenses <GO> this lade and the bites <GO> <SEP> to this <SEP>
+| tgt word:  ['the', 'tribune', 'newspaper', 'lade']
+| prd word:  ['this', 'contributed', 'contributed', 'lade']
+
+
+step:  8200 | time: 14.26 | loss: 3.562
+| tgt:  <GO> i think <MASK> 's a little hope invested in mcnabb and he <MASK> <MASK> lot of <MASK> for the performance of his team that <MASK> really didn 't deserve . <SEP> there is a little hope <MASK> in <MASK> , and he got a lot of credit <MASK> the performance of this team that he didn 't deserve .
+| prd:  <GO> i i he 's a <GO> york $ in $ and he he in his of invested for the of of his <quote> that he <SEP> <SEP> 't <SEP> the <SEP> there is a with $ invested in invested , and he , a , of <GO> the the new of this <NUM> that he <GO> we for the
+| tgt word:  ['there', 'got', 'a', 'credit', 'he', 'invested', 'mcnabb', 'for']
+| prd word:  ['he', 'he', 'in', 'invested', 'he', 'invested', 'invested', 'the']
+
+
+step:  8300 | time: 14.29 | loss: 3.210
+| tgt:  <GO> bloodsworth was ultimately cleared with evidence gathered from <MASK> semen stain on the victim 's <MASK> . <MASK> <MASK> <NUM> , after nine years in <MASK> , bloodsworth was cleared with evidence gathered from a semen <MASK> on the victim 's panties
+| prd:  <GO> the was <NUM> cleared with <NUM> was from stain was stain on the was 's death of <SEP> in <NUM> soas after <NUM> years in <NUM> , the was , with <SEP> gathered from a from on on the and 's nottinghamshire
+| tgt word:  ['a', 'panties', '<SEP>', 'in', 'prison', 'stain']
+| prd word:  ['stain', 'death', '<SEP>', 'in', '<NUM>', 'on']
+
+
+step:  8400 | time: 14.95 | loss: 3.102
+| tgt:  <GO> on saturday , a 149mph serve against agassi equalled rusedski 's world record . <SEP> on saturday , roddick equalled the world record with a <NUM> m.p.h. serve in beating andre agassi
+| prd:  <GO> on <NUM> , a agassi agassi , <NUM> hurricane hurricane 's the <NUM> <GO> <SEP> on the , the , the in , with a <NUM> or hurricane in the a <NUM>
+| tgt word:  ['record', 'the', '<NUM>', 'm.p.h.']
+| prd word:  ['<NUM>', 'the', '<NUM>', 'or']
+
+
+step:  8500 | time: 14.47 | loss: 3.165
+| tgt:  <GO> worldwide , more than <NUM> million people have seen <quote> les miz , <MASK> with gross receipts of $ <NUM> <MASK> . <SEP> worldwide , <MASK> misã©rables has been seen by over <NUM> million people , <MASK> <MASK> total gross of over $ <MASK> billion
+| prd:  <GO> the , more than <NUM> million the have said <quote> <NUM> <NUM> , <quote> with the for of $ <NUM> million the <SEP> the , <NUM> to has been seen by over <NUM> million <NUM> , <quote> the <NUM> the of the $ <NUM> billion
+| tgt word:  ['<quote>', 'billion', 'les', 'with', 'a', '<NUM>']
+| prd word:  ['<quote>', 'million', '<NUM>', '<quote>', 'the', '<NUM>']
+
+
+step:  8600 | time: 14.09 | loss: 3.742
+| tgt:  <GO> <MASK> <MASK> program , u.s. officials work with foreign port authorities to identify , target and search high-risk cargo . <SEP> <MASK> the <MASK> , us officials work with foreign port authorities to <MASK> out high-risk cargo before it can reach the <MASK> states
+| prd:  <GO> the the , , u.s. the the with not , <SEP> to be , officials and <SEP> <SEP> <SEP> <NUM> <SEP> the the united , us to , with a port to to port was to both of it to states the united of
+| tgt word:  ['under', 'the', 'under', 'program', 'seek', 'united']
+| prd word:  ['the', 'the', 'the', 'united', 'port', 'united']
+
+
+step:  8700 | time: 14.17 | loss: 5.105
+| tgt:  <GO> powell tvs back seek <quote> he 's accusing the president of india ludicrous act , <quote> he said . distract if so , powell said , he 's calling geneva president ludicrous , too
+| prd:  <GO> <quote> said the to <quote> the 's president the president of <quote> the , , <quote> he said <SEP> <SEP> <quote> <quote> , <quote> said , he 's president president 's president , <quote>
+| tgt word:  ['fired', ':', 'a', '<SEP>', 'the']
+| prd word:  ['said', 'to', '<quote>', '<SEP>', 'president']
+
+
+step:  8800 | time: 14.14 | loss: 4.353
+| tgt:  <GO> <quote> it 's swipe to happen , <quote> said jim santangelo , president tung the teamsters joint council <NUM> in el all-share . <SEP> <quote> that really on-demand the companies , big time abstain <quote> said get santangelo , president of the fullest joint council <NUM> in el monte
+| prd:  <GO> <quote> it 's standard to be , <quote> said president , , president , the teamsters , , <NUM> in el <NUM> . <SEP> <quote> that standard is the companies , is , <quote> <quote> said the , , president of the , is council <NUM> in president points
+| tgt word:  ['going', 'of', 'monte', 'affects', ',', 'jim', 'teamsters']
+| prd word:  ['standard', ',', '<NUM>', 'is', '<quote>', 'the', ',']
+
+
+step:  8900 | time: 14.25 | loss: 2.436
+| tgt:  <GO> it would now take place some time before august <NUM> in auckland . <SEP> the meeting would now be held before august <NUM>
+| prd:  <GO> it would be would be the the before percent <NUM> in <NUM> said <SEP> the on would be be <NUM> before $ <NUM>
+| tgt word:  ['would', 'auckland', '<SEP>']
+| prd word:  ['would', '<NUM>', '<SEP>']
+
+
+step:  9000 | time: 14.13 | loss: 4.017
+| tgt:  <GO> <quote> it was brazen intimidation to keep people on the reservation <MASK> <quote> said a republican who <MASK> but did not want to <MASK> named . <SEP> <quote> it was a brazen attempt <MASK> <MASK> <MASK> <quote> said a republican legislator who attended the meeting
+| prd:  <GO> <quote> it was the simpson to <NUM> , on the reservation , <quote> said a , who , but <SEP> not to to according a <SEP> <SEP> <quote> it was a on optimal , intimidation , <quote> said a , , who , the ,
+| tgt word:  [',', 'attended', 'be', 'at', 'intimidation', ',']
+| prd word:  [',', ',', 'according', ',', 'intimidation', ',']
+
+
+step:  9100 | time: 14.10 | loss: 3.470
+| tgt:  <GO> after he <MASK> led <MASK> the execution chamber <MASK> strapped to a gurney , <MASK> <MASK> his head and appeared to smile as his <MASK> adviser <MASK> to him . <SEP> <MASK> he was led into the execution chamber and strapped to a gurney , swisher raised his head and appeared to smile as <MASK> prison chaplain spoke in his ear
+| prd:  <GO> after he was to to the and is and to to a was , was to his not and be to be as his , <SEP> and to <SEP> said <SEP> he he was was , the and chamber and strapped to a and , , , his his and was to community as his <GO> to to in his was
+| tgt word:  ['was', 'into', 'and', 'swisher', 'raised', 'spiritual', 'spoke', 'after', 'the']
+| prd word:  ['was', 'to', 'and', 'was', 'to', ',', 'and', 'he', 'his']
+
+
+step:  9200 | time: 14.15 | loss: 4.205
+| tgt:  <GO> and yes , inconvenienced prognosis is definitely part of the story , titled troubleshooting-assistance arthur miller , elia kazan and residential blacklist : none without sin . <quote> <SEP> note the subheading of norris terrible parable in the <quote> american masters <quote> series , admission arthur miller , elia kazan and parrado <NUM>-by-18-inch : none without sin .
+| prd:  <GO> and we , <quote> the is this the of the this , the the a <quote> , the the and <quote> the : <quote> in <SEP> <SEP> <SEP> <SEP> <quote> the <quote> of <quote> the the in the <quote> the the <quote> ' , <quote> the miller , <quote> the and the . : <quote> without <quote> .
+| tgt word:  ['marilyn', 'monroe', '<quote>', 'the', 'this', '<quote>', 'the', 'blacklist']
+| prd word:  ['<quote>', 'the', 'the', '<quote>', '<quote>', '<quote>', 'the', '.']
+
+
+step:  9300 | time: 14.15 | loss: 2.789
+| tgt:  <GO> the hulk weekend take surpasses <MASK> previous june record of $ 54.9-million for austin powers : the spy who shagged me . <SEP> it beat <MASK> previous record of $ <NUM> <MASK> by <NUM> 's <quote> austin <MASK> : <MASK> spy who shagged me <MASK>
+| prd:  <GO> the year for a for the the the <NUM> of $ <NUM> for the <quote> , the suggested who for the . <SEP> it 's the for the of $ <NUM> percent by <NUM> 's <quote> the <quote> : <quote> the who said for .
+| tgt word:  ['the', 'the', 'set', 'powers', 'the', '.']
+| prd word:  ['the', 'the', 'percent', '<quote>', '<quote>', '.']
+
+
+step:  9400 | time: 14.12 | loss: 3.195
+| tgt:  <GO> by <NUM> p.m. , claudette was centered about <NUM> miles east of brownsville <MASK> with maximum sustained winds of <NUM> <MASK> , <NUM> mph shy <MASK> hurricane strength . <SEP> early monday <MASK> the center of claudette was about <NUM> miles east of brownsville , <MASK> maximum sustained wind blowing at <MASK> mph , <MASK> <MASK> <MASK> of hurricane strength
+| prd:  <GO> by <NUM> p.m. , , was , about <NUM> thereafter was of , with with maximum hurricane winds of <NUM> with , <NUM> , , with <NUM> the 's <SEP> in monday , the , of the was about <NUM> or , of <NUM> , with , <NUM> , , at <NUM> , , <NUM> <NUM> strength of <NUM> heart
+| tgt word:  [',', 'mph', 'of', ',', 'with', '<NUM>', '<NUM>', 'mph', 'shy']
+| prd word:  ['with', 'with', 'with', ',', 'with', '<NUM>', '<NUM>', '<NUM>', 'strength']
+
+
+step:  9500 | time: 14.09 | loss: 3.520
+| tgt:  <GO> senate majority <MASK> <MASK> frist , a tennessee republican , said he intended <MASK> work to get the <MASK> <MASK> removed <MASK> the <MASK> bill . <SEP> senate majority leader bill frist , a tennessee republican , said he intended to work to see that the loan provision was not in the <MASK> bill
+| prd:  <GO> <quote> majority leader frist <NUM> , a tennessee by , said he 's to work to would the republican , not in the final <SEP> <NUM> <SEP> senate he , , it , a tennessee , , said he taking to work to said that the , he was not in the final bill
+| tgt word:  ['leader', 'bill', 'to', 'loan', 'provision', 'from', 'final', 'final']
+| prd word:  ['leader', 'frist', 'to', 'republican', ',', 'in', 'final', 'final']
+
+
+step:  9600 | time: 14.23 | loss: 2.884
+| tgt:  <GO> <MASK> a result , nelson <MASK> faces up to <NUM> <MASK> ' jail instead <MASK> life . <SEP> the <MASK> means nelson faces up to <NUM> years in prison rather than a possible life sentence
+| prd:  <GO> he a <SEP> , nelson if was up to <NUM> years ' on and on said . <SEP> the faces <quote> would was up to <NUM> years in and from than a said to <NUM>
+| tgt word:  ['as', 'now', 'years', 'of', 'verdict']
+| prd word:  ['he', 'if', 'years', 'on', 'faces']
+
+
+step:  9700 | time: 14.37 | loss: 2.681
+| tgt:  <GO> he has also directed <quote> the flintstones , <quote> <quote> beethoven <MASK> <quote> and <quote> jingle all the way . <quote> <SEP> <MASK> 's other credits include <MASK> the <MASK> <MASK> <quote> <quote> jingle all the way <MASK> and <quote> beethoven .
+| prd:  <GO> he has also , <quote> the flintstones , <quote> <quote> . , <quote> and <quote> said all the said , <SEP> <SEP> levant 's other include include <quote> the flintstones <quote> <quote> <quote> , all the on <quote> and <quote> . ,
+| tgt word:  [',', 'levant', '<quote>', 'flintstones', ',', '<quote>']
+| prd word:  [',', 'levant', '<quote>', 'flintstones', '<quote>', '<quote>']
+
+
+step:  9800 | time: 14.16 | loss: 2.888
+| tgt:  <GO> in <NUM> , the building 's owners , the port authority of new york and new jersey , issued guidelines to upgrade the fireproofing to a thickness of <NUM> { inches . <SEP> the nist discovered that in <NUM> the port authority issued guidelines to upgrade the fireproofing to a thickness of <NUM> 1 / <NUM> inches
+| prd:  <GO> in <NUM> , the new 's the , the , , of new new and new <NUM> , , to to to the fireproofing to a of of <NUM> fireproofing <NUM> the <SEP> the nist the that in <NUM> the to to , <NUM> to <NUM> the , to a , of <NUM> to , <NUM> to
+| tgt word:  ['authority', 'inches', 'that', 'in', 'authority', 'a', '1', '/']
+| prd word:  [',', '<NUM>', 'that', 'in', 'to', 'a', 'to', ',']
+
+
+step:  9900 | time: 14.06 | loss: 3.090
+| tgt:  <MASK> <MASK> stock closed friday at $ <MASK> , down $ <NUM> , or <NUM> percent , on the nasdaq stock market . <MASK> shares of brocade closed at $ <NUM> , down $ <NUM> , or <MASK> percent
+| prd:  <GO> the <SEP> was friday at $ <NUM> , down $ <NUM> , or <NUM> percent , on the <GO> <SEP> market the <SEP> the of <GO> was at $ <NUM> , down $ <NUM> , or <NUM> percent
+| tgt word:  ['<GO>', 'the', '<NUM>', '<SEP>', '<NUM>']
+| prd word:  ['<GO>', 'the', '<NUM>', '<SEP>', '<NUM>']
+

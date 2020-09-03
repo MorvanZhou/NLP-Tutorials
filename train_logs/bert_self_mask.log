@@ -1,0 +1,291 @@
+C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\python.exe E:/Python/NLP-Tutorials/BERT_self_mask.py
+2020-09-03 18:48:43.227682: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+num word:  12880
+2020-09-03 18:48:46.088187: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library nvcuda.dll
+2020-09-03 18:48:46.178498: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-09-03 18:48:46.178775: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-09-03 18:48:46.788382: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-09-03 18:48:47.730815: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-09-03 18:48:48.036713: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-09-03 18:48:49.208189: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-09-03 18:48:49.536546: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-09-03 18:48:52.366893: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-09-03 18:48:52.367829: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-09-03 18:48:52.368542: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2
+2020-09-03 18:48:52.376402: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x16af7c762a0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-09-03 18:48:52.376690: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-09-03 18:48:52.377498: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1561] Found device 0 with properties:
+pciBusID: 0000:01:00.0 name: GeForce GTX 1060 6GB computeCapability: 6.1
+coreClock: 1.7335GHz coreCount: 10 deviceMemorySize: 6.00GiB deviceMemoryBandwidth: 178.99GiB/s
+2020-09-03 18:48:52.377859: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudart64_101.dll
+2020-09-03 18:48:52.378015: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+2020-09-03 18:48:52.378148: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cufft64_10.dll
+2020-09-03 18:48:52.378279: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library curand64_10.dll
+2020-09-03 18:48:52.378413: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusolver64_10.dll
+2020-09-03 18:48:52.378579: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cusparse64_10.dll
+2020-09-03 18:48:52.378714: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cudnn64_7.dll
+2020-09-03 18:48:52.379545: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1703] Adding visible gpu devices: 0
+2020-09-03 18:48:52.913439: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1102] Device interconnect StreamExecutor with strength 1 edge matrix:
+2020-09-03 18:48:52.913642: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1108]      0
+2020-09-03 18:48:52.913728: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1121] 0:   N
+2020-09-03 18:48:52.914402: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1247] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 4700 MB memory) -> physical GPU (device: 0, name: GeForce GTX 1060 6GB, pci bus id: 0000:01:00.0, compute capability: 6.1)
+2020-09-03 18:48:52.917200: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x16a9789a2a0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+2020-09-03 18:48:52.917383: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): GeForce GTX 1060 6GB, Compute Capability 6.1
+2020-09-03 18:48:53.219726: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library cublas64_10.dll
+WARNING:tensorflow:From C:\Users\morvanzhou\AppData\Local\Continuum\anaconda3\envs\nlp\lib\site-packages\tensorflow\python\ops\array_grad.py:644: _EagerTensorBase.cpu (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.identity instead.
+
+
+step:  0 | time: 0.66 | loss: 9.680
+| tgt:  sixteen days later , as superheated air from the shuttle 's reentry rushed into the damaged wing , <quote> there was no possibility for crew survival , <quote> the board said . <SEP> sixteen days later , as superheated air from the shuttle â s re-entry rushed into the damaged wing , â â there was no possibility for crew survival , â â the board said .
+| prd:  monserrate change closed-door beef patients presidency jitters forecasting e raises protected leonid cube rice blast richter marsh shawanda thames discuss expending left beleaguered lawyers attendees rosa sarah slab first-quarter nations apologising al-qaida motive insight declined whims flows troubleshooting-assistance charities â â sound beas.o obligation turnpike protesting blaine standings coria chemical protocols job -- assault absent gel explode mikhail actual immunizing loud stands half-century trimester tony-award longhorn defend silence
+
+
+step:  100 | time: 14.16 | loss: 8.114
+| tgt:  media editor jon friedman contributed to this story . <SEP> jon friedman is media editor for cbs.marketwatch.com in new york .
+| prd:  the , , . , , , the the <SEP> , , , . the , , the <SEP> , ,
+
+
+step:  200 | time: 13.92 | loss: 6.708
+| tgt:  a suburban chicago man was arrested wednesday on charges of secretly gathering information on iraqi opposition figures as an unregistered agent of saddam hussein 's intelligence service . <SEP> the fbi arrested a suburban chicago man wednesday and charged him with secretly collecting information on individuals in the united states who opposed saddam hussein 's iraqi government .
+| prd:  the the , the the the the the the , the the the the the , the the the , , the the the the . , , <SEP> the , the the , , , , , , , , , , the , the , the , , the , , , , the , ,
+
+
+step:  300 | time: 13.94 | loss: 6.283
+| tgt:  he will replace ron dittemore , who announced his resignation april <NUM> . <SEP> dittemore announced his plans to resign on april <NUM> .
+| prd:  the the , the . the the . , the the , . <SEP> the <NUM> , the , , , the , .
+
+
+step:  400 | time: 13.88 | loss: 5.886
+| tgt:  when police removed the four from the home , they weighed <NUM> pounds combined . <SEP> each boy weighed less than <NUM> pounds when they were removed from the home oct. <NUM> .
+| prd:  the the , the , <NUM> <NUM> <NUM> , the , . , , . <SEP> the <NUM> , , . <NUM> . , <NUM> the , <NUM> <NUM> <NUM> , <NUM> .
+
+
+step:  500 | time: 14.02 | loss: 5.909
+| tgt:  the u.s. food and drug administration rejected imclone 's original application in december <NUM> , saying the trial had been sloppily conducted . <SEP> the food and drug administration ultimately denied imclone 's drug application in december <NUM> , saying that an erbitux clinical trial was deficient .
+| prd:  the the the , the , , , , the , , the , . <quote> the the . . . . . <SEP> <quote> <NUM> . the <NUM> . the the , the , , the , . <quote> , the the , the , the .
+
+
+step:  600 | time: 14.01 | loss: 5.853
+| tgt:  dixon put his style on display sunday afternoon in winning the honda indy <NUM> at pikes peak international raceway . <SEP> scott dixon eventually made winning the honda indy <NUM> look easy sunday at pikes peak international raceway .
+| prd:  the to the <NUM> . the <NUM> <NUM> to the the united <NUM> <NUM> percent the million . a . <SEP> the . <NUM> to the the new to <NUM> percent a to , <NUM> . to a .
+
+
+step:  700 | time: 14.44 | loss: 5.377
+| tgt:  the victim , who was also not identified , was taken to kings county hospital in <quote> extremely critical <quote> condition , czartoryski said . <SEP> the shooting victim was taken to kings county hospital center , where he later died , the police said .
+| prd:  the new , <quote> , the , the , <quote> and , the , , , the <SEP> , , <SEP> , <quote> , . <SEP> the united , , the the the , , , , <quote> the , , , <quote> new , .
+
+
+step:  800 | time: 14.19 | loss: 4.971
+| tgt:  on saturday , a 149mph serve against agassi equalled rusedski 's world record . <SEP> on saturday , roddick equalled the world record with a <NUM> m.p.h. serve in beating andre agassi .
+| prd:  the the , the year than in a . <NUM> , <NUM> , . <SEP> the the , a <NUM> the new , , the new percent nasdaq , <NUM> in <NUM> .
+
+
+step:  900 | time: 14.17 | loss: 5.210
+| tgt:  at first blush , then , the distinction drawn by the creators of the do-not-call registry would seem to draw the line in precisely the right place . <SEP> at first blush , then , the creators of the registry would seem to have drawn the line between exempted and banned calls in the right place .
+| prd:  the the , , the , the first states of the first , the first of , be of be the united , the the united , . <SEP> the the , , the , the united , the united . be of be of of first , <NUM> and the , to the united , .
+
+
+step:  1000 | time: 13.99 | loss: 4.583
+| tgt:  the technology-laced nasdaq composite index .ixic climbed <NUM> points , or <NUM> percent , to <NUM> , based on the latest data , and marking its highest close since may <NUM> , <NUM> . <SEP> the technology-laced nasdaq composite index < .ixic > was up <NUM> points , or <NUM> percent , at <NUM> , marking its highest close since may <NUM> , <NUM> .
+| prd:  the dow nasdaq , index .spx , <NUM> percent , or <NUM> , , or <NUM> , or in the company <NUM> , or <NUM> <NUM> <NUM> <NUM> in <NUM> <NUM> , or . <SEP> the nasdaq nasdaq , index , <NUM> , , <NUM> <NUM> , , or <NUM> percent , the <NUM> , the the <NUM> <NUM> in <NUM> <NUM> , <NUM> .
+
+
+step:  1100 | time: 14.03 | loss: 4.385
+| tgt:  he beat testicular cancer that had spread to his lungs and brain . <SEP> armstrong , <NUM> , battled testicular cancer that spread to his brain .
+| prd:  the said <NUM> of , the been to be court and other . <SEP> the , the , <quote> 's <NUM> to the to the first .
+
+
+step:  1200 | time: 14.75 | loss: 4.517
+| tgt:  a spokesman for the u.s. attorney 's office in atlanta also refused to comment . <SEP> coca-cola announced friday morning that the u.s. attorney 's office in atlanta has started an inquiry .
+| prd:  the statement for the u.s. of 's of and a in said to be . <SEP> it than a a of the first of 's first and a in been in <quote> .
+
+
+step:  1300 | time: 14.17 | loss: 4.508
+| tgt:  just five months ago , dean committed to accepting taxpayer money and vowed to attack any democrat who didnt . <SEP> just five months ago , dean committed to accepting taxpayer money and the spending limits that come with it and vowed to attack any democrat who didnt .
+| prd:  he he has , , which 's to be has <NUM> to would to be to states , would . <SEP> the that . , , which 's to be been . to the first said to he to the to is to be to states , was .
+
+
+step:  1400 | time: 14.01 | loss: 3.741
+| tgt:  <quote> craxi begged me to intervene because he believed the operation damaged the state , <quote> mr berlusconi said . <SEP> <quote> i had no direct interest and craxi begged me to intervene because he believed that the deal was damaging to the state , <quote> berlusconi testified .
+| prd:  <quote> i think said the be to that said the united <quote> the the , <quote> <SEP> <quote> said . <SEP> <quote> i said not <quote> of and <quote> 'donnell <quote> the the to the said the the <quote> , <SEP> to the the , <quote> i <quote> .
+
+
+step:  1500 | time: 14.13 | loss: 3.381
+| tgt:  he has no immediate plans for television advertising , believing it is unnecessary this early . <SEP> a lieberman aide said there were no immediate plans for television advertising .
+| prd:  he said been immediate are for it will , but it 's not that week . <SEP> the statement think said he is that immediate . to the said .
+
+
+step:  1600 | time: 13.98 | loss: 3.615
+| tgt:  however , a recent slide in prices and opec 's expectations of a surge in oil inventories have compounded its fears about a further softening of the market . <SEP> a <NUM> percent slide in crude prices this month and expectations of a build up in oil inventories compounded opec 's fears of a further softening of the market .
+| prd:  it , a a average in <NUM> to other 's share of a year in <NUM> & as been a first of a a of of the company . <SEP> a a percent of in <SEP> of for year to is of a year $ to <SEP> cent . share 's first of a year of of the company .
+
+
+step:  1700 | time: 13.99 | loss: 3.439
+| tgt:  currently , about <NUM> u.s. troops are stationed in south korea . <SEP> there are <NUM> u.s. troops in asia , most of them in south korea and japan .
+| prd:  he , <NUM> <NUM> the of were trying in prison center . <SEP> he was <NUM> and troops and prison , <NUM> of the in prison than and other .
+
+
+step:  1800 | time: 14.03 | loss: 3.585
+| tgt:  yesterday , shares closed up <NUM> cents , or <NUM> percent , at $ <NUM> . <SEP> amazon 's shares yesterday closed at $ <NUM> on the nasdaq stock market , up <NUM> cents .
+| prd:  shares , up rose up <NUM> percent , or <NUM> percent , at $ <NUM> . <SEP> shares 's shares from shares at $ <NUM> , the nasdaq stock exchange , or <NUM> percent .
+
+
+step:  1900 | time: 14.00 | loss: 2.765
+| tgt:  water samples are being tested in a state lab to determine what caused the reaction . <SEP> water samples are being sent to the state health department for analysis .
+| prd:  they 's are not published in a the department to pass they would the united . <SEP> however 's are not held to the new company department for both .
+
+
+step:  2000 | time: 14.01 | loss: 3.205
+| tgt:  baer said he had concluded that lawyers for the two victims <quote> have shown , albeit barely ... that iraq provided material support to bin laden and al-qaeda <quote> . <SEP> judge harold baer concluded wednesday that lawyers for the two victims <quote> have shown , albeit barely ... that iraq provided material support to bin laden and al-qaida . <quote>
+| prd:  however said he had no that we for the new years <quote> it been , according <SEP> going a we 's i support . be laden and wisconsin <quote> . <SEP> <quote> h. putin <SEP> that that we for the two years . to been , ashcroft told going that we 's any support to give laden and wisconsin . <quote>
+
+
+step:  2100 | time: 14.04 | loss: 2.747
+| tgt:  it is almost certain to exacerbate the bitter divisions between washington and europe that have not abated since the end of the war in iraq . <SEP> it is almost certain to exacerbate the divisions between washington and europe that emerged before the war in iraq .
+| prd:  it is not certain to kill the war islands between the and it that it been immediately on the war of the <quote> in iraq . <SEP> it is not certainly to give the order between the and is that war before the war in iraq .
+
+
+step:  2200 | time: 14.13 | loss: 2.863
+| tgt:  it will cost about $ <NUM> per eight-week course of treatment , comparable to other injected cancer therapies , a spokeswoman said . <SEP> it will cost about $ <NUM> per average course of treatment -16 to <NUM> weeks .
+| prd:  it will be a $ <NUM> percent cent course of $ , compared to be loss cancer nasdaq , a public said . <SEP> it will be a $ <NUM> per cent .dji of $ or to <NUM> percent .
+
+
+step:  2300 | time: 14.47 | loss: 2.549
+| tgt:  gillette shares rose $ <NUM> , or <NUM> percent , to $ <NUM> in afternoon new york stock exchange trading . <SEP> shares of gillette closed down <NUM> cents at $ <NUM> in trading wednesday on the new york stock exchange .
+| prd:  shares shares rose $ <NUM> , or <NUM> percent , to $ <NUM> in $ trading york stock exchange stock . <SEP> shares of $ closed up <NUM> percent a $ <NUM> in new on on the new york stock exchange .
+
+
+step:  2400 | time: 14.44 | loss: 2.199
+| tgt:  water management officials in florida were worried about some of the already-swollen rivers and lakes , because a direct hit from a hurricane could cause severe flooding . <SEP> water management officials in florida were worried about the storm 's possible effect on some of their already-swollen rivers and lakes .
+| prd:  they 's officials in iraq were worried about about of the commission rivers and russian , but a 1,700-square-mile operations from a statement by face military acute . <SEP> prosecutors 's has in iraq were sent about the bill will presidential without on thursday of a grip rivers and fishing .
+
+
+step:  2500 | time: 14.28 | loss: 2.270
+| tgt:  a day earlier , a committee appointed by reformist president mohammad khatami called for an independent judicial inquiry into kazemi 's death . <SEP> a day earlier , a committee appointed by president mohammad khatami had called for an independent inquiry into the <NUM>-year-old photojournalist 's death .
+| prd:  a day earlier , a day appointed by a president mohammad khatami called for an independent inquiry inquiry into kazemi 's death . <SEP> a day earlier , a day appointed by an mohammad khatami had been for an independent inquiry into the case photojournalist 's death .
+
+
+step:  2600 | time: 13.99 | loss: 2.143
+| tgt:  chief financial officer andy bryant has said that hike had a greater affect volume than officials expected . <SEP> bryant has said that hike had a greater effect on demand than officials expected .
+| prd:  has financial officer ago bryant has said that million had a half $ interest than has expected . <SEP> prosecutors has said that causes had a half more on thursday than has expected .
+
+
+step:  2700 | time: 14.01 | loss: 2.321
+| tgt:  she said six were from douglas county , the southwestern oregon county that includes roseburg , and two were from the portland area . <SEP> six were from douglas county , which includes roseburg , and two from the portland area .
+| prd:  they were they were from iraq county , the dow including county that were pennsylvania , and two were from the latest area . <SEP> two were from iraq county , including were signed , and two from the uterus area .
+
+
+step:  2800 | time: 14.17 | loss: 1.990
+| tgt:  shares of hartford rose $ <NUM> to $ <NUM> in new york stock exchange composite trading . <SEP> shares of hartford were up $ <NUM> , or <NUM> percent , to $ <NUM> in midday trading .
+| prd:  shares of $ rose $ <NUM> to $ <NUM> in new york stock exchange trading trading . <SEP> shares of echostar were up $ <NUM> , or <NUM> percent , to $ <NUM> in addition trading .
+
+
+step:  2900 | time: 14.12 | loss: 1.755
+| tgt:  treatment guidelines , many written by medical-specialty organizations , recommend approaches to many ailments , such as painkillers and exercise for arthritis . <SEP> treatment guidelines , many written by medical specialty organizations , outline recommended approaches to many common ailments , ranging from painkillers and exercise for arthritis to surgery for breast cancer .
+| prd:  peoplesoft out , many different by long-lived organizations , wash sprayregen to be guerrillas , will as well and others for example . <SEP> many for , many years by many ethics organizations , ibm recommended approaches to be years stock , including from any and exchange for each to this for afghanistan cancer .
+
+
+step:  3000 | time: 14.15 | loss: 1.847
+| tgt:  many women complain that they become more forgetful around the time of menopause , and some doctors believe that hormonal changes are the reason . <SEP> many women complain that they become more forgetful after menopause , and some doctors have come to believe the hormonal changes brought on by menopause are the reason .
+| prd:  some state worked that they remain more than from the deal of licensing , and other are would that affects changes are the test . <SEP> some other recognized that they believe more than in whipple , and an of are been to do the difficulty energy needed on of sending are the deal .
+
+
+step:  3100 | time: 14.16 | loss: 1.639
+| tgt:  it even struck a deal for distribution and advertising with popular p2p service grokster . <SEP> puretunes has also lost a distribution deal with the popular grokster file-swapping software company .
+| prd:  it even struck a deal for distribution and advertising with popular p2p service grokster . <SEP> puretunes has also lost a distribution deal with the popular grokster file-swapping software company .
+
+
+step:  3200 | time: 14.19 | loss: 1.682
+| tgt:  north american markets grabbed early gains monday morning , as earnings season begins to slow and economic indicators take the spotlight . <SEP> north american futures pointed to a strong start to the first trading session of the week monday , as earnings season slows and economic indicators take the spotlight .
+| prd:  u.s. american markets grabbed early morning monday yesterday , as earnings season begins to close and economic indicators take the . . <SEP> north american markets pointed to a few fell to the new trading yesterday of the city monday , as earnings season begins and exchange indicators take the dollar .
+
+
+step:  3300 | time: 14.10 | loss: 1.266
+| tgt:  no dates have been set for the civil or the criminal trial . <SEP> no dates have been set for the criminal or civil cases , but shanley has pleaded not guilty .
+| prd:  no immediate have been ruled for the criminal or the u.s. public . <SEP> one affiliation have been ruled for the state last how cases , but none has declined not immediately .
+
+
+step:  3400 | time: 14.10 | loss: 1.252
+| tgt:  <quote> we are starting the epidemic with more cases and more areas affected than last year . <SEP> <quote> it indicates we are starting the epidemic with more cases than last year , <quote> gerberding said .
+| prd:  <quote> we are trying the epidemic with more cases and more million affected than last year . <SEP> <quote> it had we are expected the epidemic with more cases than <NUM> year , <quote> gerberding said .
+
+
+step:  3500 | time: 14.12 | loss: 1.224
+| tgt:  around <NUM> : <NUM> a.m. edt ( <NUM> gmt ) , the euro was at $ <NUM> against the dollar , up <NUM> percent on the day . <SEP> against the swiss franc the dollar was at <NUM> francs , up <NUM> percent on the day .
+| prd:  around <NUM> : <NUM> a.m. edt ( <NUM> points ) , the dollar was at $ <NUM> on the dollar , up <NUM> percent on the day . <SEP> against the nasdaq franc the dollar was at <NUM> points , up <NUM> percent on the day .
+
+
+step:  3600 | time: 14.16 | loss: 1.153
+| tgt:  shares closed on nasdaq just below their <NUM>-week high , at $ <NUM> , up $ <NUM> . <SEP> trading of echostar 's stock closed tuesday at a <NUM>-week high of $ <NUM> , up $ <NUM> .
+| prd:  shares closed on nasdaq has near its <NUM>-week high , at $ <NUM> , up $ <NUM> . <SEP> trading of echostar 's stock closed monday at a share high of $ <NUM> , up $ <NUM> .
+
+
+step:  3700 | time: 14.11 | loss: 0.890
+| tgt:  police arrested a <quote> potential suspect <quote> monday in the case of a nine-year-old girl who turned up safe two days after being violently abducted from her home . <SEP> police arrested a <quote> potential suspect <quote> monday in the abduction of a <NUM>-year-old who was found safe after two days , the police chief said .
+| prd:  police arrested a <quote> suspect suspect <quote> monday in the case of a statement girl who had up good two years with being correctly abducted from his home . <SEP> police arrested a <quote> suspect suspect <quote> may , the town of a <NUM>-year-old who was found safe from two years , the police chief said .
+
+
+step:  3800 | time: 14.06 | loss: 0.818
+| tgt:  the state wants to lower wolf numbers in approximately a 1,700-square-mile area near the village of mcgrath . <SEP> the state wants to kill the wolves in approximately a 1,700-square-mile area near mcgrath to establish a moose nursery of sorts .
+| prd:  the state wants to lower wolf control in approximately a 1,700-square-mile area near the village of mcgrath . <SEP> the state wants to kill the wolves in approximately a 1,700-square-mile area near mcgrath to kill a moose nursery of sorts .
+
+
+step:  3900 | time: 14.15 | loss: 0.876
+| tgt:  <quote> there is no conscious policy on the part of the united states to move the dollar at all , <quote> snow said . <SEP> <quote> there is no conscious policy of the united states , i can assure you of this , to move the dollar at all , <quote> he said .
+| prd:  <quote> there is no conscious policy on the part of the united states to move the dollar at all , <quote> snow said . <SEP> <quote> there is no conscious policy of the united states , i can assure you of this , to move the dollar at all , <quote> he said .
+
+
+step:  4000 | time: 14.14 | loss: 0.836
+| tgt:  kelly will begin meetings with russian deputy foreign minister alexander losyukov in washington on monday . <SEP> russian deputy foreign minister alexander losyukov said in moscow tuesday a firm date would be fixed by this months end .
+| prd:  kelly will begin meetings with russian deputy foreign minister alexander losyukov in washington on monday . <SEP> russian deputy foreign minister alexander on said in moscow tuesday a year plan would be fixed by this week end .
+
+
+step:  4100 | time: 14.07 | loss: 0.632
+| tgt:  the songs are on offer for <NUM> cents each , or $ <NUM> for an album . <SEP> the company will offer songs for <NUM> cents and albums for $ <NUM> .
+| prd:  the transaction are on offer for <NUM> cents peoplesoft , or $ <NUM> for an album . <SEP> the company will offer songs for <NUM> cents and albums for $ <NUM> .
+
+
+step:  4200 | time: 14.08 | loss: 0.582
+| tgt:  neither military action nor large-scale bribery can solve the north korean problem , wolfowitz said . <SEP> indeed , wolfowitz admitted saturday that neither military action nor <quote> large scale bribery <quote> would solve the issue .
+| prd:  neither military action nor large-scale bribery can solve the north korean problem , wolfowitz said . <SEP> indeed , wolfowitz admitted saturday that neither military action nor <quote> large scale bribery <quote> would solve the issue .
+
+
+step:  4300 | time: 14.07 | loss: 0.503
+| tgt:  <quote> we can 't change the past , but we can do a lot about the future , <quote> sheehan said at a news conference wednesday afternoon . <SEP> <quote> we can 't change the past , but we can do a lot about the future , <quote> sheehan said hours after arriving in phoenix .
+| prd:  <quote> we can do know the past , <quote> we are do a statement about the past , <quote> lieberman said at a news conference wednesday afternoon . <SEP> <quote> we can 't change the past , <quote> we can do a lot about the past , <quote> <SEP> said sunday after arriving in california .
+
+
+step:  4400 | time: 14.08 | loss: 0.503
+| tgt:  <quote> biotech products , if anything , may be safer than conventional products because of all the testing , <quote> fraley said , adding that <NUM> countries have adopted biotechnology . <SEP> <quote> biotech products , if anything , may be safer than conventional products because of all the testing , <quote> said robert fraley , monsanto 's executive vice president .
+| prd:  <quote> biotech products , if many , may be safer than conventional products because of all the testing , <quote> fraley said , adding that <NUM> years have adopted biotechnology . <SEP> <quote> biotech products , if anything , may be safer , conventional products because of all the testing , <quote> said there fraley , monsanto 's executive vice president .
+
+
+step:  4500 | time: 14.14 | loss: 0.300
+| tgt:  robert liscouski , the assistant secretary of homeland security for infrastructure protection , will oversee ncsd . <SEP> ncsd 's chief will be robert liscouski , the assistant secretary of homeland security for infrastructure protection .
+| prd:  robert liscouski , the assistant secretary of homeland security for infrastructure protection , will oversee ncsd . <SEP> ncsd 's chief will be robert liscouski , the assistant secretary of homeland security for infrastructure protection .
+
+
+step:  4600 | time: 14.04 | loss: 0.467
+| tgt:  associated press writer curt anderson at the justice department in washington , d.c. , contributed to this story . <SEP> associated press writer jay reeves in birmingham , ala . , contributed to this story .
+| prd:  associated press writer curt anderson at the justice department in washington , d.c. , contributed to this story . <SEP> associated press writer diane reeves in birmingham , homeland . , contributed to this story .
+
+
+step:  4700 | time: 14.09 | loss: 0.301
+| tgt:  wal- mart , kohl 's corp. , family dollar stores inc . , and big lots inc. posted may sales that fell below wall street 's modest expectations . <SEP> wal-mart , kohl 's corp. and big lots inc. were among the merchants posting may sales below wall street 's modest expectations .
+| prd:  wal- mart , kohl 's corp. , family dollar stores inc . , and big lots inc. posted may sales that fell below wall street 's modest expectations . <SEP> wal-mart , kohl 's corp. and big lots inc. were among the merchants posting may sales below wall street 's modest expectations .
+
+
+step:  4800 | time: 14.01 | loss: 0.307
+| tgt:  in europe , france 's cac-40 rose <NUM> percent , britain 's ftse <NUM> slipped <NUM> percent and germany 's dax index advanced <NUM> percent . <SEP> in afternoon trading in europe , france 's cac-40 fell <NUM> percent , britain 's ftse <NUM> dropped <NUM> percent and germany 's dax index lost <NUM> percent .
+| prd:  in afternoon , france 's cac-40 rose <NUM> percent , france 's cac-40 <NUM> points <NUM> percent and germany 's dax index advanced <NUM> percent . <SEP> in afternoon trading in europe , france 's cac-40 rose <NUM> percent , britain 's ftse <NUM> gained <NUM> percent and germany 's dax index rose <NUM> percent .
+
+
+step:  4900 | time: 14.15 | loss: 0.281
+| tgt:  lord falconer hailed the changes as <quote> a new beginning as far as the courts , crown prosecution service and police are concerned <quote> . <SEP> <quote> it 's a new beginning as far as the courts , crown prosecution service and police are concerned , making the criminal justice system work better . <quote>
+| prd:  lord falconer hailed the changes as this a new beginning as far as the courts , crown prosecution service and police are concerned <quote> . <SEP> <quote> it 's a new beginning as far as the courts , crown prosecution service and police are concerned , making the criminal justice system work better . <quote>
+
+Process finished with exit code 0
