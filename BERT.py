@@ -11,10 +11,6 @@ import os
 class BERT(GPT):
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg=3, drop_rate=0.1, padding_idx=0):
         super().__init__(model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg, drop_rate, padding_idx)
-        self.padding_idx = padding_idx
-        self.n_vocab = n_vocab
-        self.max_len = max_len
-
         # I think task emb is not necessary for pretraining,
         # because the aim of all tasks is to train a universal sentence embedding
         # the body encoder is the same across all task, and the output layer defines each task.
@@ -24,25 +20,6 @@ class BERT(GPT):
         #     input_dim=n_task, output_dim=model_dim,  # [n_task, dim]
         #     embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         # )
-
-        self.word_emb = keras.layers.Embedding(
-            input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
-        )
-
-        self.segment_emb = keras.layers.Embedding(
-            input_dim=max_seg, output_dim=model_dim,  # [max_seg, dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
-        )
-        self.position_emb = self.add_weight(
-            name="pos", shape=[1, max_len, model_dim], dtype=tf.float32,   # [1, step, dim]
-            initializer=keras.initializers.RandomNormal(0., 0.01))
-        self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
-        self.task_mlm = keras.layers.Dense(n_vocab)
-        self.task_nsp = keras.layers.Dense(2)
-
-        self.cross_entropy = keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction="none")
-        self.opt = keras.optimizers.Adam(lr)
 
     def step(self, seqs, segs, seqs_, loss_mask, nsp_labels):
         with tf.GradientTape() as tape:
@@ -148,6 +125,6 @@ if __name__ == "__main__":
     m = BERT(
         model_dim=MODEL_DIM, max_len=d.max_len, n_layer=N_LAYER, n_head=4, n_vocab=d.num_word,
         lr=LEARNING_RATE, max_seg=d.num_seg, drop_rate=0.2, padding_idx=d.v2i["<PAD>"])
-    train(m, d, step=5000, name="bert")
+    train(m, d, step=10000, name="bert")
     export_attention(m, d, "bert")
 
