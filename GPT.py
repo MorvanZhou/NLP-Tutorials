@@ -22,12 +22,8 @@ class GPT(keras.Model):
             input_dim=max_seg, output_dim=model_dim,  # [max_seg, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
-        self.position_emb = keras.layers.Embedding(
-            input_dim=max_len, output_dim=model_dim,  # [step, dim]
-            embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
-        )
         self.position_emb = self.add_weight(
-            name="pos", shape=[max_len, model_dim], dtype=tf.float32,
+            name="pos", shape=[max_len, model_dim], dtype=tf.float32,   # [step, dim]
             initializer=keras.initializers.RandomNormal(0., 0.01))
         self.position_space = tf.ones((1, max_len, max_len))
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
