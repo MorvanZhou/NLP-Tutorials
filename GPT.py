@@ -117,6 +117,7 @@ if __name__ == "__main__":
     MODEL_DIM = 256
     N_LAYER = 4
     LEARNING_RATE = 1e-4
+
     d = utils.MRPCData("./MRPC", 2000)
     print("num word: ", d.num_word)
     m = GPT(
