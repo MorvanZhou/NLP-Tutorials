@@ -41,9 +41,8 @@ class BERT(keras.Model):
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
         )
         self.position_emb = self.add_weight(
-            name="pos", shape=[max_len, model_dim], dtype=tf.float32,   # [step, dim]
+            name="pos", shape=[1, max_len, model_dim], dtype=tf.float32,   # [1, step, dim]
             initializer=keras.initializers.RandomNormal(0., 0.01))
-        self.position_space = tf.ones((1, max_len, max_len))
         self.encoder = Encoder(n_head, model_dim, drop_rate, n_layer)
         self.o_mlm = keras.layers.Dense(n_vocab)
         self.o_nsp = keras.layers.Dense(2)
@@ -70,8 +69,7 @@ class BERT(keras.Model):
         return loss, mlm_logits
 
     def input_emb(self, seqs, segs):
-        return self.word_emb(seqs) + self.segment_emb(segs) + tf.matmul(
-            self.position_space, self.position_emb)  # [n, step, dim]
+        return self.word_emb(seqs) + self.segment_emb(segs) + self.position_emb  # [n, step, dim]
 
     def pad_mask(self, seqs):
         mask = tf.cast(tf.math.equal(seqs, self.padding_idx), tf.float32)
