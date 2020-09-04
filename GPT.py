@@ -107,7 +107,7 @@ def export_attention(model, data, name="gpt"):
 
     # save attention matrix for visualization
     seqs, segs, xlen, nsp_labels = data.sample(32)
-    model(seqs[:, :-1], segs[:, :-1], False)
+    model.call(seqs[:, :-1], segs[:, :-1], False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
     with open("./visual/tmp/%s_attention_matrix.pkl" % name, "wb") as f:
         pickle.dump(data, f)
