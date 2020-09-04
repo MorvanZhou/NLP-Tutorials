@@ -63,8 +63,8 @@ def pad_zero(seqs, max_len):
 
 
 def maybe_download_mrpc(save_dir="./MRPC/", proxy=None):
-    train_url = 'https://dl.fbaipublicfiles.com/senteval/senteval_data/msr_paraphrase_train.txt'
-    test_url = 'https://dl.fbaipublicfiles.com/senteval/senteval_data/msr_paraphrase_test.txt'
+    train_url = 'https://mofanpy.com/static/files/MRPC/msr_paraphrase_train.txt'
+    test_url = 'https://mofanpy.com/static/files/MRPC/msr_paraphrase_test.txt'
     os.makedirs(save_dir, exist_ok=True)
     proxies = {"http": proxy, "https": proxy}
     for url in [train_url, test_url]:

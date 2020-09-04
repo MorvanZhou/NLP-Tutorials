@@ -292,6 +292,6 @@ if __name__ == "__main__":
     # transformer_attention_line(case=0)
 
     model = ["gpt", "bert", "bert_self_mask"][1]
-    case = 6
+    case = 7
     self_attention_matrix(model, case=case)
     self_attention_line(model, case=case)
