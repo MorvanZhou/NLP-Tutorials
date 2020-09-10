@@ -20,7 +20,7 @@ All code implementations in this tutorial are organized as following:
 5. Pretrained Models
   - [ELMo](/ELMO.py)
   - [GPT](/GPT.py)
-  - [BERT](/BERT.py) or my new attempt [Bert with self mask](/BERT_self_mask.py)
+  - [BERT](/BERT.py) or my new attempt [Bert with next mask](/BERT_next_mask.py)
  
 ## some of the results
 
@@ -41,6 +41,6 @@ transformer encoder-decoder attention visualization
 ![transformer attention](img/transformer0_decoder_encoder_attention.png)
 ![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
 
-bert self attention visualization
+bert next masked attention visualization
 
-![bert](img/bert_self_mask2_self_attention_line.png)
+![bert](img/bert_next_mask2_self_attention_line.png)
