@@ -20,7 +20,7 @@ All code implementations in this tutorial are organized as following:
 5. Pretrained Models
   - [ELMo](/ELMO.py)
   - [GPT](/GPT.py)
-  - [BERT](/BERT.py) or my new attempt [Bert with next mask](/BERT_next_mask.py)
+  - [BERT](/BERT.py) or my new attempt [Bert with window mask](/BERT_window_mask.py)
  
 ## some of the results
 
