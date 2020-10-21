@@ -42,7 +42,7 @@ class CBOW(keras.Model):
         # noise-contrastive estimation
         self.nce_w = self.add_weight(
             name="nce_w", shape=[v_dim, emb_dim],
-            initializer=keras.initializers.TruncatedNormal(0., 1.))  # [n_vocab, emb_dim]
+            initializer=keras.initializers.TruncatedNormal(0., 0.1))  # [n_vocab, emb_dim]
         self.nce_b = self.add_weight(
             name="nce_b", shape=(v_dim,),
             initializer=keras.initializers.Constant(0.1))  # [n_vocab, ]
