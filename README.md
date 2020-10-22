@@ -37,8 +37,8 @@ Skip-Gram [code](skip-gram.py)
 
 CBOW [code](CBOW.py)
 
-![](https://mofanpy.com/static/results-small/nlp/cbow_illustration.png)
-![](https://mofanpy.com/static/results-small/nlp/skip_gram_illustration.png)
+![](img/cbow_illustration.png)
+![](img/skip_gram_illustration.png)
 ![w2v](img/cbow.png)
 
 ## Seq2Seq
@@ -46,21 +46,21 @@ CBOW [code](CBOW.py)
 
 Seq2Seq [code](seq2seq.py)
 
-![](https://mofanpy.com/static/results-small/nlp/seq2seq_illustration.png)
+![](img/seq2seq_illustration.png)
 
 ## CNNLanguageModel
 [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
 CNN language model [code](cnn-lm.py)
 
-![](https://mofanpy.com/static/results-small/nlp/cnn-ml_sentence_embedding.png)
+![](img/cnn-ml_sentence_embedding.png)
 
 ## Seq2SeqAttention
 [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
 
 Seq2Seq Attention [code](seq2seq_attention.py)
 
-![](https://mofanpy.com/static/results-small/nlp/luong_attention.png)
+![](img/luong_attention.png)
 ![seq2seq attention](img/seq2seq_attention.png)
 
 ## Transformer
@@ -68,7 +68,7 @@ Seq2Seq Attention [code](seq2seq_attention.py)
 
 Transformer [code](transformer.py)
 
-![](https://mofanpy.com/static/results-small/nlp/transformer_encoder_decoder.png)
+![](img/transformer_encoder_decoder.png)
 ![transformer attention](img/transformer0_decoder_encoder_attention.png)
 ![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
 
@@ -77,17 +77,17 @@ Transformer [code](transformer.py)
 
 ELMO [code](ELMo.py)
 
-![](https://mofanpy.com/static/results-small/nlp/elmo_training.png)
-![](https://mofanpy.com/static/results-small/nlp/elmo_word_emb.png)
+![](img/elmo_training.png)
+![](img/elmo_word_emb.png)
 
 ## GPT
 [Improving Language Understanding by Generative Pre-Training](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 
 GPT [code](GPT.py)
 
-![](https://mofanpy.com/static/results-small/nlp/gpt_structure.png)
-![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention_line.png)
-![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention.png)
+![](img/gpt_structure.png)
+![](img/gpt7_self_attention_line.png)
+![](img/gpt7_self_attention.png)
 
 ## BERT
 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
@@ -96,5 +96,5 @@ BERT [code](BERT.py)
 
 My new attempt [Bert with window mask](BERT_window_mask.py)
 
-![](https://mofanpy.com/static/results-small/nlp/bert_gpt_comparison.png)
+![](img/bert_gpt_comparison.png)
 ![bert](img/bert_self_mask2_self_attention_line.png)
