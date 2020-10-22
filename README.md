@@ -69,7 +69,6 @@ Seq2Seq Attention [code](seq2seq_attention.py)
 Transformer [code](transformer.py)
 
 ![](img/transformer_encoder_decoder.png)
-![transformer attention](img/transformer0_decoder_encoder_attention.png)
 ![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
 
 ## ELMO
@@ -87,7 +86,6 @@ GPT [code](GPT.py)
 
 ![](img/gpt_structure.png)
 ![](img/gpt7_self_attention_line.png)
-![](img/gpt7_self_attention.png)
 
 ## BERT
 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
