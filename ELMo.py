@@ -1,3 +1,4 @@
+# [Deep contextualized word representations](https://arxiv.org/pdf/1802.05365.pdf)
 from tensorflow import keras
 import tensorflow as tf
 import numpy as np
