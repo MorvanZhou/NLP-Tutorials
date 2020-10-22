@@ -21,8 +21,10 @@ All code implementations in this tutorial are organized as following:
   - [ELMo](#ELMO)
   - [GPT](#GPT)
   - [BERT](#BERT)
- 
-## TF-IDF
+
+
+## Details
+### TF-IDF
 
 TF-IDF numpy [code](tf_idf.py)
 
@@ -30,7 +32,7 @@ TF-IDF short sklearn [code](tf_idf_sklearn.py)
 
 ![tf idf](img/tfidf_matrix.png)
 
-## Word2Vec
+### Word2Vec
 [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781.pdf)
 
 Skip-Gram [code](skip-gram.py)
@@ -41,21 +43,21 @@ CBOW [code](CBOW.py)
 ![](img/skip_gram_illustration.png)
 ![w2v](img/cbow.png)
 
-## Seq2Seq
+### Seq2Seq
 [Sequence to Sequence Learning with Neural Networks](https://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf)
 
 Seq2Seq [code](seq2seq.py)
 
 ![](img/seq2seq_illustration.png)
 
-## CNNLanguageModel
+### CNNLanguageModel
 [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
 CNN language model [code](cnn-lm.py)
 
 ![](img/cnn-ml_sentence_embedding.png)
 
-## Seq2SeqAttention
+### Seq2SeqAttention
 [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
 
 Seq2Seq Attention [code](seq2seq_attention.py)
@@ -63,7 +65,7 @@ Seq2Seq Attention [code](seq2seq_attention.py)
 ![](img/luong_attention.png)
 ![seq2seq attention](img/seq2seq_attention.png)
 
-## Transformer
+### Transformer
 [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
 
 Transformer [code](transformer.py)
@@ -71,7 +73,7 @@ Transformer [code](transformer.py)
 ![](img/transformer_encoder_decoder.png)
 ![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
 
-## ELMO
+### ELMO
 [Deep contextualized word representations](https://arxiv.org/pdf/1802.05365.pdf)
 
 ELMO [code](ELMo.py)
@@ -79,7 +81,7 @@ ELMO [code](ELMo.py)
 ![](img/elmo_training.png)
 ![](img/elmo_word_emb.png)
 
-## GPT
+### GPT
 [Improving Language Understanding by Generative Pre-Training](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 
 GPT [code](GPT.py)
@@ -87,7 +89,7 @@ GPT [code](GPT.py)
 ![](img/gpt_structure.png)
 ![](img/gpt7_self_attention_line.png)
 
-## BERT
+### BERT
 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
 
 BERT [code](BERT.py)
