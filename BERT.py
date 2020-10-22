@@ -1,3 +1,4 @@
+# [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
 import numpy as np
 import tensorflow as tf
 import utils
