@@ -13,9 +13,9 @@ All code implementations in this tutorial are organized as following:
   - [Skip-Gram](#Word2Vec)
 3. Understand Sentence (Seq2Seq)
   - [seq2seq](#Seq2Seq)
-  - [CNN language model](#CNN language model)
+  - [CNN language model](#CNNLanguageModel)
 4. All about Attention
-  - [seq2seq with attention](#Seq2Seq Attention)
+  - [seq2seq with attention](#Seq2SeqAttention)
   - [Transformer](#Transformer)
 5. Pretrained Models
   - [ELMo](#ELMO)
@@ -25,6 +25,7 @@ All code implementations in this tutorial are organized as following:
 ## TF-IDF
 
 TF-IDF numpy [code](tf_idf.py)
+
 TF-IDF short sklearn [code](tf_idf_sklearn.py)
 
 ![tf idf](img/tfidf_matrix.png)
@@ -47,14 +48,14 @@ Seq2Seq [code](seq2seq.py)
 
 ![](https://mofanpy.com/static/results-small/nlp/seq2seq_illustration.png)
 
-## CNN language model
+## CNNLanguageModel
 [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
 CNN language model [code](cnn-lm.py)
 
 ![](https://mofanpy.com/static/results-small/nlp/cnn-ml_sentence_embedding.png)
 
-## Seq2Seq Attention
+## Seq2SeqAttention
 [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
 
 Seq2Seq Attention [code](seq2seq_attention.py)
@@ -96,4 +97,4 @@ BERT [code](BERT.py)
 My new attempt [Bert with window mask](BERT_window_mask.py)
 
 ![](https://mofanpy.com/static/results-small/nlp/bert_gpt_comparison.png)
-![bert](img/bert_next_mask2_self_attention_line.png)
+![bert](img/bert_self_mask2_self_attention_line.png)
