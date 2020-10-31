@@ -21,80 +21,80 @@ All code implementations in this tutorial are organized as following:
   - [ELMo](#ELMO)
   - [GPT](#GPT)
   - [BERT](#BERT)
-
-
-## Details
-### TF-IDF
+ 
+## TF-IDF
 
 TF-IDF numpy [code](tf_idf.py)
 
 TF-IDF short sklearn [code](tf_idf_sklearn.py)
 
-![tf idf](img/tfidf_matrix.png)
+![tf idf](https://mofanpy.com/static/results-small/nlp/tfidf_matrix.png)
 
-### Word2Vec
+## Word2Vec
 [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781.pdf)
 
 Skip-Gram [code](skip-gram.py)
 
 CBOW [code](CBOW.py)
 
-![](img/cbow_illustration.png)
-![](img/skip_gram_illustration.png)
-![w2v](img/cbow.png)
+![](https://mofanpy.com/static/results-small/nlp/cbow_illustration.png)
+![](https://mofanpy.com/static/results-small/nlp/skip_gram_illustration.png)
+![w2v](https://mofanpy.com/static/results/nlp/cbow_code_result.png)
 
-### Seq2Seq
+## Seq2Seq
 [Sequence to Sequence Learning with Neural Networks](https://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf)
 
 Seq2Seq [code](seq2seq.py)
 
-![](img/seq2seq_illustration.png)
+![](https://mofanpy.com/static/results-small/nlp/seq2seq_illustration.png)
 
-### CNNLanguageModel
+## CNNLanguageModel
 [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
 CNN language model [code](cnn-lm.py)
 
-![](img/cnn-ml_sentence_embedding.png)
+![](https://mofanpy.com/static/results-small/nlp/cnn-ml_sentence_embedding.png)
 
-### Seq2SeqAttention
+## Seq2SeqAttention
 [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
 
 Seq2Seq Attention [code](seq2seq_attention.py)
 
-![](img/luong_attention.png)
-![seq2seq attention](img/seq2seq_attention.png)
+![](https://mofanpy.com/static/results-small/nlp/luong_attention.png)
+![seq2seq attention](https://mofanpy.com/static/results-small/nlp/seq2seq_attention_res.png)
 
-### Transformer
+## Transformer
 [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
 
 Transformer [code](transformer.py)
 
-![](img/transformer_encoder_decoder.png)
+![](https://mofanpy.com/static/results-small/nlp/transformer_encoder_decoder.png)
+![transformer attention](img/transformer0_decoder_encoder_attention.png)
 ![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
 
-### ELMO
+## ELMO
 [Deep contextualized word representations](https://arxiv.org/pdf/1802.05365.pdf)
 
 ELMO [code](ELMo.py)
 
-![](img/elmo_training.png)
-![](img/elmo_word_emb.png)
+![](https://mofanpy.com/static/results-small/nlp/elmo_training.png)
+![](https://mofanpy.com/static/results-small/nlp/elmo_word_emb.png)
 
-### GPT
+## GPT
 [Improving Language Understanding by Generative Pre-Training](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 
 GPT [code](GPT.py)
 
-![](img/gpt_structure.png)
-![](img/gpt7_self_attention_line.png)
+![](https://mofanpy.com/static/results-small/nlp/gpt_structure.png)
+![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention_line.png)
+![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention.png)
 
-### BERT
+## BERT
 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
 
 BERT [code](BERT.py)
 
 My new attempt [Bert with window mask](BERT_window_mask.py)
 
-![](img/bert_gpt_comparison.png)
-![bert](img/bert_self_mask2_self_attention_line.png)
+![](https://mofanpy.com/static/results-small/nlp/bert_gpt_comparison.png)
+![bert](https://mofanpy.com/static/results-small/nlp/bert_self_mask4_self_attention_line.png)
