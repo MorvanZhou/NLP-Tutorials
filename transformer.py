@@ -1,3 +1,4 @@
+# [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np

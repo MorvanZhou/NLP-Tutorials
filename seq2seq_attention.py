@@ -1,3 +1,4 @@
+# [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
