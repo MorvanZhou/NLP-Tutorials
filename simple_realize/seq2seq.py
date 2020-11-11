@@ -80,8 +80,8 @@ class Seq2Seq(keras.Model):
 
 
 class myTensorboard(keras.callbacks.TensorBoard):
-    def __init__(self, data, log_dir='logs', histogram_freq=0, write_graph=True, write_images=False,
-                 embeddings_freq=True, **kwargs):
+    def __init__(self, data, log_dir='logs/seq2seq', histogram_freq=10, write_graph=True, write_images=True,
+                 embeddings_freq=10, **kwargs):
         self.data = data
         super().__init__(log_dir=log_dir, histogram_freq=histogram_freq, write_graph=write_graph,
                          write_images=write_images, embeddings_freq=embeddings_freq, **kwargs)
@@ -95,6 +95,7 @@ class myTensorboard(keras.callbacks.TensorBoard):
             res = self.data.idx2str(y_[0])
             src = self.data.idx2str(x[0])
             print(
+                '\n',
                 "t: ", epoch,
                 "| input: ", src,
                 "| target: ", target,
@@ -106,6 +107,8 @@ class myTensorboard(keras.callbacks.TensorBoard):
 def train():
     # get and process data
     data = utils.DateData(DataSize)
+    train_x, train_y, train_l = data.sample(DataSize)
+
     print("Chinese time order: yy/mm/dd ", data.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", data.date_en[:3])
     print("vocabularies: ", data.vocab)
     print("x index sample: \n{}\n{}".format(data.idx2str(data.x[0]), data.x[0]),
@@ -117,7 +120,6 @@ def train():
 
     model.compile(optimizer=keras.optimizers.Adam(Learn_rate), loss=keras.losses.SparseCategoricalCrossentropy(False),
                   metrics=[keras.metrics.sparse_categorical_accuracy])
-    train_x, train_y, train_l = data.sample(DataSize)
     model.fit((train_x, train_y), train_y, callbacks=[myTensorboard(data)], batch_size=Batch_size, epochs=Epochs)
 
 
