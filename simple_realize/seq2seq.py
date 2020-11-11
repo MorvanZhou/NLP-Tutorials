@@ -4,8 +4,8 @@ from tensorflow import keras
 import utils
 
 Batch_size = 64
-Learn_rate = 0.001
-Epochs = 30
+Learn_rate = 0.01
+Epochs = 15
 DataSize = 8192
 
 
@@ -80,18 +80,17 @@ class Seq2Seq(keras.Model):
 
 
 class myTensorboard(keras.callbacks.TensorBoard):
-    def __init__(self, data, log_dir='logs/seq2seq', histogram_freq=10, write_graph=True, write_images=True,
+    def __init__(self, data, log_dir='logs/seq2seq', histogram_freq=1, write_graph=True, write_images=True,
                  embeddings_freq=10, **kwargs):
         self.data = data
         super().__init__(log_dir=log_dir, histogram_freq=histogram_freq, write_graph=write_graph,
                          write_images=write_images, embeddings_freq=embeddings_freq, **kwargs)
-
     def on_epoch_end(self, epoch, logs=None):
-        if (not epoch % 5):
+        if (not epoch % 1):
             x, y, l = self.data.sample(1)
             y_ = self.model((x, y), training=False)
             y_ = tf.argmax(y_, -1).numpy()
-            target = self.data.idx2str(y[0, 1:-1])
+            target = self.data.idx2str(y[0])
             res = self.data.idx2str(y_[0])
             src = self.data.idx2str(x[0])
             print(
@@ -117,7 +116,6 @@ def train():
     model = Seq2Seq(
         data.num_word, data.num_word, emb_dim=16, units=32,
         max_pred_len=11, start_token=data.start_token, end_token=data.end_token)
-
     model.compile(optimizer=keras.optimizers.Adam(Learn_rate), loss=keras.losses.SparseCategoricalCrossentropy(False),
                   metrics=[keras.metrics.sparse_categorical_accuracy])
     model.fit((train_x, train_y), train_y, callbacks=[myTensorboard(data)], batch_size=Batch_size, epochs=Epochs)
