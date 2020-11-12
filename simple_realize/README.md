@@ -24,13 +24,13 @@
 ##Word2Vec
 * [CBOW](CBOW.py)
 * [Skip-Gram](skip-gram.py)
-![](imgs/skip-gram.gif)
+![](./imgs/skip-gram.gif)
 
 ##Seq2Seq
 * [seq2seq](seq2seq.py)
 * [cnn-im](cnn-lm.py)
-![月份和数字聚在一起，而符号则分散开](imgs/seq2seq-embedding.gif)
+![月份和数字聚在一起，而符号则分散开](./imgs/seq2seq-embedding.gif)
 
 ##Seq2SeqAttention
 * [seq2seq_attention](seq2seq_attention.py)
-![](imgs/attention.gif)
+![](./imgs/attention.gif)
