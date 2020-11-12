@@ -17,7 +17,7 @@
   - [Skip-Gram](#Word2Vec)
 2. Understand Sentence (Seq2Seq)
   - [seq2seq](#Seq2Seq)
-  - [CNN language model](#CNNLanguageModel)
+  - [CNN language model](#Seq2Seq)
 3. All about Attention
   - [seq2seq with attention](#Seq2SeqAttention)
   
