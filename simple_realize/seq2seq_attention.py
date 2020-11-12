@@ -7,7 +7,7 @@ Batch_size = 64
 Learn_rate = 0.01
 Epochs = 15
 DataSize = 8192
-use_attention=False
+use_attention=True
 
 
 
