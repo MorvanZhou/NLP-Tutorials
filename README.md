@@ -22,7 +22,7 @@ All code implementations in this tutorial are organized as following:
   - [GPT](#GPT)
   - [BERT](#BERT)
 
-Thanks for the contribution made by @W1Fl with a simplified keras codes in [simple_realize](simple_realize)
+Thanks for the contribution made by [@W1Fl](https://github.com/W1Fl) with a simplified keras codes in [simple_realize](simple_realize)
 
 ## TF-IDF
 
