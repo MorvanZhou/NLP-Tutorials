@@ -21,7 +21,9 @@ All code implementations in this tutorial are organized as following:
   - [ELMo](#ELMO)
   - [GPT](#GPT)
   - [BERT](#BERT)
- 
+
+Thanks for the contribution made by @W1Fl with a simplified keras codes in [simple_realize](simple_realize)
+
 ## TF-IDF
 
 TF-IDF numpy [code](tf_idf.py)
