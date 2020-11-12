@@ -1,4 +1,7 @@
 # [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781.pdf)
+'''
+created by YuYang github.com/W1Fl
+'''
 from io import BytesIO
 
 import imageio
