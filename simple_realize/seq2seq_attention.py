@@ -1,4 +1,7 @@
 # [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
+'''
+created by YuYang github.com/W1Fl
+'''
 import tensorflow as tf
 from tensorflow import keras
 import utils
