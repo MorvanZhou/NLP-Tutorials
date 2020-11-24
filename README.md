@@ -24,6 +24,10 @@ All code implementations in this tutorial are organized as following:
 
 Thanks for the contribution made by [@W1Fl](https://github.com/W1Fl) with a simplified keras codes in [simple_realize](simple_realize)
 
+## Dependencies
+
+[requirements.txt](requirements.txt)
+
 ## TF-IDF
 
 TF-IDF numpy [code](tf_idf.py)
