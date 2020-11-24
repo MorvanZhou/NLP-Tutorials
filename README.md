@@ -31,7 +31,7 @@ $ git clone https://github.com/MorvanZhou/NLP-Tutorials
 $ cd NLP-Tutorials/
 $ sudo pip3 install -r requirements.txt
 ```
-[requirements.txt](requirements.txt)
+
 
 ## TF-IDF
 
