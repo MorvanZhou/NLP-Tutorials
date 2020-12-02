@@ -65,7 +65,7 @@ class ELMo(keras.Model):
         xs = [tf.concat((f[:, :-1, :], b[:, 1:, :]), axis=2).numpy() for f, b in zip(fxs, bxs)]
         for x in xs:
             print("layers shape=", x.shape)
-        return np.mean(xs)
+        return xs
 
 
 def train(model, data, step):
