@@ -21,7 +21,18 @@ All code implementations in this tutorial are organized as following:
   - [ELMo](#ELMO)
   - [GPT](#GPT)
   - [BERT](#BERT)
- 
+
+Thanks for the contribution made by [@W1Fl](https://github.com/W1Fl) with a simplified keras codes in [simple_realize](simple_realize)
+
+## Installation
+
+```shell script
+$ git clone https://github.com/MorvanZhou/NLP-Tutorials
+$ cd NLP-Tutorials/
+$ sudo pip3 install -r requirements.txt
+```
+
+
 ## TF-IDF
 
 TF-IDF numpy [code](tf_idf.py)
@@ -69,8 +80,8 @@ Seq2Seq Attention [code](seq2seq_attention.py)
 Transformer [code](transformer.py)
 
 ![](https://mofanpy.com/static/results-small/nlp/transformer_encoder_decoder.png)
-![transformer attention](img/transformer0_decoder_encoder_attention.png)
-![transformer attention line](img/transformer0_encoder_decoder_attention_line.png)
+![transformer attention](https://mofanpy.com/static/results-small/nlp/transformer0_decoder_encoder_attention.png)
+![transformer attention line](https://mofanpy.com/static/results-small/nlp/transformer0_encoder_decoder_attention_line.png)
 
 ## ELMO
 [Deep contextualized word representations](https://arxiv.org/pdf/1802.05365.pdf)
@@ -87,7 +98,6 @@ GPT [code](GPT.py)
 
 ![](https://mofanpy.com/static/results-small/nlp/gpt_structure.png)
 ![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention_line.png)
-![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention.png)
 
 ## BERT
 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
