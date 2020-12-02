@@ -71,16 +71,16 @@ class PositionWiseFFN(keras.layers.Layer):
 class EncodeLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.ln = [keras.layers.LayerNormalization() for _ in range(2)]
+        self.ln = [keras.layers.LayerNormalization(axis=[1, 2]) for _ in range(2)]
         self.mh = MultiHead(n_head, model_dim, drop_rate)
         self.ffn = PositionWiseFFN(model_dim)
         self.drop = keras.layers.Dropout(drop_rate)
 
     def call(self, xz, training, mask):
         attn = self.mh.call(xz, xz, xz, mask, training)       # [n, step, dim]
-        o1 = self.ln[0](attn + xz, training)
+        o1 = self.ln[0](attn + xz)
         ffn = self.drop(self.ffn.call(o1), training)
-        o = self.ln[1](ffn + o1, training)         # [n, step, dim]
+        o = self.ln[1](ffn + o1)         # [n, step, dim]
         return o
 
 
@@ -98,18 +98,18 @@ class Encoder(keras.layers.Layer):
 class DecoderLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.ln = [keras.layers.LayerNormalization() for _ in range(3)]
+        self.ln = [keras.layers.LayerNormalization(axis=[1, 2]) for _ in range(3)]
         self.drop = keras.layers.Dropout(drop_rate)
         self.mh = [MultiHead(n_head, model_dim, drop_rate) for _ in range(2)]
         self.ffn = PositionWiseFFN(model_dim)
 
     def call(self, yz, xz, training, look_ahead_mask, pad_mask):
         attn = self.mh[0].call(yz, yz, yz, look_ahead_mask, training)       # decoder self attention
-        o1 = self.ln[0](attn + yz, training)
+        o1 = self.ln[0](attn + yz)
         attn = self.mh[1].call(o1, xz, xz, pad_mask, training)       # decoder + encoder attention
-        o2 = self.ln[1](attn + o1, training)
+        o2 = self.ln[1](attn + o1)
         ffn = self.drop(self.ffn.call(o2), training)
-        o = self.ln[2](ffn + o2, training)
+        o = self.ln[2](ffn + o2)
         return o
 
 
