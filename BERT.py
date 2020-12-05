@@ -13,7 +13,8 @@ class BERT(GPT):
         super().__init__(model_dim, max_len, n_layer, n_head, n_vocab, lr, max_seg, drop_rate, padding_idx)
         # I think task emb is not necessary for pretraining,
         # because the aim of all tasks is to train a universal sentence embedding
-        # the body encoder is the same across all task, and the output layer defines each task.
+        # the body encoder is the same across all tasks,
+        # and different output layer defines different task just like transfer learning.
         # finetuning replaces output layer and leaves the body encoder unchanged.
 
         # self.task_emb = keras.layers.Embedding(
@@ -126,6 +127,7 @@ def export_attention(model, data, name="bert"):
 
 
 if __name__ == "__main__":
+    utils.set_soft_gpu(True)
     MODEL_DIM = 256
     N_LAYER = 4
     LEARNING_RATE = 1e-4

@@ -115,6 +115,7 @@ def export_attention(model, data, name="gpt"):
 
 
 if __name__ == "__main__":
+    # utils.set_soft_gpu(True)
     MODEL_DIM = 256
     N_LAYER = 4
     LEARNING_RATE = 1e-4
