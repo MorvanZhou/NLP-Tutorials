@@ -1,6 +1,6 @@
 # Natural Language Processing Tutorial
 
-Tutorial in Chinese can be found in [mofanpy.com](https://mofanpy.com/tutorials/machine-learning/nlp).
+Tutorial in Chinese can be found in [mofanpy.com](https://mofanpy.com/tutorials/machine-learning/nlp/).
 
 This repo includes many simple implementations of models in Neural Language Processing (NLP).
 
