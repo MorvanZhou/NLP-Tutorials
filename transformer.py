@@ -1,11 +1,12 @@
 # [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import utils
 import time
 import pickle
-import os
 
 
 MODEL_DIM = 32
@@ -13,6 +14,29 @@ MAX_LEN = 12
 N_LAYER = 3
 N_HEAD = 4
 DROP_RATE = 0.1
+
+
+class LayerNorm(keras.layers.Layer):
+    def __init__(self, epsilon=1e-5):
+        super().__init__()
+        self.epsilon = epsilon
+        self.gamma, self.beta = None, None
+
+    def build(self, input_shape):
+        self.gamma = self.add_weight(
+            name='gamma',
+            shape=[1],
+            initializer=keras.initializers.RandomNormal(1, 0.02))
+
+        self.beta = self.add_weight(
+            name='beta',
+            shape=[1],
+            initializer=keras.initializers.RandomNormal(0, 0.02))
+
+    def call(self, x, trainable=None):
+        ins_mean, ins_sigma = tf.nn.moments(x, axes=[1, 2], keepdims=True)  # on [n, step, dim]
+        x_ins = (x - ins_mean) * (tf.math.rsqrt(ins_sigma + self.epsilon))
+        return x_ins * self.gamma + self.beta
 
 
 class MultiHead(keras.layers.Layer):
@@ -71,7 +95,7 @@ class PositionWiseFFN(keras.layers.Layer):
 class EncodeLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.ln = [keras.layers.LayerNormalization(axis=[1, 2]) for _ in range(2)]
+        self.ln = [LayerNorm() for _ in range(2)]
         self.mh = MultiHead(n_head, model_dim, drop_rate)
         self.ffn = PositionWiseFFN(model_dim)
         self.drop = keras.layers.Dropout(drop_rate)
@@ -98,7 +122,7 @@ class Encoder(keras.layers.Layer):
 class DecoderLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.ln = [keras.layers.LayerNormalization(axis=[1, 2]) for _ in range(3)]
+        self.ln = [LayerNorm() for _ in range(3)]
         self.drop = keras.layers.Dropout(drop_rate)
         self.mh = [MultiHead(n_head, model_dim, drop_rate) for _ in range(2)]
         self.ffn = PositionWiseFFN(model_dim)
@@ -141,6 +165,7 @@ class PositionEmbedding(keras.layers.Layer):
     def call(self, x):
         x_embed = self.embeddings(x) + self.pe  # [n, step, dim]
         return x_embed
+
 
 class Transformer(keras.Model):
     def __init__(self, model_dim, max_len, n_layer, n_head, n_vocab, drop_rate=0.1, padding_idx=0):
@@ -197,13 +222,13 @@ class Transformer(keras.Model):
             y_embed = self.embed(y)
             decoded_z = self.decoder.call(
                 y_embed, encoded_z, False, look_ahead_mask=self._look_ahead_mask(y), pad_mask=self._pad_mask(y))
-            logit = self.o(decoded_z)[0, tgti, :].numpy()
-            idx = np.argmax(logit)
+            logit = self.o(decoded_z)[:, tgti, :].numpy()
+            idx = np.argmax(logit, axis=1)
             tgti += 1
-            tgt[0, tgti] = idx
-            if idx == v2i["<EOS>"] or tgti >= self.max_len:
+            tgt[:, tgti] = idx
+            if tgti >= self.max_len:
                 break
-        return "".join([i2v[i] for i in tgt[0, 1:tgti]])
+        return ["".join([i2v[i] for i in tgt[j, 1:tgti]]) for j in range(len(src))]
 
     @property
     def attentions(self):
@@ -263,5 +288,5 @@ if __name__ == "__main__":
           "\ny index sample: \n{}\n{}".format(d.idx2str(d.y[0]), d.y[0]))
 
     m = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, d.num_word, DROP_RATE)
-    train(m, d, step=600)
+    # train(m, d, step=600)
     export_attention(m, d)
