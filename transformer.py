@@ -1,13 +1,11 @@
 # [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import utils
 import time
 import pickle
-
+import os
 
 MODEL_DIM = 32
 MAX_LEN = 12
@@ -23,20 +21,22 @@ class LayerNorm(keras.layers.Layer):
         self.gamma, self.beta = None, None
 
     def build(self, input_shape):
+        # norm only on z-dim axis. If norm step-dim, the inference gets wrong
         self.gamma = self.add_weight(
             name='gamma',
-            shape=[1],
+            shape=input_shape[2:],
             initializer=keras.initializers.RandomNormal(1, 0.02))
-
         self.beta = self.add_weight(
             name='beta',
-            shape=[1],
+            shape=input_shape[2:],
             initializer=keras.initializers.RandomNormal(0, 0.02))
 
-    def call(self, x, trainable=None):
-        ins_mean, ins_sigma = tf.nn.moments(x, axes=[1, 2], keepdims=True)  # on [n, step, dim]
-        x_ins = (x - ins_mean) * (tf.math.rsqrt(ins_sigma + self.epsilon))
-        return x_ins * self.gamma + self.beta
+    def call(self, x, *args, **kwargs):
+        # norm only on z-dim axis. If norm step-dim, the inference gets wrong
+        mean = tf.reduce_mean(x, axis=[2], keepdims=True)
+        sigma = tf.math.reduce_std(x, axis=[2], keepdims=True)
+        x_norm = (x - mean) / (tf.math.sqrt(sigma + self.epsilon))
+        return x_norm * self.gamma + self.beta
 
 
 class MultiHead(keras.layers.Layer):
@@ -222,8 +222,8 @@ class Transformer(keras.Model):
             y_embed = self.embed(y)
             decoded_z = self.decoder.call(
                 y_embed, encoded_z, False, look_ahead_mask=self._look_ahead_mask(y), pad_mask=self._pad_mask(y))
-            logit = self.o(decoded_z)[:, tgti, :].numpy()
-            idx = np.argmax(logit, axis=1)
+            logits = self.o(decoded_z)[:, tgti, :].numpy()
+            idx = np.argmax(logits, axis=1)
             tgti += 1
             tgt[:, tgti] = idx
             if tgti >= self.max_len:
@@ -288,5 +288,5 @@ if __name__ == "__main__":
           "\ny index sample: \n{}\n{}".format(d.idx2str(d.y[0]), d.y[0]))
 
     m = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, d.num_word, DROP_RATE)
-    # train(m, d, step=600)
+    train(m, d, step=600)
     export_attention(m, d)
