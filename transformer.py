@@ -266,7 +266,7 @@ def train(model, data, step):
         pickle.dump({"v2i": data.v2i, "i2v": data.i2v}, f)
 
 
-def export_attention(model, data):
+def export_attention(model, data, name="transformer"):
     with open("./visual/tmp/transformer_v2i_i2v.pkl", "rb") as f:
         dic = pickle.load(f)
     model.load_weights("./visual/models/transformer/model.ckpt")
@@ -276,7 +276,9 @@ def export_attention(model, data):
         "src": [[data.i2v[i] for i in bx[j]] for j in range(len(bx))],
         "tgt": [[data.i2v[i] for i in by[j]] for j in range(len(by))],
         "attentions": model.attentions}
-    with open("./visual/tmp/transformer_attention_matrix.pkl", "wb") as f:
+    path = "./visual/tmp/%s_attention_matrix.pkl" % name
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
         pickle.dump(attn_data, f)
 
 

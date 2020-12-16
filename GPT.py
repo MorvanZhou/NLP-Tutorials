@@ -110,12 +110,14 @@ def export_attention(model, data, name="gpt"):
     seqs, segs, xlen, nsp_labels = data.sample(32)
     model.call(seqs[:, :-1], segs[:, :-1], False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
-    with open("./visual/tmp/%s_attention_matrix.pkl" % name, "wb") as f:
+    path = "./visual/tmp/%s_attention_matrix.pkl" % name
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
         pickle.dump(data, f)
 
 
 if __name__ == "__main__":
-    # utils.set_soft_gpu(True)
+    utils.set_soft_gpu(True)
     MODEL_DIM = 256
     N_LAYER = 4
     LEARNING_RATE = 1e-4

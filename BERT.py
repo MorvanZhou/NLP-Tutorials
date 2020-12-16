@@ -122,7 +122,9 @@ def export_attention(model, data, name="bert"):
     seqs, segs, xlen, nsp_labels = data.sample(32)
     model.call(seqs, segs, False)
     data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
-    with open("./visual/tmp/%s_attention_matrix.pkl" % name, "wb") as f:
+    path = "./visual/tmp/%s_attention_matrix.pkl" % name
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
         pickle.dump(data, f)
 
 
