@@ -284,6 +284,7 @@ def export_attention(model, data, name="transformer"):
 
 
 if __name__ == "__main__":
+    utils.set_soft_gpu(True)
     d = utils.DateData(4000)
     print("Chinese time order: yy/mm/dd ", d.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", d.date_en[:3])
     print("vocabularies: ", d.vocab)

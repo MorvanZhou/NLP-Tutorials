@@ -97,6 +97,7 @@ def export_w2v(model, data):
 
 
 if __name__ == "__main__":
+    utils.set_soft_gpu(True)
     UNITS = 256
     N_LAYERS = 2
     BATCH_SIZE = 16
