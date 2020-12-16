@@ -21,18 +21,18 @@ class LayerNorm(keras.layers.Layer):
         self.gamma, self.beta = None, None
 
     def build(self, input_shape):
-        # norm only on z-dim axis. If norm step-dim, the inference gets wrong
+        shape = [1, 1, input_shape[2]]
         self.gamma = self.add_weight(
             name='gamma',
-            shape=input_shape[2:],
+            shape=shape,
             initializer=keras.initializers.RandomNormal(1, 0.02))
         self.beta = self.add_weight(
             name='beta',
-            shape=input_shape[2:],
+            shape=shape,
             initializer=keras.initializers.RandomNormal(0, 0.02))
 
     def call(self, x, *args, **kwargs):
-        # norm only on z-dim axis. If norm step-dim, the inference gets wrong
+        # norm only on z-dim axis.
         mean = tf.reduce_mean(x, axis=[2], keepdims=True)
         sigma = tf.math.reduce_std(x, axis=[2], keepdims=True)
         x_norm = (x - mean) / (tf.math.sqrt(sigma + self.epsilon))
