@@ -262,6 +262,7 @@ def train(model, data, step):
 
     os.makedirs("./visual/models/transformer", exist_ok=True)
     model.save_weights("./visual/models/transformer/model.ckpt")
+    os.makedirs("./visual/tmp", exist_ok=True)
     with open("./visual/tmp/transformer_v2i_i2v.pkl", "wb") as f:
         pickle.dump({"v2i": data.v2i, "i2v": data.i2v}, f)
 
