@@ -15,7 +15,7 @@ DROP_RATE = 0.1
 
 
 class LayerNorm(keras.layers.Layer):
-    def __init__(self, epsilon=1e-5):
+    def __init__(self, epsilon=1e-6):
         super().__init__()
         self.epsilon = epsilon
         self.gamma, self.beta = None, None
@@ -34,8 +34,9 @@ class LayerNorm(keras.layers.Layer):
     def call(self, x, *args, **kwargs):
         # norm only on z-dim axis.
         mean = tf.reduce_mean(x, axis=[2], keepdims=True)
-        sigma = tf.math.reduce_std(x, axis=[2], keepdims=True)
-        x_norm = (x - mean) / (tf.math.sqrt(sigma + self.epsilon))
+        diff = x - mean
+        variance = tf.math.reduce_mean(tf.math.square(diff), axis=[2], keepdims=True)
+        x_norm = diff / tf.math.sqrt(variance + self.epsilon)
         return x_norm * self.gamma + self.beta
 
 
