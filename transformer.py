@@ -14,32 +14,6 @@ N_HEAD = 4
 DROP_RATE = 0.1
 
 
-class LayerNorm(keras.layers.Layer):
-    def __init__(self, epsilon=1e-6):
-        super().__init__()
-        self.epsilon = epsilon
-        self.gamma, self.beta = None, None
-
-    def build(self, input_shape):
-        shape = [1, 1, input_shape[2]]
-        self.gamma = self.add_weight(
-            name='gamma',
-            shape=shape,
-            initializer=keras.initializers.RandomNormal(1, 0.02))
-        self.beta = self.add_weight(
-            name='beta',
-            shape=shape,
-            initializer=keras.initializers.RandomNormal(0, 0.02))
-
-    def call(self, x, *args, **kwargs):
-        # norm only on z-dim axis.
-        mean = tf.reduce_mean(x, axis=[2], keepdims=True)
-        diff = x - mean
-        variance = tf.math.reduce_mean(tf.math.square(diff), axis=[2], keepdims=True)
-        x_norm = diff / tf.math.sqrt(variance + self.epsilon)
-        return x_norm * self.gamma + self.beta
-
-
 class MultiHead(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
@@ -96,7 +70,7 @@ class PositionWiseFFN(keras.layers.Layer):
 class EncodeLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.ln = [LayerNorm() for _ in range(2)]
+        self.ln = [keras.layers.LayerNormalization(axis=-1) for _ in range(2)]  # only norm z-dim
         self.mh = MultiHead(n_head, model_dim, drop_rate)
         self.ffn = PositionWiseFFN(model_dim)
         self.drop = keras.layers.Dropout(drop_rate)
@@ -123,15 +97,15 @@ class Encoder(keras.layers.Layer):
 class DecoderLayer(keras.layers.Layer):
     def __init__(self, n_head, model_dim, drop_rate):
         super().__init__()
-        self.ln = [LayerNorm() for _ in range(3)]
+        self.ln = [keras.layers.LayerNormalization(axis=-1) for _ in range(3)] # only norm z-dim
         self.drop = keras.layers.Dropout(drop_rate)
         self.mh = [MultiHead(n_head, model_dim, drop_rate) for _ in range(2)]
         self.ffn = PositionWiseFFN(model_dim)
 
-    def call(self, yz, xz, training, look_ahead_mask, pad_mask):
-        attn = self.mh[0].call(yz, yz, yz, look_ahead_mask, training)       # decoder self attention
+    def call(self, yz, xz, training, yz_look_ahead_mask, xz_pad_mask):
+        attn = self.mh[0].call(yz, yz, yz, yz_look_ahead_mask, training)       # decoder self attention
         o1 = self.ln[0](attn + yz)
-        attn = self.mh[1].call(o1, xz, xz, pad_mask, training)       # decoder + encoder attention
+        attn = self.mh[1].call(o1, xz, xz, xz_pad_mask, training)       # decoder + encoder attention
         o2 = self.ln[1](attn + o1)
         ffn = self.drop(self.ffn.call(o2), training)
         o = self.ln[2](ffn + o2)
@@ -143,9 +117,9 @@ class Decoder(keras.layers.Layer):
         super().__init__()
         self.ls = [DecoderLayer(n_head, model_dim, drop_rate) for _ in range(n_layer)]
 
-    def call(self, yz, xz, training, look_ahead_mask, pad_mask):
+    def call(self, yz, xz, training, yz_look_ahead_mask, xz_pad_mask):
         for l in self.ls:
-            yz = l.call(yz, xz, training, look_ahead_mask, pad_mask)
+            yz = l.call(yz, xz, training, yz_look_ahead_mask, xz_pad_mask)
         return yz
 
 
@@ -187,7 +161,7 @@ class Transformer(keras.Model):
         pad_mask = self._pad_mask(x)
         encoded_z = self.encoder.call(x_embed, training, mask=pad_mask)
         decoded_z = self.decoder.call(
-            y_embed, encoded_z, training, look_ahead_mask=self._look_ahead_mask(x), pad_mask=pad_mask)
+            y_embed, encoded_z, training, yz_look_ahead_mask=self._look_ahead_mask(y), xz_pad_mask=pad_mask)
         o = self.o(decoded_z)
         return o
 
@@ -222,7 +196,7 @@ class Transformer(keras.Model):
             y = tgt[:, :-1]
             y_embed = self.embed(y)
             decoded_z = self.decoder.call(
-                y_embed, encoded_z, False, look_ahead_mask=self._look_ahead_mask(y), pad_mask=self._pad_mask(y))
+                y_embed, encoded_z, False, yz_look_ahead_mask=self._look_ahead_mask(y), xz_pad_mask=self._pad_mask(src_pad))
             logits = self.o(decoded_z)[:, tgti, :].numpy()
             idx = np.argmax(logits, axis=1)
             tgti += 1
@@ -293,5 +267,5 @@ if __name__ == "__main__":
           "\ny index sample: \n{}\n{}".format(d.idx2str(d.y[0]), d.y[0]))
 
     m = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_HEAD, d.num_word, DROP_RATE)
-    train(m, d, step=600)
+    train(m, d, step=800)
     export_attention(m, d)

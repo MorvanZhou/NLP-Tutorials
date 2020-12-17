@@ -288,10 +288,10 @@ if __name__ == "__main__":
     # all_mask_kinds()
     # seq2seq_attention()
     # position_embedding()
-    # transformer_attention_matrix(case=0)
-    # transformer_attention_line(case=0)
+    transformer_attention_matrix(case=0)
+    transformer_attention_line(case=0)
 
-    model = ["gpt", "bert", "bert_window_mask"][1]
-    case = 6
-    self_attention_matrix(model, case=case)
-    self_attention_line(model, case=case)
+    # model = ["gpt", "bert", "bert_window_mask"][1]
+    # case = 6
+    # self_attention_matrix(model, case=case)
+    # self_attention_line(model, case=case)
