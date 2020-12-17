@@ -42,7 +42,7 @@ class MultiHead(keras.layers.Layer):
         s = q @ tf.transpose(k, [0, 1, 3, 2]) / (tf.math.sqrt(self.k_f) + 1e-8)
         if mask is not None:
             s += mask * -1e9
-        a = tf.nn.softmax(s)  # [b,h,attention,s]
+        a = tf.nn.softmax(s)
         self.attention = a
         b = a @ v
         o = tf.concat(tf.unstack(b, axis=1), 2) @ self.wo
@@ -188,7 +188,7 @@ class Transformer(keras.Model):
         pad_mask = self._pad_mask(x)
         encoded_z = self.encoder(x_embed, mask=pad_mask)
         decoded_z = self.decoder(
-            (encoded_z, y_embed), look_ahead_mask=self._look_ahead_mask(x), pad_mask=pad_mask)
+            (encoded_z, y_embed), look_ahead_mask=self._look_ahead_mask(y), pad_mask=pad_mask)
         o = self.o(decoded_z)
         return o
 
@@ -213,7 +213,7 @@ class Transformer(keras.Model):
             y = tgt[:, :-1]
             y_embed = self.embed(y)
             decoded_z = self.decoder(
-                (encoded_z, y_embed), look_ahead_mask=self._look_ahead_mask(src_pad), pad_mask=self._pad_mask(src_pad))
+                (encoded_z, y_embed), look_ahead_mask=self._look_ahead_mask(y), pad_mask=self._pad_mask(src_pad))
             logit = self.o(decoded_z)[:, tgti, :].numpy()
             idx = np.argmax(logit, 1)
             tgti += 1
