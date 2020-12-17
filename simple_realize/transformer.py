@@ -10,12 +10,12 @@ import utils
 
 MODEL_DIM = 32
 MAX_LEN = 12
-N_LAYER = 2
+N_LAYER = 3
 N_HEAD = 4
-DataSize = 6400
-Batch_size = 64
-Learn_rate = 0.001
-Epochs = 50
+DATA_SIZE = 6400
+BATCH_SIZE = 64
+LEARN_RATE = 0.001
+EPOCHS = 60
 
 
 class MultiHead(keras.layers.Layer):
@@ -27,18 +27,19 @@ class MultiHead(keras.layers.Layer):
     def build(self, input_shape):
         (q_b, q_t, q_f), (k_b, k_t, k_f), (v_b, v_t, v_f) = input_shape
         self.k_f = tf.cast(q_f, tf.float32)
-        self.wq = self.add_weight('wq', [self.n_head, q_f, q_f])
-        self.wk = self.add_weight('wk', [self.n_head, k_f, k_f])
-        self.wv = self.add_weight('wv', [self.n_head, v_f, v_f])
-        self.wo = self.add_weight('wo', [self.n_head * v_f, v_f])
+        h_dim = q_f // self.n_head
+        self.wq = self.add_weight('wq', [self.n_head, q_f, h_dim])
+        self.wk = self.add_weight('wk', [self.n_head, k_f, h_dim])
+        self.wv = self.add_weight('wv', [self.n_head, v_f, h_dim])
+        self.wo = self.add_weight('wo', [self.n_head * h_dim, v_f])
         super(MultiHead, self).build(input_shape)
 
     def call(self, inputs, mask=None, **kwargs):
         i_q, i_k, i_v = [i[:, tf.newaxis, ...] for i in inputs]  # add multihead axis
-        q = i_q @ self.wq  # [b,h,s,f]
+        q = i_q @ self.wq  # [b,h,s,h_dim]
         k = i_k @ self.wk
         v = i_v @ self.wv
-        s = k @ tf.transpose(q, [0, 1, 3, 2]) / (tf.math.sqrt(self.k_f) + 1e-8)
+        s = q @ tf.transpose(k, [0, 1, 3, 2]) / (tf.math.sqrt(self.k_f) + 1e-8)
         if mask is not None:
             s += mask * -1e9
         a = tf.nn.softmax(s)  # [b,h,attention,s]
@@ -112,9 +113,9 @@ class DecoderLayer(keras.layers.Layer):
 
     def call(self, inputs, look_ahead_mask=None, pad_mask=None, **kwargs):
         xz, yz = inputs
-        attn = self.mh[0]((yz, yz, yz), mask=look_ahead_mask)  # decoder self attention
+        attn = self.mh[0]([yz] * 3, mask=look_ahead_mask)  # decoder self attention
         o1 = self.ln[0](attn + yz)
-        attn = self.mh[1]((o1, xz, xz), mask=look_ahead_mask)  # decoder + encoder attention
+        attn = self.mh[1]([o1, xz, xz], mask=pad_mask)  # decoder + encoder attention
         o2 = self.ln[1](attn + o1)
         ffn = self.ffn(o2)
         o = self.ln[2](ffn + o2)
@@ -134,7 +135,7 @@ class Decoder(keras.layers.Layer):
     def call(self, inputs, look_ahead_mask=None, pad_mask=None):
         xz, yz = inputs
         for l in self.ls:
-            yz = l((yz, xz), look_ahead_mask, pad_mask)
+            yz = l((xz, yz), look_ahead_mask, pad_mask)
         return yz
 
 
@@ -164,7 +165,7 @@ class PositionEmbedding(keras.layers.Layer):
 
 
 class Transformer(keras.Model):
-    def __init__(self, model_dim, max_len, n_encoder_layer, n_decoder_layer, n_head, n_vocab, i2v, v2i, padding_idx=0):
+    def __init__(self, model_dim, max_len, n_encoder_layer, n_decoder_layer, n_head, n_vocab, padding_idx=0):
         super().__init__()
         self.n_vocab = n_vocab
         self.n_decoder_layer = n_decoder_layer
@@ -173,8 +174,6 @@ class Transformer(keras.Model):
         self.model_dim = model_dim
         self.max_len = max_len
         self.padding_idx = padding_idx
-        self.v2i = v2i
-        self.i2v = i2v
 
     def build(self, input_shape):
         self.embed = PositionEmbedding(self.max_len, self.model_dim, self.n_vocab)
@@ -189,7 +188,7 @@ class Transformer(keras.Model):
         pad_mask = self._pad_mask(x)
         encoded_z = self.encoder(x_embed, mask=pad_mask)
         decoded_z = self.decoder(
-            (y_embed, encoded_z), look_ahead_mask=self._look_ahead_mask(x), pad_mask=pad_mask)
+            (encoded_z, y_embed), look_ahead_mask=self._look_ahead_mask(x), pad_mask=pad_mask)
         o = self.o(decoded_z)
         return o
 
@@ -203,10 +202,10 @@ class Transformer(keras.Model):
         mask = tf.sign(pad_mask + mask[tf.newaxis, tf.newaxis, ...])
         return mask  # (step, step)
 
-    def translate(self, src):
-        src = tf.expand_dims(src, 0)
+    def translate(self, src, i2v, v2i):
+        src = tf.reshape(src, (-1, src.shape[-1]))
         src_pad = utils.pad_zero(src, self.max_len)
-        tgt = utils.pad_zero([[self.v2i["<GO>"]]], self.max_len + 1)
+        tgt = utils.pad_zero(v2i["<GO>"] * tf.ones_like(src), self.max_len + 1)
         tgti = 0
         x_embed = self.embed(src_pad)
         encoded_z = self.encoder(x_embed, mask=self._pad_mask(src_pad))
@@ -214,14 +213,14 @@ class Transformer(keras.Model):
             y = tgt[:, :-1]
             y_embed = self.embed(y)
             decoded_z = self.decoder(
-                (y_embed, encoded_z), look_ahead_mask=self._look_ahead_mask(y), pad_mask=self._pad_mask(y))
-            logit = self.o(decoded_z)[0, tgti, :].numpy()
-            idx = np.argmax(logit)
+                (encoded_z, y_embed), look_ahead_mask=self._look_ahead_mask(src_pad), pad_mask=self._pad_mask(src_pad))
+            logit = self.o(decoded_z)[:, tgti, :].numpy()
+            idx = np.argmax(logit, 1)
             tgti += 1
-            tgt[0, tgti] = idx
-            if idx == self.v2i["<EOS>"] or tgti >= self.max_len:
+            tgt[:, tgti] = idx
+            if tgti >= self.max_len:
                 break
-        return "".join([self.i2v[i] for i in tgt[0]])
+        return ["".join([i2v[i] for i in tgt[j, 1:tgti]]) for j in range(len(src))]
 
 
 class Loss(keras.losses.Loss):
@@ -245,49 +244,41 @@ class myTensorboard(keras.callbacks.TensorBoard):
                          write_images=write_images, embeddings_freq=embeddings_freq, **kwargs)
 
     def on_epoch_end(self, epoch, logs=None):
+        idx2str=lambda idx:[self.data.idx2str(i) for i in idx]
         if (not epoch % 1):
-            x, y, l = self.data.sample(1)
-            x = utils.pad_zero(x, MAX_LEN)
-            y = utils.pad_zero(y, MAX_LEN)
-            res_ = self.model(np.array([x, y])).numpy().argmax(2)
-            res_ = self.data.idx2str(res_[0])
-            res = self.model.translate(x[0])
-            target = self.data.idx2str(y[0])
-            src = self.data.idx2str(x[0])
+            (x, y), _ = load_data(self.data,3)
+            res = self.model.translate(x, self.data.i2v, self.data.v2i)
+            target =idx2str(y)
+            src = idx2str(x)
             print(
                 '\n',
-                "| input: ", src,
-                "| target: ", target,
-                "| inference: ", res,
-                "| training inference: ", res_,
-
+                "| input: ", *src,'\n',
+                "| target: ",*target,'\n',
+                "| inference: ", *res,'\n',
             )
         super(myTensorboard, self).on_epoch_end(epoch, logs)
 
 
-def load_data(data):
-    x, y, seq_len = data.sample(DataSize)
+def load_data(data,size):
+    x, y, seq_len = data.sample(size)
     x = utils.pad_zero(x, MAX_LEN)
     y = utils.pad_zero(y, MAX_LEN + 1)
     return (x, y[:, :-1]), y[:, 1:]
 
 
 def train(model: Transformer, data):
-    x, y = load_data(data)
-    Loss()(y, model(x))
+    x, y = load_data(data,DATA_SIZE)
     tb = myTensorboard(data)
-    model.compile(keras.optimizers.Adam(Learn_rate), loss=Loss())
-    model.fit(x, y, batch_size=Batch_size, epochs=Epochs, callbacks=[tb])
-    x = np.array([12, 12, 1, 4, 4, 1, 5, 4, 0, 0, 0, 0])
-    y = np.array([14, 5, 4, 2, 24, 2, 4, 12, 12, 12, 13, 0])
+    model.compile(keras.optimizers.Adam(LEARN_RATE), loss=Loss())
+    model.fit(x, y, batch_size=BATCH_SIZE, epochs=EPOCHS, callbacks=[tb])
 
 
 if __name__ == "__main__":
-    d = utils.DateData(DataSize)
+    d = utils.DateData(DATA_SIZE)
     print("Chinese time order: yy/mm/dd ", d.date_cn[:3], "\nEnglish time order: dd/M/yyyy ", d.date_en[:3])
     print("vocabularies: ", d.vocab)
     print("x index sample: \n{}\n{}".format(d.idx2str(d.x[0]), d.x[0]),
           "\ny index sample: \n{}\n{}".format(d.idx2str(d.y[0]), d.y[0]))
-    m = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_LAYER, N_HEAD, d.num_word, d.i2v, d.v2i)
+    m = Transformer(MODEL_DIM, MAX_LEN, N_LAYER, N_LAYER, N_HEAD, d.num_word)
     m.build([[None, 12], [None, 12]])
     train(m, d)
