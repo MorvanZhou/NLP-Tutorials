@@ -1,8 +1,8 @@
 # [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781.pdf)
 import tensorflow as tf
 from tensorflow import keras
-from utils import process_w2v_data
-from visual import show_w2v_word_embedding
+from utils import process_w2v_data      # this refers to utils.py in my [repo](https://github.com/MorvanZhou/NLP-Tutorials/)
+from visual import show_w2v_word_embedding  # this refers to visual.py in my [repo](https://github.com/MorvanZhou/NLP-Tutorials/)
 
 corpus = [
     # numbers

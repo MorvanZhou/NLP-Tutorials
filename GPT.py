@@ -1,7 +1,7 @@
 # [Improving Language Understanding by Generative Pre-Training](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 import tensorflow as tf
 from tensorflow import keras
-import utils
+import utils    # this refers to utils.py in my [repo](https://github.com/MorvanZhou/NLP-Tutorials/)
 import time
 from transformer import Encoder
 import pickle

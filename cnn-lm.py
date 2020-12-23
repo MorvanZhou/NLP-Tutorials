@@ -3,7 +3,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-import utils
+import utils    # this refers to utils.py in my [repo](https://github.com/MorvanZhou/NLP-Tutorials/)
 import tensorflow_addons as tfa
 
 

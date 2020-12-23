@@ -1,8 +1,7 @@
 # [Deep contextualized word representations](https://arxiv.org/pdf/1802.05365.pdf)
 from tensorflow import keras
 import tensorflow as tf
-import numpy as np
-import utils
+import utils    # this refers to utils.py in my [repo](https://github.com/MorvanZhou/NLP-Tutorials/)
 import time
 import os
 

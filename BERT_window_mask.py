@@ -1,6 +1,6 @@
 import tensorflow as tf
 from GPT import GPT, train, export_attention
-import utils
+import utils    # this refers to utils.py in my [repo](https://github.com/MorvanZhou/NLP-Tutorials/)
 
 
 class BERT(GPT):
