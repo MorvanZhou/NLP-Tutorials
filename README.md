@@ -39,7 +39,10 @@ TF-IDF numpy [code](tf_idf.py)
 
 TF-IDF short sklearn [code](tf_idf_sklearn.py)
 
-![tf idf](https://mofanpy.com/static/results-small/nlp/tfidf_matrix.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/tfidf_matrix.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/tfidf_matrix.png" height="250px" alt="image">
+</a>
+
 
 ## Word2Vec
 [Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/pdf/1301.3781.pdf)
@@ -48,56 +51,93 @@ Skip-Gram [code](skip-gram.py)
 
 CBOW [code](CBOW.py)
 
-![](https://mofanpy.com/static/results-small/nlp/cbow_illustration.png)
-![](https://mofanpy.com/static/results-small/nlp/skip_gram_illustration.png)
-![w2v](https://mofanpy.com/static/results/nlp/cbow_code_result.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/cbow_illustration.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/cbow_illustration.png" height="250px" alt="image">
+</a>
+
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/skip_gram_illustration.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/skip_gram_illustration.png" height="250px" alt="image">
+</a>
+
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/cbow_code_result.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/cbow_code_result.png" height="250px" alt="image">
+</a>
+
 
 ## Seq2Seq
 [Sequence to Sequence Learning with Neural Networks](https://papers.nips.cc/paper/5346-sequence-to-sequence-learning-with-neural-networks.pdf)
 
 Seq2Seq [code](seq2seq.py)
 
-![](https://mofanpy.com/static/results-small/nlp/seq2seq_illustration.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/seq2seq_illustration.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/seq2seq_illustration.png" height="250px" alt="image">
+</a>
 
 ## CNNLanguageModel
 [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
 CNN language model [code](cnn-lm.py)
 
-![](https://mofanpy.com/static/results-small/nlp/cnn-ml_sentence_embedding.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/cnn-ml_sentence_embedding.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/cnn-ml_sentence_embedding.png" height="250px" alt="image">
+</a>
+
 
 ## Seq2SeqAttention
 [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/pdf/1508.04025.pdf)
 
 Seq2Seq Attention [code](seq2seq_attention.py)
 
-![](https://mofanpy.com/static/results-small/nlp/luong_attention.png)
-![seq2seq attention](https://mofanpy.com/static/results-small/nlp/seq2seq_attention_res.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/luong_attention.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/luong_attention.png" height="250px" alt="image">
+</a>
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/seq2seq_attention_res.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/seq2seq_attention_res.png" height="250px" alt="image">
+</a>
+
+
 
 ## Transformer
 [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
 
 Transformer [code](transformer.py)
 
-![](https://mofanpy.com/static/results-small/nlp/transformer_encoder_decoder.png)
-![transformer attention](https://mofanpy.com/static/results-small/nlp/transformer0_decoder_encoder_attention.png)
-![transformer attention line](https://mofanpy.com/static/results-small/nlp/transformer0_encoder_decoder_attention_line.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/transformer_encoder_decoder.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/transformer_encoder_decoder.png" height="250px" alt="image">
+</a>
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/transformer0_decoder_encoder_attention.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/transformer0_decoder_encoder_attention.png" height="250px" alt="image">
+</a>
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/transformer0_encoder_decoder_attention_line.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/transformer0_encoder_decoder_attention_line.png" height="250px" alt="image">
+</a>
+
 
 ## ELMO
 [Deep contextualized word representations](https://arxiv.org/pdf/1802.05365.pdf)
 
 ELMO [code](ELMo.py)
 
-![](https://mofanpy.com/static/results-small/nlp/elmo_training.png)
-![](https://mofanpy.com/static/results-small/nlp/elmo_word_emb.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/elmo_training.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/elmo_training.png" height="250px" alt="image">
+</a>
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/elmo_word_emb.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/elmo_word_emb.png" height="250px" alt="image">
+</a>
+
 
 ## GPT
 [Improving Language Understanding by Generative Pre-Training](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 
 GPT [code](GPT.py)
 
-![](https://mofanpy.com/static/results-small/nlp/gpt_structure.png)
-![](https://mofanpy.com/static/results-small/nlp/gpt7_self_attention_line.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/gpt_structure.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/gpt_structure.png" height="250px" alt="image">
+</a>
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/gpt7_self_attention_line.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/gpt7_self_attention_line.png" height="250px" alt="image">
+</a>
+
 
 ## BERT
 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/pdf/1810.04805.pdf)
@@ -106,5 +146,10 @@ BERT [code](BERT.py)
 
 My new attempt [Bert with window mask](BERT_window_mask.py)
 
-![](https://mofanpy.com/static/results-small/nlp/bert_gpt_comparison.png)
-![bert](https://mofanpy.com/static/results-small/nlp/bert_self_mask4_self_attention_line.png)
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/bert_gpt_comparison.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/bert_gpt_comparison.png" height="250px" alt="image">
+</a>
+<a target="_blank" href="https://mofanpy.com/static/results/nlp/bert_self_mask4_self_attention_line.png" style="text-align: center">
+<img src="https://mofanpy.com/static/results/nlp/bert_self_mask4_self_attention_line.png" height="250px" alt="image">
+</a>
+
