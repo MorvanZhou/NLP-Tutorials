@@ -136,4 +136,4 @@ scores = docs_score(q)
 d_ids = scores.argsort()[-3:][::-1]
 print("\ntop 3 docs for '{}':\n{}".format(q, [docs[i] for i in d_ids]))
 
-show_tfidf(tf_idf.T, [i2v[i] for i in range(len(i2v))], "tfidf_matrix")
+show_tfidf(tf_idf.T, [i2v[i] for i in range(tf_idf.shape[0])], "tfidf_matrix")

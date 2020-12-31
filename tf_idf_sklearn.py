@@ -35,4 +35,5 @@ print("\ntop 3 docs for '{}':\n{}".format(q, [docs[i] for i in res[::-1]]))
 
 
 i2v = {i: v for v, i in vectorizer.vocabulary_.items()}
-show_tfidf(tf_idf.todense(), [i2v[i] for i in range(len(i2v))], "tfidf_sklearn_matrix")
+dense_tfidf = tf_idf.todense()
+show_tfidf(dense_tfidf, [i2v[i] for i in range(dense_tfidf.shape[1])], "tfidf_sklearn_matrix")

@@ -6,11 +6,11 @@ import os
 import utils
 
 
-def show_tfidf(tfidf, vocb, filename):
-    # [n_vocab, n_doc]
+def show_tfidf(tfidf, vocab, filename):
+    # [n_doc, n_vocab]
     plt.imshow(tfidf, cmap="YlGn", vmin=tfidf.min(), vmax=tfidf.max())
-    plt.xticks(np.arange(tfidf.shape[1]), vocb, fontsize=6, rotation=90)
-    plt.yticks(np.arange(tfidf.shape[0]), np.arange(1, tfidf.shape[1]+1), fontsize=6)
+    plt.xticks(np.arange(tfidf.shape[1]), vocab, fontsize=6, rotation=90)
+    plt.yticks(np.arange(tfidf.shape[0]), np.arange(1, tfidf.shape[0]+1), fontsize=6)
     plt.tight_layout()
     plt.savefig("./visual/results/%s.png" % filename, format="png", dpi=500)
     plt.show()
