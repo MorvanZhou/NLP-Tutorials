@@ -15,6 +15,17 @@ class GPT(keras.Model):
         self.n_vocab = n_vocab
         self.max_len = max_len
 
+        # I think task emb is not necessary for pretraining,
+        # because the aim of all tasks is to train a universal sentence embedding
+        # the body encoder is the same across all tasks,
+        # and different output layer defines different task just like transfer learning.
+        # finetuning replaces output layer and leaves the body encoder unchanged.
+
+        # self.task_emb = keras.layers.Embedding(
+        #     input_dim=n_task, output_dim=model_dim,  # [n_task, dim]
+        #     embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
+        # )
+
         self.word_emb = keras.layers.Embedding(
             input_dim=n_vocab, output_dim=model_dim,  # [n_vocab, dim]
             embeddings_initializer=tf.initializers.RandomNormal(0., 0.01),
