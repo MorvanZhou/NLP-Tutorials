@@ -61,7 +61,10 @@ class ELMo(keras.Model):
 
     def get_emb(self, seqs):
         fxs, bxs = self.call(seqs)
-        xs = [tf.concat((f[:, :-1, :], b[:, 1:, :]), axis=2).numpy() for f, b in zip(fxs, bxs)]
+        xs = [
+                 tf.concat((fxs[0][:, 1:, :], bxs[0][:, :-1, :]), axis=2).numpy()   # from word embedding
+             ] + [
+            tf.concat((f[:, :-1, :], b[:, 1:, :]), axis=2).numpy() for f, b in zip(fxs[1:], bxs[1:])] # from sentence embedding
         for x in xs:
             print("layers shape=", x.shape)
         return xs
