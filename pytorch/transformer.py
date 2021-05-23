@@ -2,10 +2,11 @@ import torch.nn as nn
 from torch.nn.functional import cross_entropy,softmax, relu
 import numpy as np
 import torch
+from torch.utils import data
 import utils
 from torch.utils.data import DataLoader
 
-MAX_LEN = 12
+MAX_LEN = 11
 
 class MultiHead(nn.Module):
     def __init__(self, n_head, model_dim, drop_rate):
@@ -107,11 +108,12 @@ class Encoder(nn.Module):
 class DecoderLayer(nn.Module):
     def __init__(self,n_head,model_dim,drop_rate):
         super().__init__()
-        self.mh = [MultiHead(n_head, model_dim, drop_rate) for _ in range(2)]
+        self.mh = nn.ModuleList([MultiHead(n_head, model_dim, drop_rate) for _ in range(2)])
         self.ffn = PositionWiseFFN(model_dim,drop_rate)
     
     def forward(self,yz, xz, training, yz_look_ahead_mask,xz_pad_mask):
         dec_output = self.mh[0](yz, yz, yz, yz_look_ahead_mask, training)
+        
         dec_output = self.mh[1](dec_output, xz, xz, xz_pad_mask, training)
 
         dec_output = self.ffn(dec_output)
@@ -144,8 +146,10 @@ class PositionEmbedding(nn.Module):
         self.pe = torch.from_numpy(pe).type(torch.float32)
         self.embeddings = nn.Embedding(n_vocab,emb_dim)
         self.embeddings.weight.data.normal_(0,0.1)
-    
+        
     def forward(self, x):
+        device = self.embeddings.weight.device
+        self.pe = self.pe.to(device)    
         x_embed = self.embeddings(x) + self.pe  # [n, step, dim]
         return x_embed
 
@@ -160,12 +164,12 @@ class Transformer(nn.Module):
         self.encoder = Encoder(n_head, emb_dim, drop_rate, n_layer)
         self.decoder = Decoder(n_head, emb_dim, drop_rate, n_layer)
         self.o = nn.Linear(emb_dim,n_vocab)
-        self.opt = torch.optim.Adam(self.parameters(),lr=0.001)
+        self.opt = torch.optim.Adam(self.parameters(),lr=0.002)
     
     def forward(self,x,y,training= None):
         x_embed, y_embed = self.embed(x), self.embed(y) # [n, step, emb_dim] * 2
         pad_mask = self._pad_mask(x)
-        encoded_z = self.encoder(x_embed,training,pad_mask) # [n, step, emb_dim]
+        encoded_z = self.encoder(x_embed,training,pad_mask) # [n, step, emb_dim]\
         yz_look_ahead_mask = self._look_ahead_mask(y)
         decoded_z = self.decoder(y_embed,encoded_z, training, yz_look_ahead_mask, pad_mask)
         o = self.o(decoded_z)   # [n, step, n_vocab]
@@ -178,57 +182,69 @@ class Transformer(nn.Module):
         loss = cross_entropy(logits.reshape(-1, self.dec_v_emb),y[:,1:].reshape(-1))
         loss.backward()
         self.opt.step()
-        return loss.detach().numpy(), logits
+        return loss.cpu().data.numpy(), logits
 
     def _pad_bool(self, seqs):
-        return torch.eq(seqs,self.padding_idx)
-    
+        o = torch.eq(seqs,self.padding_idx)
+        return o
     def _pad_mask(self, seqs):
-        mask = self._pad_bool(seqs)
-        return mask[:, None, None, :]
+        len_q = seqs.size(1)
+        mask = self._pad_bool(seqs).unsqueeze(1).expand(-1,len_q,-1)    # [n, len_q, step]
+        return mask.unsqueeze(1)
     
     def _look_ahead_mask(self,seqs):
+        device = next(self.parameters()).device
         batch_size, seq_len = seqs.shape
-        mask = torch.triu(torch.ones((seq_len,seq_len), dtype=torch.long), diagonal=1)  # [seq_len ,seq_len]
-        mask = torch.where(self._pad_bool(seqs)[:,None,None,:],1,mask[None,None,:,:])   # [n, 1, seq_len, seq_len]
-        return mask
+        mask = torch.triu(torch.ones((seq_len,seq_len), dtype=torch.long), diagonal=1).to(device)  # [seq_len ,seq_len]
+        mask = torch.where(self._pad_bool(seqs)[:,None,None,:],1,mask[None,None,:,:]).to(device)   # [n, 1, seq_len, seq_len]
+        return mask>0
     
     def translate(self, src, v2i, i2v):
-        src_pad = utils.pad_zero(src, self.max_len)
-        target = utils.pad_zero(np.array([[v2i["<GO>"], ] for _ in range(len(src))]), self.max_len+1)
+        self.eval()
+        device = next(self.parameters()).device
+        src_pad = src
+        target = torch.from_numpy(utils.pad_zero(np.array([[v2i["<GO>"], ] for _ in range(len(src))]), self.max_len+1)).to(device)
         x_embed = self.embed(src_pad)
         encoded_z = self.encoder(x_embed,False,mask=self._pad_mask(src_pad))
-        for i in range(1,self.max_len):
+        for i in range(0,self.max_len):
             y = target[:,:-1]
             y_embed = self.embed(y)
             decoded_z = self.decoder(y_embed,encoded_z,False,self._look_ahead_mask(y),self._pad_mask(src_pad))
-            logits = self.o(decoded_z)[:,i,:].data.numpy()
-            idx = np.argmax(logits,axis = 1)
-            target[:,i] = idx
-        return ["".join([i2v[i] for i in target[j,1:]]) for j in range(len(src))]
+            o = self.o(decoded_z)[:,i,:]
+            idx = o.argmax(dim = 1).detach()
+            target[:,i+1] = idx
+        self.train()
+        return target
 
 
 
 
 def train():
+    
     dataset = utils.DateData(4000)
     print("Chinese time order: yy/mm/dd ",dataset.date_cn[:3],"\nEnglish time order: dd/M/yyyy", dataset.date_en[:3])
     print("Vocabularies: ", dataset.vocab)
     print(f"x index sample:  \n{dataset.idx2str(dataset.x[0])}\n{dataset.x[0]}",
     f"\ny index sample:  \n{dataset.idx2str(dataset.y[0])}\n{dataset.y[0]}")
     loader = DataLoader(dataset,batch_size=32,shuffle=True)
-    model = Transformer(emb_dim=16,max_len=MAX_LEN, n_layer=3, n_head=4, n_vocab=dataset.num_word, drop_rate=0.1)
+    model = Transformer(n_vocab=dataset.num_word, max_len=MAX_LEN, n_layer = 3, emb_dim=64, n_head = 8, drop_rate=0.1, padding_idx=0)
+    if torch.cuda.is_available():
+        print("GPU train avaliable")
+        device =torch.device("cuda")
+        model = model.cuda()
+    else:
+        device = torch.device("cpu")
+        model = model.cpu()
     for i in range(100):
         for batch_idx , batch in enumerate(loader):
             bx, by, decoder_len = batch
-            bx, by = torch.from_numpy(utils.pad_zero(bx,max_len = MAX_LEN)).type(torch.LongTensor), torch.from_numpy(utils.pad_zero(by,MAX_LEN+1)).type(torch.LongTensor)
+            bx, by = torch.from_numpy(utils.pad_zero(bx,max_len = MAX_LEN)).type(torch.LongTensor).to(device), torch.from_numpy(utils.pad_zero(by,MAX_LEN+1)).type(torch.LongTensor).to(device)
             loss, logits = model.step(bx,by)
             if batch_idx%50 == 0:
-                logits = logits[0]
-                target = dataset.idx2str(by[0, 1:-1].data.numpy())
-                pred = logits.argmax(dim=1)
-                res = dataset.idx2str(pred.data.numpy())
-                src = dataset.idx2str(bx[0].data.numpy())
+                target = dataset.idx2str(by[0, 1:-1].cpu().data.numpy())
+                pred = model.translate(bx[0:1],dataset.v2i,dataset.i2v)
+                res = dataset.idx2str(pred[0].cpu().data.numpy())
+                src = dataset.idx2str(bx[0].cpu().data.numpy())
                 print(
                     "Epoch: ",i,
                     "| t: ", batch_idx,
