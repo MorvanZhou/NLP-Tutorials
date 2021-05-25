@@ -56,7 +56,7 @@ class DateData:
 
 
 def pad_zero(seqs, max_len):
-    padded = np.full((len(seqs), max_len), fill_value=PAD_ID, dtype=np.int32)
+    padded = np.full((len(seqs), max_len), fill_value=PAD_ID, dtype=np.long)
     for i, seq in enumerate(seqs):
         padded[i, :len(seq)] = seq
     return padded

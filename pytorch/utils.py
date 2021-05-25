@@ -47,6 +47,12 @@ class DateData(tDataset):
                 break
         return "".join(x)
 
+def pad_zero(seqs, max_len):
+    padded = np.full((len(seqs), max_len), fill_value=PAD_ID, dtype=np.int32)
+    for i, seq in enumerate(seqs):
+        padded[i, :len(seq)] = seq
+    return padded
+
 class Dataset:
     def __init__(self,x,y,v2i,i2v):
         self.x,self.y = x,y
