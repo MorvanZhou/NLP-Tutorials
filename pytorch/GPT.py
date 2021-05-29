@@ -2,6 +2,8 @@ from transformer import Encoder
 from torch import nn,optim
 from torch.nn.functional import cross_entropy,softmax, relu
 from torch.utils.data import DataLoader
+from torch.utils.data.dataloader import default_collate
+
 import torch
 import utils
 import os
@@ -21,6 +23,7 @@ class GPT(nn.Module):
         self.segment_emb.weight.data.normal_(0,0.1)
         self.position_emb = torch.empty(1,max_len,model_dim)
         nn.init.kaiming_normal_(self.position_emb,mode='fan_out', nonlinearity='relu')
+        self.position_emb = nn.Parameter(self.position_emb)
 
 
         self.encoder = Encoder(n_head=num_head, emb_dim=model_dim, drop_rate=drop_rate, n_layer=num_layer)
@@ -47,6 +50,8 @@ class GPT(nn.Module):
         return loss.cpu().data.numpy(), mlm_logits
     
     def input_emb(self,seqs, segs):
+        # device = next(self.parameters()).device
+        # self.position_emb = self.position_emb.to(device)
         return self.word_emb(seqs) + self.segment_emb(segs) + self.position_emb
     
     def mask(self, seqs):
@@ -58,8 +63,8 @@ class GPT(nn.Module):
         return mask>0   # [n, 1, seq_len, seq_len]
 
 def train():
-    MODEL_DIM = 256
-    N_LAYER = 4
+    MODEL_DIM = 512
+    N_LAYER = 8
     LEARNING_RATE = 1e-4
     dataset = utils.MRPCData("./MRPC",2000)
     print("num word: ",dataset.num_word)
@@ -67,11 +72,20 @@ def train():
         model_dim=MODEL_DIM, max_len=dataset.max_len-1, num_layer=N_LAYER, num_head=4, n_vocab=dataset.num_word,
         lr=LEARNING_RATE, max_seg=dataset.num_seg, drop_rate=0.2, padding_idx=dataset.pad_id
     )
+    if torch.cuda.is_available():
+        print("GPU train avaliable")
+        device =torch.device("cuda")
+        model = model.cuda()
+    else:
+        device = torch.device("cpu")
+        model = model.cpu()
+    
     loader = DataLoader(dataset,batch_size=32,shuffle=True)
+
     for epoch in range(100):
         for batch_idx, batch in enumerate(loader):
             seqs, segs,xlen,nsp_labels = batch
-            seqs, segs = seqs.type(torch.LongTensor), segs.type(torch.LongTensor)
+            seqs, segs,nsp_labels = seqs.type(torch.LongTensor).to(device), segs.type(torch.LongTensor).to(device),nsp_labels.to(device)
             # pred: [n, step, n_vocab]
             loss,pred = model.step(seqs=seqs[:,:-1], segs= segs[:,:-1], seqs_=seqs[:,1:], nsp_labels=nsp_labels)
             if batch_idx %100 == 0:
@@ -80,7 +94,7 @@ def train():
                     "Epoch: ",epoch,
                 "|batch: ", batch_idx,
                 "| loss: %.3f" % loss,
-                "\n| tgt: ", " ".join([dataset.i2v[i] for i in seqs[0, 1:].data.numpy()[:xlen[0].sum()+1]]),
+                "\n| tgt: ", " ".join([dataset.i2v[i] for i in seqs[0, 1:].cpu().data.numpy()[:xlen[0].sum()+1]]),
                 "\n| prd: ", " ".join([dataset.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
 

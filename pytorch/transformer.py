@@ -141,7 +141,7 @@ class PositionEmbedding(nn.Module):
     def __init__(self, max_len, emb_dim, n_vocab):
         super().__init__()
         pos = np.expand_dims(np.arange(max_len),1)  # [max_len, 1]
-        pe = pos / np.power(1000, 2*np.expand_dims(np.arange(emb_dim),0)/emb_dim)  # [max_len, emb_dim]
+        pe = pos / np.power(1000, 2*np.expand_dims(np.arange(emb_dim)//2,0)/emb_dim)  # [max_len, emb_dim]
         pe[:, 0::2] = np.sin(pe[:, 0::2])
         pe[:, 1::2] = np.cos(pe[:, 1::2])
         pe = np.expand_dims(pe,0) # [1, max_len, emb_dim]
