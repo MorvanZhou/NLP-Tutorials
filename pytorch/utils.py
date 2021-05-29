@@ -163,6 +163,57 @@ def _process_mrpc(dir="./MRPC", rows=None):
             data[n][m+"id"] = [[v2i[v] for v in c.split(" ")] for c in data[n][m]]
     return data, v2i, i2v
 
+class MRPCData(tDataset):
+    num_seg = 3
+    pad_id = PAD_ID
+
+    def __init__(self, data_dir="./MRPC/", rows=None, proxy=None):
+        maybe_download_mrpc(save_dir=data_dir, proxy=proxy)
+        data, self.v2i, self.i2v = _process_mrpc(data_dir, rows)
+        self.max_len = max(
+            [len(s1) + len(s2) + 3 for s1, s2 in zip(
+                data["train"]["s1id"] + data["test"]["s1id"], data["train"]["s2id"] + data["test"]["s2id"])])
+
+        self.xlen = np.array([
+            [
+                len(data["train"]["s1id"][i]), len(data["train"]["s2id"][i])
+             ] for i in range(len(data["train"]["s1id"]))], dtype=int)
+        x = [
+            [self.v2i["<GO>"]] + data["train"]["s1id"][i] + [self.v2i["<SEP>"]] + data["train"]["s2id"][i] + [self.v2i["<SEP>"]]
+            for i in range(len(self.xlen))
+        ]
+        self.x = pad_zero(x, max_len=self.max_len)
+        self.nsp_y = data["train"]["is_same"][:, None]
+
+        self.seg = np.full(self.x.shape, self.num_seg-1, np.int32)
+        for i in range(len(x)):
+            si = self.xlen[i][0] + 2
+            self.seg[i, :si] = 0
+            si_ = si + self.xlen[i][1] + 1
+            self.seg[i, si:si_] = 1
+
+        self.word_ids = np.array(list(set(self.i2v.keys()).difference(
+            [self.v2i[v] for v in ["<PAD>", "<MASK>", "<SEP>"]])))
+    
+    def __getitem__(self,idx):
+        return self.x[idx], self.seg[idx], self.xlen[idx], self.nsp_y[idx]
+
+    def sample(self, n):
+        bi = np.random.randint(0, self.x.shape[0], size=n)
+        bx, bs, bl, by = self.x[bi], self.seg[bi], self.xlen[bi], self.nsp_y[bi]
+        return bx, bs, bl, by
+
+    @property
+    def num_word(self):
+        return len(self.v2i)
+    
+    def __len__(self):
+        return len(self.x)
+
+    @property
+    def mask_id(self):
+        return self.v2i["<MASK>"]
+
 class MRPCSingle(tDataset):
     pad_id = PAD_ID
 
