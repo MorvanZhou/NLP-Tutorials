@@ -22,6 +22,7 @@ class MultiHead(nn.Module):
         self.o_dense = nn.Linear(model_dim, model_dim)
         self.o_drop = nn.Dropout(drop_rate)
         self.layer_norm = nn.LayerNorm(model_dim)
+        self.attention = None
 
     def forward(self,q,k,v,mask,training):
         # residual connect

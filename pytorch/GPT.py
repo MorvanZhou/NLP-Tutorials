@@ -7,6 +7,7 @@ from torch.utils.data.dataloader import default_collate
 import torch
 import utils
 import os
+import pickle
 
 class GPT(nn.Module):
 
@@ -61,6 +62,13 @@ class GPT(nn.Module):
         pad = torch.eq(seqs,self.padding_idx)   # [n, seq_len]
         mask = torch.where(pad[:,None,None,:],1,mask[None,None,:,:]).to(device)   # [n, 1, seq_len, seq_len]
         return mask>0   # [n, 1, seq_len, seq_len]
+    
+    @property
+    def attentions(self):
+        attentions = {
+            "encoder": [l.mh.attention.cpu().data.numpy() for l in self.encoder.encoder_layers]
+        }
+        return attentions
 
 def train():
     MODEL_DIM = 512
@@ -82,7 +90,7 @@ def train():
     
     loader = DataLoader(dataset,batch_size=32,shuffle=True)
 
-    for epoch in range(100):
+    for epoch in range(10):
         for batch_idx, batch in enumerate(loader):
             seqs, segs,xlen,nsp_labels = batch
             seqs, segs,nsp_labels = seqs.type(torch.LongTensor).to(device), segs.type(torch.LongTensor).to(device),nsp_labels.to(device)
@@ -97,7 +105,22 @@ def train():
                 "\n| tgt: ", " ".join([dataset.i2v[i] for i in seqs[0, 1:].cpu().data.numpy()[:xlen[0].sum()+1]]),
                 "\n| prd: ", " ".join([dataset.i2v[i] for i in pred[:xlen[0].sum()+1]]),
                 )
+    os.makedirs("./visual/models/gpt",exist_ok=True)
+    torch.save(model.state_dict(),"./visual/models/gpt/model.pth")
+    export_attention(model,device,dataset)
 
+def export_attention(model,device,data,name="gpt"):
+    model.load_state_dict(torch.load("./visual/models/gpt/model.pth",map_location=device))
+    seqs, segs,xlen,nsp_labels = data[:32]
+    seqs, segs,xlen,nsp_labels = torch.from_numpy(seqs),torch.from_numpy(segs),torch.from_numpy(xlen),torch.from_numpy(nsp_labels)
+    seqs, segs,nsp_labels = seqs.type(torch.LongTensor).to(device), segs.type(torch.LongTensor).to(device),nsp_labels.to(device)
+    model(seqs[:,:-1],segs[:,:-1],False)
+    seqs = seqs.cpu().data.numpy()
+    data = {"src": [[data.i2v[i] for i in seqs[j]] for j in range(len(seqs))], "attentions": model.attentions}
+    path = "./visual/tmp/%s_attention_matrix.pkl" % name
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "wb") as f:
+        pickle.dump(data, f)
 if __name__ == "__main__":
     train()
             
