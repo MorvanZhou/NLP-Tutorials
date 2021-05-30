@@ -71,8 +71,8 @@ class GPT(nn.Module):
         return attentions
 
 def train():
-    MODEL_DIM = 512
-    N_LAYER = 8
+    MODEL_DIM = 256
+    N_LAYER = 4
     LEARNING_RATE = 1e-4
     dataset = utils.MRPCData("./MRPC",2000)
     print("num word: ",dataset.num_word)
