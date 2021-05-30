@@ -90,7 +90,7 @@ def train():
     
     loader = DataLoader(dataset,batch_size=32,shuffle=True)
 
-    for epoch in range(10):
+    for epoch in range(100):
         for batch_idx, batch in enumerate(loader):
             seqs, segs,xlen,nsp_labels = batch
             seqs, segs,nsp_labels = seqs.type(torch.LongTensor).to(device), segs.type(torch.LongTensor).to(device),nsp_labels.to(device)
