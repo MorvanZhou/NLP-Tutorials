@@ -22,6 +22,7 @@ class MultiHead(nn.Module):
         self.o_dense = nn.Linear(model_dim, model_dim)
         self.o_drop = nn.Dropout(drop_rate)
         self.layer_norm = nn.LayerNorm(model_dim)
+        self.attention = None
 
     def forward(self,q,k,v,mask,training):
         # residual connect
@@ -141,7 +142,7 @@ class PositionEmbedding(nn.Module):
     def __init__(self, max_len, emb_dim, n_vocab):
         super().__init__()
         pos = np.expand_dims(np.arange(max_len),1)  # [max_len, 1]
-        pe = pos / np.power(1000, 2*np.expand_dims(np.arange(emb_dim),0)/emb_dim)  # [max_len, emb_dim]
+        pe = pos / np.power(1000, 2*np.expand_dims(np.arange(emb_dim)//2,0)/emb_dim)  # [max_len, emb_dim]
         pe[:, 0::2] = np.sin(pe[:, 0::2])
         pe[:, 1::2] = np.cos(pe[:, 1::2])
         pe = np.expand_dims(pe,0) # [1, max_len, emb_dim]

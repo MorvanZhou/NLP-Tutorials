@@ -94,6 +94,8 @@ def train():
     for i in range(100):
         for batch_idx , batch in enumerate(loader):
             bx, by, decoder_len = batch
+            bx = bx.type(torch.LongTensor)
+            by = by.type(torch.LongTensor)
             loss = model.step(bx,by)
             if batch_idx % 70 == 0:
                 target = dataset.idx2str(by[0, 1:-1].data.numpy())

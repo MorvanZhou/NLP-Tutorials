@@ -45,11 +45,15 @@ class Seq2Seq(nn.Module):
         dec_in = dec_emb_in[0]                  # [n, emb_dim]
         output = []
         for i in range(self.max_pred_len):
-            attn_prod = torch.matmul(self.attn(o),hx.unsqueeze(2))  # [n, step, 1]
-            attn_weight = softmax(attn_prod,dim=1)                  # [n, step, 1]
-            context = torch.matmul(o.permute(0,2,1),attn_weight)    # [n, units, 1]
+            attn_prod = torch.matmul(self.attn(hx.unsqueeze(1)),o.permute(0,2,1)) # [n, 1, step]
+            att_weight = softmax(attn_prod, dim=2)  # [n, 1, step]
+            context = torch.matmul(att_weight,o)    # [n, 1, units]
+            # attn_prod = torch.matmul(self.attn(o),hx.unsqueeze(2))  # [n, step, 1]
+            # attn_weight = softmax(attn_prod,dim=1)                  # [n, step, 1]
+            # context = torch.matmul(o.permute(0,2,1),attn_weight)    # [n, units, 1]
             hx, cx = self.decoder_cell(dec_in, (hx, cx))
-            hc = torch.cat([context.squeeze(2),hx],dim=1)           # [n, units *2]
+            hc = torch.cat([context.squeeze(1),hx],dim=1)           # [n, units *2]
+            # hc = torch.cat([context.squeeze(2),hx],dim=1)           # [n, units *2]
             result = self.decoder_dense(hc)
             result = result.argmax(dim=1).view(-1,1)
             dec_in=self.dec_embeddings(result).permute(1,0,2)[0]
@@ -67,11 +71,20 @@ class Seq2Seq(nn.Module):
         dec_emb_in = dec_emb_in.permute(1,0,2)      # [step, n, emb_dim]
         output = []
         for i in range(dec_emb_in.shape[0]):
-            attn_prod = torch.matmul(self.attn(o),hx.unsqueeze(2))  # [n, step, 1]
-            attn_weight = softmax(attn_prod,dim=1)                  # [n, step, 1]
-            context = torch.matmul(o.permute(0,2,1),attn_weight)    # [n, units, 1]
+            # General Attention:
+            # score(ht,hs) = (ht^T)(Wa)hs
+            # hs is the output from encoder
+            # ht is the previous hidden state from decoder
+            # self.attn(o): [n, step, units]
+            attn_prod = torch.matmul(self.attn(hx.unsqueeze(1)),o.permute(0,2,1)) # [n, 1, step]
+            att_weight = softmax(attn_prod, dim=2)  # [n, 1, step]
+            context = torch.matmul(att_weight,o)    # [n, 1, units]
+            # attn_prod = torch.matmul(self.attn(o),hx.unsqueeze(2))  # [n, step, 1]
+            # attn_weight = softmax(attn_prod,dim=1)                  # [n, step, 1]
+            # context = torch.matmul(o.permute(0,2,1),attn_weight)    # [n, units, 1]
             hx, cx = self.decoder_cell(dec_emb_in[i], (hx, cx))     # [n, units]
-            hc = torch.cat([context.squeeze(2),hx],dim=1)           # [n, units *2]
+            hc = torch.cat([context.squeeze(1),hx],dim=1)           # [n, units *2]
+            # hc = torch.cat([context.squeeze(2),hx],dim=1)           # [n, units *2]
             result = self.decoder_dense(hc)                              # [n, dec_v_dim]
             output.append(result)
         output = torch.stack(output,dim=0)  # [step, n, dec_v_dim]
