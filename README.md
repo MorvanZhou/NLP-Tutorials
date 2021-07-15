@@ -23,7 +23,7 @@ All code implementations in this tutorial are organized as following:
   - [BERT](#BERT)
 
 Thanks for the contribution made by [@W1Fl](https://github.com/W1Fl) with a simplified keras codes in [simple_realize](simple_realize).
-And the a pytorch version of this NLP tutorial made by [@ruifanxu](https://github.com/ruifan831).
+And the a [pytorch version of this NLP](/pytorch) tutorial made by [@ruifanxu](https://github.com/ruifan831).
 
 ## Installation
 
