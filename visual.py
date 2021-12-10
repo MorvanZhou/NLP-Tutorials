@@ -12,7 +12,11 @@ def show_tfidf(tfidf, vocab, filename):
     plt.xticks(np.arange(tfidf.shape[1]), vocab, fontsize=6, rotation=90)
     plt.yticks(np.arange(tfidf.shape[0]), np.arange(1, tfidf.shape[0]+1), fontsize=6)
     plt.tight_layout()
-    plt.savefig("./visual/results/%s.png" % filename, format="png", dpi=500)
+    # creating the output folder 
+    output_folder = './visual/results/'
+    if not os.path.exists(output_folder):
+       os.makedirs(output_folder)
+    plt.savefig(os.path.join(output_folder, '%s.png') % filename, format="png", dpi=500)
     plt.show()
 
 
