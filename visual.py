@@ -14,8 +14,7 @@ def show_tfidf(tfidf, vocab, filename):
     plt.tight_layout()
     # creating the output folder 
     output_folder = './visual/results/'
-    if not os.path.exists(output_folder):
-       os.makedirs(output_folder)
+    os.makedirs(output_folder, exist_ok=True)
     plt.savefig(os.path.join(output_folder, '%s.png') % filename, format="png", dpi=500)
     plt.show()
 
