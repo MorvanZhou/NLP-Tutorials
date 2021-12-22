@@ -95,10 +95,11 @@ class Seq2Seq(nn.Module):
         batch_size = x.shape[0]
         logit = self.train_logit(x,y)    
         dec_out = y[:,1:]
-        loss = cross_entropy(logit.reshape(-1,self.dec_v_dim),dec_out.reshape(-1))
+        loss = cross_entropy(logit.reshape(-1,self.dec_v_dim),dec_out.reshape(-1).long())
         loss.backward()
         self.opt.step()
         return loss.detach().numpy()
+
 
 
 def train():
