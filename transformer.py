@@ -127,7 +127,8 @@ class PositionEmbedding(keras.layers.Layer):
     def __init__(self, max_len, model_dim, n_vocab):
         super().__init__()
         pos = np.arange(max_len)[:, None]
-        pe = pos / np.power(10000, 2. * np.arange(model_dim)[None, :] / model_dim)  # [max_len, dim]
+#         pe = pos / np.power(10000, 2. * np.arange(model_dim)[None, :] / model_dim)  # [max_len, dim]
+        pe = pos / np.power(10000, 2. * (np.arange(model_dim)[None, :]//2) / model_dim)  # [max_len, dim] # 按照position embedding公式来应该是这样
         pe[:, 0::2] = np.sin(pe[:, 0::2])
         pe[:, 1::2] = np.cos(pe[:, 1::2])
         pe = pe[None, :, :]  # [1, max_len, model_dim]    for batch adding
