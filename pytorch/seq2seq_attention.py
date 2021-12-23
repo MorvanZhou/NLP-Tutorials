@@ -101,6 +101,7 @@ class Seq2Seq(nn.Module):
         return loss.detach().numpy()
 
 
+
 def train():
     dataset = utils.DateData(4000)
     print("Chinese time order: yy/mm/dd ",dataset.date_cn[:3],"\nEnglish time order: dd/M/yyyy", dataset.date_en[:3])
