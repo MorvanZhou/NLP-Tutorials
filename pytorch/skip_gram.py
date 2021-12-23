@@ -50,7 +50,7 @@ class SkipGram(nn.Module):
     def loss(self,x,y,training=None):
         embedded = self(x,training)
         pred= self.hidden_out(embedded)
-        return cross_entropy(pred,y)
+        return cross_entropy(pred,y.long())
     
     def step(self,x,y):
         self.opt.zero_grad()
@@ -81,6 +81,6 @@ if __name__ == "__main__":
     train(m,d)
 
     #plotting
-    show_w2v_word_embedding(m,d,"./visual/results/skipgram.png")
+    show_w2v_word_embedding(m,d,"./skipgram.png")
 
 

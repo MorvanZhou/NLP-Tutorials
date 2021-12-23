@@ -50,14 +50,14 @@ class CBOW(nn.Module):
     def loss(self, x, y, training=None):
         embedded = self(x,training)
         pred= self.hidden_out(embedded)
-        return cross_entropy(pred,y)
+        return cross_entropy(pred,y.long())
     
     def step(self,x,y):
         self.opt.zero_grad()
         loss = self.loss(x,y,True)
         loss.backward()
         self.opt.step()
-        return loss.detach().numpy()
+        return loss.detach().cpu().numpy()
 
 def train(model,data):
     if torch.cuda.is_available():
@@ -79,4 +79,4 @@ if __name__ == "__main__":
     m = CBOW(d.num_word, 2)
     train(m,d)
 
-    show_w2v_word_embedding(m,d,"./visual/results/cbow.png")
+    show_w2v_word_embedding(m,d,"./cbow.png")

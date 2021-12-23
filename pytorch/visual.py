@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 def show_w2v_word_embedding(model,data,path):
-    word_emb = model.embeddings.weight.data.numpy()
+    word_emb = model.embeddings.weight.data.cpu().numpy()
     for i in range(data.num_word):
         c = "blue"
         try:
