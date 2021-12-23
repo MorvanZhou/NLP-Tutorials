@@ -3,3 +3,6 @@
 visual/
 MRPC/
 img/
+*.py
+*.py
+pytorch/seq2seq_attention.py
