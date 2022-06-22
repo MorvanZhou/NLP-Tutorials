@@ -1,5 +1,5 @@
 matplotlib==3.2.1
-numpy==1.18.5
+numpy==1.22.0
 pandas==1.0.4
 requests==2.23.0
 sklearn==0.23.0
